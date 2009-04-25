@@ -281,6 +281,7 @@ enum sensor_cfg_t {
  CFG_GET_PREV_P_PL,
  CFG_GET_PICT_L_PF,
  CFG_GET_PICT_P_PL,
+ CFG_GET_AF_MAX_STEPS,
 
  CFG_GET_PICT_MAX_EXP_LC,
 
@@ -352,7 +353,7 @@ struct sensor_cfg_data_t {
  enum sensor_cfg_t cfgtype;
  enum sensor_mode_t mode;
  enum sensor_resolution_t rs;
-
+ uint8_t max_steps;
  union {
  int8_t effect;
  uint8_t lens_shading;
@@ -382,5 +383,6 @@ enum sensor_get_info_t {
 struct msm_camsensor_info_t {
  char name[MAX_SENSOR_NAME];
  int8_t flash_enabled;
+ int8_t total_steps;
 };
 #endif
