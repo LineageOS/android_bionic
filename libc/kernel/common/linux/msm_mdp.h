@@ -13,11 +13,16 @@
 #define _MSM_MDP_H_
 
 #include <linux/types.h>
+#include <linux/fb.h>
 
 #define MSMFB_IOCTL_MAGIC 'm'
 #define MSMFB_GRP_DISP _IOW(MSMFB_IOCTL_MAGIC, 1, unsigned int)
 #define MSMFB_BLIT _IOW(MSMFB_IOCTL_MAGIC, 2, unsigned int)
+#define MSMFB_SUSPEND_SW_REFRESHER _IOW(MSMFB_IOCTL_MAGIC, 128, unsigned int)
+#define MSMFB_RESUME_SW_REFRESHER _IOW(MSMFB_IOCTL_MAGIC, 129, unsigned int)
+#define MSMFB_CURSOR _IOW(MSMFB_IOCTL_MAGIC, 130, struct fb_cursor)
 
+#define MDP_IMGTYPE2_START 0x10000
 enum {
  MDP_RGB_565,
  MDP_XRGB_8888,
@@ -30,7 +35,10 @@ enum {
  MDP_Y_CBCR_H2V1,
  MDP_RGBA_8888,
  MDP_BGRA_8888,
- MDP_IMGTYPE_LIMIT
+ MDP_IMGTYPE_LIMIT,
+ MDP_BGR_565 = MDP_IMGTYPE2_START,
+ MDP_FB_FORMAT,
+ MDP_IMGTYPE_LIMIT2
 };
 
 enum {
@@ -45,7 +53,9 @@ enum {
 #define MDP_ROT_180 (MDP_FLIP_UD|MDP_FLIP_LR)
 #define MDP_ROT_270 (MDP_ROT_90|MDP_FLIP_UD|MDP_FLIP_LR)
 #define MDP_DITHER 0x8
-#define MDP_BLUR 0x10
+
+#define MDP_DEINTERLACE 0x80000000
+#define MDP_SHARPENING 0x40000000
 
 #define MDP_TRANSP_NOP 0xffffffff
 #define MDP_ALPHA_NOP 0xff
@@ -73,6 +83,7 @@ struct mdp_blit_req {
  uint32_t alpha;
  uint32_t transp_mask;
  uint32_t flags;
+ int sharpening_strength;
 };
 
 struct mdp_blit_req_list {
@@ -81,3 +92,4 @@ struct mdp_blit_req_list {
 };
 
 #endif
+
