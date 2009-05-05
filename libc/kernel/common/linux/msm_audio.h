@@ -86,6 +86,11 @@ struct msm_audio_stats {
 #define SND_MUTE_UNMUTED 0
 #define SND_MUTE_MUTED 1
 
+struct msm_mute_info {
+ uint32_t mute;
+ uint32_t path;
+};
+
 struct msm_snd_device_config {
  uint32_t device;
  uint32_t ear_mute;
