@@ -72,6 +72,7 @@ struct msm_audio_config {
  uint32_t channel_count;
  uint32_t sample_rate;
  uint32_t type;
+ uint32_t meta_field;
  uint32_t unused[3];
 };
 
