@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (c) 2009, Code Aurora Forum. All rights reserved.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -80,11 +81,7 @@ extern void __init_tls(void**  tls, void*  thread_info);
 extern int __set_tls(void *ptr);
 
 /* get the TLS */
-#ifdef __arm__
-#  define __get_tls() ( *((volatile void **) 0xffff0ff0) )
-#else
 extern void*  __get_tls( void );
-#endif
 
 /* return the stack base and size, used by our malloc debugger */
 extern void*  __get_stack_base(int  *p_stack_size);

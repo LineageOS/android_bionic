@@ -277,6 +277,7 @@ libc_common_src_files += \
 	bionic/eabi.c \
 	arch-arm/bionic/__get_pc.S \
 	arch-arm/bionic/__get_sp.S \
+	arch-arm/bionic/__get_tls.S \
 	arch-arm/bionic/_exit_with_stack_teardown.S \
 	arch-arm/bionic/_setjmp.S \
 	arch-arm/bionic/atomics_arm.S \
@@ -344,6 +345,10 @@ endif
 
 ifeq ($(TARGET_ARCH),arm)
   libc_common_cflags += -fstrict-aliasing
+endif
+
+ifneq (, $(filter msm7630_surf msm7630_ffa qsd8250_surf qsd8250_ffa, $(TARGET_PRODUCT)))
+  libc_common_cflags += -DCOPROC_TLS=1
 endif
 
 libc_common_c_includes := \
