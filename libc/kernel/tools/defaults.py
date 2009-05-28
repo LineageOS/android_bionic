@@ -16,7 +16,7 @@ kernel_dirs = [ "linux", "asm", "asm-generic", "mtd" ]
 
 # path to the directory containing the original kernel headers
 #
-kernel_original_path = os.path.normpath( find_program_dir() + '../original' )
+kernel_original_path = os.path.normpath( find_program_dir() + '/../original' )
 
 # a special value that is used to indicate that a given macro is known to be
 # undefined during optimization
