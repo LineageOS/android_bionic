@@ -35,7 +35,8 @@ enum {
  VDEC_EOS,
  VDEC_FRAME_FLUSH,
  VDEC_STREAM_SWITCH,
- VDEC_SUSPEND_FINISH
+ VDEC_SUSPEND_FINISH,
+ VDEC_BUFFER_CONSUMED
 };
 
 enum {
@@ -141,6 +142,7 @@ struct vdec_frame_info {
  u32 concealed_macblk_num;
  u32 flags;
  u32 performance_stats;
+ u32 data3;
 };
 
 struct vdec_buf_info {
