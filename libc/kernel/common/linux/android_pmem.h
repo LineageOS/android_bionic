@@ -23,6 +23,12 @@ struct pmem_region {
  unsigned long len;
 };
 
+struct pmem_addr {
+	unsigned long vaddr;
+	unsigned long offset;
+	unsigned long length;
+};
+
 #define PMEM_IOCTL_MAGIC 'p'
 #define PMEM_GET_PHYS _IOW(PMEM_IOCTL_MAGIC, 1, struct pmem_region *)
 #define PMEM_MAP _IOW(PMEM_IOCTL_MAGIC, 2, struct pmem_region *)
@@ -38,6 +44,10 @@ struct pmem_region {
 #define HW3D_REVOKE_GPU _IOW(PMEM_IOCTL_MAGIC, 8, unsigned int)
 #define HW3D_GRANT_GPU _IOW(PMEM_IOCTL_MAGIC, 9, unsigned int)
 #define HW3D_WAIT_IRQ _IOW(PMEM_IOCTL_MAGIC,10, unsigned int)
+
+#define PMEM_CLEAN_INV_CACHES	_IOW(PMEM_IOCTL_MAGIC, 11, unsigned int)
+#define PMEM_CLEAN_CACHES	_IOW(PMEM_IOCTL_MAGIC, 12, unsigned int)
+#define PMEM_INV_CACHES		_IOW(PMEM_IOCTL_MAGIC, 13, unsigned int)
 
 struct android_pmem_platform_data;
 struct pmem_file_operations {
