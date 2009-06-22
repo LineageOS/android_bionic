@@ -9,7 +9,7 @@ LOCAL_SRC_FILES:= \
 	debugger.c \
 	ba.c
 
-LINKER_TEXT_BASE := 0xB0000100
+LINKER_TEXT_BASE := 0x70000100
 
 # The maximum size set aside for the linker, from
 # LINKER_TEXT_BASE rounded down to a megabyte.
