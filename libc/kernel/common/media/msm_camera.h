@@ -240,6 +240,10 @@ enum msm_v4l2_ctrl_t {
  MSM_V4L2_MAX
 };
 
+#define PP_SNAP 0x01
+#define PP_RAW_SNAP ((0x01)<<1)
+#define PP_PREV ((0x01)<<2)
+
 struct crop_info_t {
  void *info;
  int len;
