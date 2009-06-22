@@ -21,6 +21,8 @@
 #define MSMFB_SUSPEND_SW_REFRESHER _IOW(MSMFB_IOCTL_MAGIC, 128, unsigned int)
 #define MSMFB_RESUME_SW_REFRESHER _IOW(MSMFB_IOCTL_MAGIC, 129, unsigned int)
 #define MSMFB_CURSOR _IOW(MSMFB_IOCTL_MAGIC, 130, struct fb_cursor)
+#define MSMFB_SET_LUT _IOW(MSMFB_IOCTL_MAGIC, 131, struct fb_cmap)
+#define MSMFB_HISTOGRAM _IOWR(MSMFB_IOCTL_MAGIC, 132, struct mdp_histogram)
 
 #define MDP_IMGTYPE2_START 0x10000
 enum {
@@ -91,5 +93,12 @@ struct mdp_blit_req_list {
  struct mdp_blit_req req[];
 };
 
-#endif
+struct mdp_histogram {
+ uint32_t frame_cnt;
+ uint32_t bin_cnt;
+ uint32_t *r;
+ uint32_t *g;
+ uint32_t *b;
+};
 
+#endif
