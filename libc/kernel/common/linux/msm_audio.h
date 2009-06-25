@@ -33,6 +33,10 @@
 #define AUDIO_PLAY_DTMF _IOW(AUDIO_IOCTL_MAGIC, 12, unsigned)
 #define AUDIO_GET_EVENT _IOR(AUDIO_IOCTL_MAGIC, 13, unsigned)
 #define AUDIO_ABORT_GET_EVENT _IOW(AUDIO_IOCTL_MAGIC, 14, unsigned)
+#define AUDIO_REGISTER_PMEM _IOW(AUDIO_IOCTL_MAGIC, 15, unsigned)
+#define AUDIO_DEREGISTER_PMEM _IOW(AUDIO_IOCTL_MAGIC, 16, unsigned)
+#define AUDIO_ASYNC_WRITE _IOW(AUDIO_IOCTL_MAGIC, 17, unsigned)
+#define AUDIO_ASYNC_READ _IOW(AUDIO_IOCTL_MAGIC, 18, unsigned)
 #define AUDIO_GET_PCM_CONFIG _IOR(AUDIO_IOCTL_MAGIC, 30, unsigned)
 #define AUDIO_SET_PCM_CONFIG _IOW(AUDIO_IOCTL_MAGIC, 31, unsigned)
 #define AUDIO_SWITCH_DEVICE _IOW(AUDIO_IOCTL_MAGIC, 32, unsigned)
@@ -80,6 +84,18 @@ struct msm_audio_stats {
  uint32_t byte_count;
  uint32_t sample_count;
  uint32_t unused[2];
+};
+
+struct msm_audio_pmem_info {
+ int fd;
+ void *vaddr;
+};
+
+struct msm_audio_aio_buf {
+ void *buf_addr;
+ uint32_t buf_len;
+ uint32_t data_len;
+ void *private_data;
 };
 
 #define SND_IOCTL_MAGIC 's'
@@ -130,8 +146,11 @@ struct msm_audio_pcm_config {
 
 #define AUDIO_EVENT_SUSPEND 0
 #define AUDIO_EVENT_RESUME 1
+#define AUDIO_EVENT_WRITE_DONE 2
+#define AUDIO_EVENT_READ_DONE   3
 
 union msm_audio_event_payload {
+ struct msm_audio_aio_buf aio_buf;
  int reserved;
 };
 
