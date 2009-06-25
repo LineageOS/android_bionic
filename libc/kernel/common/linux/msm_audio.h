@@ -41,6 +41,7 @@
 #define AUDIO_SET_PCM_CONFIG _IOW(AUDIO_IOCTL_MAGIC, 31, unsigned)
 #define AUDIO_SWITCH_DEVICE _IOW(AUDIO_IOCTL_MAGIC, 32, unsigned)
 #define AUDIO_SET_MUTE _IOW(AUDIO_IOCTL_MAGIC, 33, unsigned)
+#define AUDIO_GET_STREAM_INFO _IOR(AUDIO_IOCTL_MAGIC, 34,   struct msm_audio_bitstream_info)
 
 #define AUDIO_MAX_COMMON_IOCTL_NUM 100
 
@@ -147,10 +148,24 @@ struct msm_audio_pcm_config {
 #define AUDIO_EVENT_SUSPEND 0
 #define AUDIO_EVENT_RESUME 1
 #define AUDIO_EVENT_WRITE_DONE 2
-#define AUDIO_EVENT_READ_DONE   3
+#define AUDIO_EVENT_READ_DONE 3
+#define AUDIO_EVENT_STREAM_INFO 4
+
+#define AUDIO_CODEC_TYPE_MP3 0
+#define AUDIO_CODEC_TYPE_AAC 1
+
+struct msm_audio_bitstream_info {
+ uint32_t codec_type;
+ uint32_t chan_info;
+ uint32_t sample_rate;
+ uint32_t bit_stream_info;
+ uint32_t bit_rate;
+ uint32_t unused[3];
+};
 
 union msm_audio_event_payload {
  struct msm_audio_aio_buf aio_buf;
+ struct msm_audio_bitstream_info stream_info;
  int reserved;
 };
 
