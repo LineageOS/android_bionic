@@ -44,6 +44,7 @@
 #define AUDIO_GET_STREAM_INFO _IOR(AUDIO_IOCTL_MAGIC, 34,   struct msm_audio_bitstream_info)
 #define AUDIO_SET_PAN _IOW(AUDIO_IOCTL_MAGIC, 35, unsigned)
 #define AUDIO_SET_QCONCERT_PLUS _IOW(AUDIO_IOCTL_MAGIC, 36, unsigned)
+#define AUDIO_SET_MBADRC _IOW(AUDIO_IOCTL_MAGIC, 37, unsigned)
 
 #define AUDIO_MAX_COMMON_IOCTL_NUM 100
 
@@ -83,6 +84,11 @@
 #define EQ_ENABLE 0x0002
 #define IIR_ENABLE 0x0004
 #define QCONCERT_PLUS_ENABLE 0x0008
+#define MBADRC_ENABLE 0x0010
+
+#define AGC_ENABLE 0x0001
+#define NS_ENABLE 0x0002
+#define TX_IIR_ENABLE 0x0004
 
 struct msm_audio_config {
  uint32_t buffer_size;
