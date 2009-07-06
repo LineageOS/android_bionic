@@ -45,6 +45,7 @@
 #define AUDIO_SET_PAN _IOW(AUDIO_IOCTL_MAGIC, 35, unsigned)
 #define AUDIO_SET_QCONCERT_PLUS _IOW(AUDIO_IOCTL_MAGIC, 36, unsigned)
 #define AUDIO_SET_MBADRC _IOW(AUDIO_IOCTL_MAGIC, 37, unsigned)
+#define AUDIO_SET_VOLUME_PATH _IOW(AUDIO_IOCTL_MAGIC, 38, struct msm_vol_info)
 
 #define AUDIO_MAX_COMMON_IOCTL_NUM 100
 
@@ -125,6 +126,11 @@ struct msm_audio_aio_buf {
 
 struct msm_mute_info {
  uint32_t mute;
+ uint32_t path;
+};
+
+struct msm_vol_info {
+ uint32_t vol;
  uint32_t path;
 };
 
