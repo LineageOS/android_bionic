@@ -36,6 +36,8 @@ struct q6_init_config {
  unsigned short max_mvy;
  unsigned short enc_frame_height_inmb;
  unsigned short enc_frame_width_inmb;
+ unsigned short dvs_frame_height;
+ unsigned short dvs_frame_width;
  unsigned int ref_frame_buf1_phy;
  unsigned int ref_frame_buf2_phy;
  unsigned int rlc_buf1_phy;
@@ -69,7 +71,7 @@ struct encode_param {
 
 struct intra_refresh {
  unsigned int intra_refresh_enable;
- unsigned int bit_error_rate;
+ unsigned int intra_mb_num;
 };
 
 struct rc_config {
