@@ -63,6 +63,8 @@
 
 #define MSM_CAM_IOCTL_FLASH_LED_CFG   _IOW(MSM_CAM_IOCTL_MAGIC, 22, enum msm_camera_led_state_t *)
 
+#define MSM_CAM_IOCTL_AF_CTRL    _IOR(MSM_CAM_IOCTL_MAGIC, 23, struct msm_ctrl_cmt_t *)
+#define MSM_CAM_IOCTL_AF_CTRL_DONE  _IOW(MSM_CAM_IOCTL_MAGIC, 24, struct msm_ctrl_cmt_t *)
 #define MAX_SENSOR_NUM 3
 #define MAX_SENSOR_NAME 32
 
@@ -237,6 +239,10 @@ enum msm_v4l2_ctrl_t {
 
  MSM_V4L2_MAX
 };
+
+#define PP_SNAP 0x01
+#define PP_RAW_SNAP ((0x01)<<1)
+#define PP_PREV ((0x01)<<2)
 
 struct crop_info_t {
  void *info;
