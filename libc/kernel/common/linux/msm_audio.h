@@ -37,6 +37,8 @@
 #define AUDIO_DEREGISTER_PMEM _IOW(AUDIO_IOCTL_MAGIC, 16, unsigned)
 #define AUDIO_ASYNC_WRITE _IOW(AUDIO_IOCTL_MAGIC, 17, unsigned)
 #define AUDIO_ASYNC_READ _IOW(AUDIO_IOCTL_MAGIC, 18, unsigned)
+#define AUDIO_SET_INCALL _IOW(AUDIO_IOCTL_MAGIC, 19, struct msm_voicerec_mode)
+
 #define AUDIO_GET_PCM_CONFIG _IOR(AUDIO_IOCTL_MAGIC, 30, unsigned)
 #define AUDIO_SET_PCM_CONFIG _IOW(AUDIO_IOCTL_MAGIC, 31, unsigned)
 #define AUDIO_SWITCH_DEVICE _IOW(AUDIO_IOCTL_MAGIC, 32, unsigned)
@@ -92,6 +94,10 @@
 #define NS_ENABLE 0x0002
 #define TX_IIR_ENABLE 0x0004
 
+#define VOC_REC_UPLINK          0x00
+#define VOC_REC_DOWNLINK        0x01
+#define VOC_REC_BOTH            0x02
+
 struct msm_audio_config {
  uint32_t buffer_size;
  uint32_t buffer_count;
@@ -133,6 +139,12 @@ struct msm_mute_info {
 struct msm_vol_info {
  uint32_t vol;
  uint32_t path;
+};
+
+struct msm_voicerec_mode {
+
+ uint32_t rec_mode;
+
 };
 
 struct msm_snd_device_config {
