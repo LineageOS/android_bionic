@@ -44,6 +44,8 @@
 #define AUDIO_GET_STREAM_INFO _IOR(AUDIO_IOCTL_MAGIC, 34,   struct msm_audio_bitstream_info)
 #define AUDIO_SET_PAN _IOW(AUDIO_IOCTL_MAGIC, 35, unsigned)
 #define AUDIO_SET_QCONCERT_PLUS _IOW(AUDIO_IOCTL_MAGIC, 36, unsigned)
+#define AUDIO_SET_MBADRC _IOW(AUDIO_IOCTL_MAGIC, 37, unsigned)
+#define AUDIO_SET_VOLUME_PATH _IOW(AUDIO_IOCTL_MAGIC, 38, struct msm_vol_info)
 
 #define AUDIO_MAX_COMMON_IOCTL_NUM 100
 
@@ -70,6 +72,12 @@
 #define DEFAULT_RX 0x0F
 
 #define BT_A2DP_TX 0x10
+
+#define HEADSET_MONO_PLUS_SPKR_MONO_RX         0x11
+#define HEADSET_MONO_PLUS_SPKR_STEREO_RX       0x12
+#define HEADSET_STEREO_PLUS_SPKR_MONO_RX       0x13
+#define HEADSET_STEREO_PLUS_SPKR_STEREO_RX     0x14
+
 #define I2S_RX 0x20
 #define I2S_TX 0x21
 
@@ -77,6 +85,11 @@
 #define EQ_ENABLE 0x0002
 #define IIR_ENABLE 0x0004
 #define QCONCERT_PLUS_ENABLE 0x0008
+#define MBADRC_ENABLE 0x0010
+
+#define AGC_ENABLE 0x0001
+#define NS_ENABLE 0x0002
+#define TX_IIR_ENABLE 0x0004
 
 struct msm_audio_config {
  uint32_t buffer_size;
@@ -113,6 +126,11 @@ struct msm_audio_aio_buf {
 
 struct msm_mute_info {
  uint32_t mute;
+ uint32_t path;
+};
+
+struct msm_vol_info {
+ uint32_t vol;
  uint32_t path;
 };
 
