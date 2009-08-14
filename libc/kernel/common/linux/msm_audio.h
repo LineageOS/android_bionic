@@ -38,12 +38,16 @@
 #define AUDIO_ASYNC_WRITE _IOW(AUDIO_IOCTL_MAGIC, 17, unsigned)
 #define AUDIO_ASYNC_READ _IOW(AUDIO_IOCTL_MAGIC, 18, unsigned)
 #define AUDIO_SET_INCALL _IOW(AUDIO_IOCTL_MAGIC, 19, struct msm_voicerec_mode)
-
+#define AUDIO_GET_NUM_SND_DEVICE _IOR(AUDIO_IOCTL_MAGIC, 20, unsigned)
+#define AUDIO_GET_SND_DEVICES _IOWR(AUDIO_IOCTL_MAGIC, 21,   struct msm_snd_device_list)
+#define AUDIO_ENABLE_SND_DEVICE _IOW(AUDIO_IOCTL_MAGIC, 22, unsigned)
+#define AUDIO_DISABLE_SND_DEVICE _IOW(AUDIO_IOCTL_MAGIC, 23, unsigned)
+#define AUDIO_ROUTE_STREAM _IOW(AUDIO_IOCTL_MAGIC, 24,   struct msm_audio_route_config)
 #define AUDIO_GET_PCM_CONFIG _IOR(AUDIO_IOCTL_MAGIC, 30, unsigned)
 #define AUDIO_SET_PCM_CONFIG _IOW(AUDIO_IOCTL_MAGIC, 31, unsigned)
 #define AUDIO_SWITCH_DEVICE _IOW(AUDIO_IOCTL_MAGIC, 32, unsigned)
 #define AUDIO_SET_MUTE _IOW(AUDIO_IOCTL_MAGIC, 33, unsigned)
-#define AUDIO_GET_STREAM_INFO _IOR(AUDIO_IOCTL_MAGIC, 34,   struct msm_audio_bitstream_info)
+#define AUDIO_GET_STREAM_INFO _IOR(AUDIO_IOCTL_MAGIC, 34, struct msm_audio_bitstream_info)
 #define AUDIO_SET_PAN _IOW(AUDIO_IOCTL_MAGIC, 35, unsigned)
 #define AUDIO_SET_QCONCERT_PLUS _IOW(AUDIO_IOCTL_MAGIC, 36, unsigned)
 #define AUDIO_SET_MBADRC _IOW(AUDIO_IOCTL_MAGIC, 37, unsigned)
@@ -76,10 +80,10 @@
 
 #define BT_A2DP_TX 0x10
 
-#define HEADSET_MONO_PLUS_SPKR_MONO_RX         0x11
-#define HEADSET_MONO_PLUS_SPKR_STEREO_RX       0x12
-#define HEADSET_STEREO_PLUS_SPKR_MONO_RX       0x13
-#define HEADSET_STEREO_PLUS_SPKR_STEREO_RX     0x14
+#define HEADSET_MONO_PLUS_SPKR_MONO_RX 0x11
+#define HEADSET_MONO_PLUS_SPKR_STEREO_RX 0x12
+#define HEADSET_STEREO_PLUS_SPKR_MONO_RX 0x13
+#define HEADSET_STEREO_PLUS_SPKR_STEREO_RX 0x14
 
 #define I2S_RX 0x20
 #define I2S_TX 0x21
@@ -94,9 +98,9 @@
 #define NS_ENABLE 0x0002
 #define TX_IIR_ENABLE 0x0004
 
-#define VOC_REC_UPLINK          0x00
-#define VOC_REC_DOWNLINK        0x01
-#define VOC_REC_BOTH            0x02
+#define VOC_REC_UPLINK 0x00
+#define VOC_REC_DOWNLINK 0x01
+#define VOC_REC_BOTH 0x02
 
 struct msm_audio_config {
  uint32_t buffer_size;
@@ -213,5 +217,31 @@ struct msm_audio_event {
  int event_type;
  int timeout_ms;
  union msm_audio_event_payload event_payload;
+};
+
+#define MSM_SNDDEV_CAP_RX 0x1
+#define MSM_SNDDEV_CAP_TX 0x2
+#define MSM_SNDDEV_CAP_VOICE 0x4
+
+struct msm_snd_device_info {
+ uint32_t dev_id;
+ uint32_t dev_cap;
+ char dev_name[64];
+};
+
+struct msm_snd_device_list {
+ uint32_t num_dev;
+ struct msm_snd_device_info *list;
+};
+
+#define AUDIO_ROUTE_STREAM_VOICE_RX 0
+#define AUDIO_ROUTE_STREAM_VOICE_TX 1
+#define AUDIO_ROUTE_STREAM_PLAYBACK 2
+#define AUDIO_ROUTE_STREAM_REC 3
+
+struct msm_audio_route_config {
+ uint32_t stream_type;
+ uint32_t stream_id;
+ uint32_t dev_id;
 };
 #endif
