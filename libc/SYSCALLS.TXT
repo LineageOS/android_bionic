@@ -225,6 +225,12 @@ int     __syslog:syslog(int, char *, int)  103
 int     init_module(void *, unsigned long, const char *)  128
 int     delete_module(const char*, unsigned int)   129
 int     klogctl:syslog(int, char *, int)   103
+# easyweb2:
+#  09-08-15
+#   o Add system calls needed by udev daemon
+#
+int     readlinkat(int dirfd, const char *, char *, size_t)  305
+int 	signalfd(int fd, const sigset_t *mask, int flags) 321
 
 # futex
 int	futex(void *, int, int, void *, void *, int) 240

@@ -126,6 +126,8 @@
 #define __NR_init_module                  (__NR_SYSCALL_BASE + 128)
 #define __NR_delete_module                (__NR_SYSCALL_BASE + 129)
 #define __NR_syslog                       (__NR_SYSCALL_BASE + 103)
+#define __NR_readlinkat                   (__NR_SYSCALL_BASE + 305)
+#define __NR_signalfd                     (__NR_SYSCALL_BASE + 321)
 #define __NR_futex                        (__NR_SYSCALL_BASE + 240)
 #define __NR_poll                         (__NR_SYSCALL_BASE + 168)
 
