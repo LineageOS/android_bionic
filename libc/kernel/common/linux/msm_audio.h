@@ -125,6 +125,7 @@ struct msm_audio_aio_buf {
  uint32_t buf_len;
  uint32_t data_len;
  void *private_data;
+ unsigned short mfield_sz; /*only useful for data has meta field */
 };
 
 #define SND_IOCTL_MAGIC 's'
