@@ -229,9 +229,9 @@ int     klogctl:syslog(int, char *, int)   103
 #  09-08-15
 #   o Add system calls needed by udev daemon
 #
-int     readlinkat(int dirfd, const char *, char *, size_t)  305
-int 	signalfd(int fd, const sigset_t *mask, int flags) 321
-
+int     readlinkat(int, const char *, char *, size_t)  305
+int 	signalfd(int, const sigset_t *, int) 321
+ 
 # futex
 int	futex(void *, int, int, void *, void *, int) 240
 
