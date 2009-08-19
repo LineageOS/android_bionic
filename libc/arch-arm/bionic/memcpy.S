@@ -141,7 +141,7 @@ cached_aligned32:
          */
 
 1:      ldmia       r1!, { r4-r11 }
-        PLD         [r12, #32]
+        PLD         [r1, #32]
         subs        r2, r2, #32
 
         stmia       r0!, { r4-r11 }
