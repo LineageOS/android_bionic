@@ -288,7 +288,6 @@ libc_common_src_files += \
 	arch-arm/bionic/tkill.S \
 	arch-arm/bionic/memcmp.S \
 	arch-arm/bionic/memcmp16.S \
-	arch-arm/bionic/memcpy.S \
 	arch-arm/bionic/memset.S \
 	arch-arm/bionic/setjmp.S \
 	arch-arm/bionic/sigsetjmp.S \
