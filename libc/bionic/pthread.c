@@ -55,7 +55,7 @@ void _thread_created_hook(pid_t thread_id) __attribute__((noinline));
 #define PTHREAD_ATTR_FLAG_USER_STACK    0x00000002
 
 #define DEFAULT_STACKSIZE (1024 * 1024)
-#define STACKBASE 0x60000000
+#define STACKBASE 0x10000000
 
 static uint8_t * gStackBase = (uint8_t *)STACKBASE;
 
