@@ -1538,7 +1538,11 @@ int pthread_kill(pthread_t tid, int sig)
     int  old_errno = errno;
     pthread_internal_t * thread = (pthread_internal_t *)tid;
 
+    if (!thread)
+        return ESRCH;
+
     ret = tkill(thread->kernel_id, sig);
+
     if (ret < 0) {
         ret = errno;
         errno = old_errno;
