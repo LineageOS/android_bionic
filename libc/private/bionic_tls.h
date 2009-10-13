@@ -88,7 +88,12 @@ extern void __init_tls(void**  tls, void*  thread_info);
 extern int __set_tls(void *ptr);
 
 /* get the TLS */
+#ifdef __arm__
+typedef void* (__get_tls_t)(void);
+static const __get_tls_t* __get_tls = (const __get_tls_t *)0xffff0fe0;
+#else
 extern void*  __get_tls( void );
+#endif
 
 /* return the stack base and size, used by our malloc debugger */
 extern void*  __get_stack_base(int  *p_stack_size);
