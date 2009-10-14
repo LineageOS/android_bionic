@@ -17,6 +17,10 @@
 #define AUDIO_SET_AAC_CONFIG _IOW(AUDIO_IOCTL_MAGIC,   (AUDIO_MAX_COMMON_IOCTL_NUM+0), unsigned)
 #define AUDIO_GET_AAC_CONFIG _IOR(AUDIO_IOCTL_MAGIC,   (AUDIO_MAX_COMMON_IOCTL_NUM+1), unsigned)
 
+#define AUDIO_SET_AAC_ENC_CONFIG _IOW(AUDIO_IOCTL_MAGIC,   (AUDIO_MAX_COMMON_IOCTL_NUM+3), struct msm_audio_aac_enc_config)
+
+#define AUDIO_GET_AAC_ENC_CONFIG _IOR(AUDIO_IOCTL_MAGIC,   (AUDIO_MAX_COMMON_IOCTL_NUM+4), struct msm_audio_aac_enc_config)
+
 #define AUDIO_AAC_FORMAT_ADTS -1
 #define AUDIO_AAC_FORMAT_RAW 0x0000
 #define AUDIO_AAC_FORMAT_PSUEDO_RAW 0x0001
@@ -63,5 +67,11 @@ struct msm_audio_aac_config {
  unsigned short channel_configuration;
 };
 
-#endif
+struct msm_audio_aac_enc_config {
+ uint32_t channels;
+ uint32_t sample_rate;
+ uint32_t bit_rate;
+ uint32_t stream_format;
+};
 
+#endif

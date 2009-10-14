@@ -47,12 +47,15 @@
 #define AUDIO_SET_PCM_CONFIG _IOW(AUDIO_IOCTL_MAGIC, 31, unsigned)
 #define AUDIO_SWITCH_DEVICE _IOW(AUDIO_IOCTL_MAGIC, 32, unsigned)
 #define AUDIO_SET_MUTE _IOW(AUDIO_IOCTL_MAGIC, 33, unsigned)
-#define AUDIO_GET_STREAM_INFO _IOR(AUDIO_IOCTL_MAGIC, 34, struct msm_audio_bitstream_info)
+#define AUDIO_GET_STREAM_INFO _IOR(AUDIO_IOCTL_MAGIC, 34,   struct msm_audio_bitstream_info)
 #define AUDIO_SET_PAN _IOW(AUDIO_IOCTL_MAGIC, 35, unsigned)
 #define AUDIO_SET_QCONCERT_PLUS _IOW(AUDIO_IOCTL_MAGIC, 36, unsigned)
 #define AUDIO_SET_MBADRC _IOW(AUDIO_IOCTL_MAGIC, 37, unsigned)
-#define AUDIO_SET_VOLUME_PATH _IOW(AUDIO_IOCTL_MAGIC, 38, struct msm_vol_info)
+#define AUDIO_SET_VOLUME_PATH _IOW(AUDIO_IOCTL_MAGIC, 38,   struct msm_vol_info)
 #define AUDIO_SET_MAX_VOL_ALL _IOW(AUDIO_IOCTL_MAGIC, 39, unsigned)
+
+#define AUDIO_SET_STREAM_CONFIG _IOW(AUDIO_IOCTL_MAGIC, 40,   struct msm_audio_stream_config)
+#define AUDIO_GET_STREAM_CONFIG _IOR(AUDIO_IOCTL_MAGIC, 41,   struct msm_audio_stream_config)
 
 #define AUDIO_MAX_COMMON_IOCTL_NUM 100
 
@@ -113,6 +116,11 @@ struct msm_audio_config {
  uint32_t unused[3];
 };
 
+struct msm_audio_stream_config {
+ uint32_t buffer_size;
+ uint32_t buffer_count;
+};
+
 struct msm_audio_stats {
  uint32_t byte_count;
  uint32_t sample_count;
@@ -129,7 +137,7 @@ struct msm_audio_aio_buf {
  uint32_t buf_len;
  uint32_t data_len;
  void *private_data;
- unsigned short mfield_sz; /*only useful for data has meta field */
+ unsigned short mfield_sz;
 };
 
 #define SND_IOCTL_MAGIC 's'
@@ -148,9 +156,7 @@ struct msm_vol_info {
 };
 
 struct msm_voicerec_mode {
-
  uint32_t rec_mode;
-
 };
 
 struct msm_snd_device_config {
