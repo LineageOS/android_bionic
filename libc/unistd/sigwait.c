@@ -53,8 +53,18 @@ int sigwait(const sigset_t *set, int *sig)
       sigset_t       dummy_sigset;
     } u;
 
+/*
+ * easyweb2:
+ *  09-08-15
+ *   o Update sigset_t type for compatibility with kernel >= 2.6.30
+ */
+#ifndef EASYWEB2
     u.kernel_sigset[0] = *set;
     u.kernel_sigset[1] = 0;  /* no real-time signals supported ? */
+#else
+    u.kernel_sigset[0] = set->sig[0];
+    u.kernel_sigset[1] = 0;  /* no real-time signals supported */
+#endif
     for (;;)
     {
      /* __rt_sigtimedwait can return EAGAIN or EINTR, we need to loop

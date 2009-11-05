@@ -31,7 +31,16 @@ extern int __sigsuspend(int, int, unsigned int);
 
 int sigsuspend(const sigset_t *_mask)
 {
+/*
+ * easyweb2:
+ *  09-08-15
+ *   o Update sigset_t type for compatibility with kernel >= 2.6.30
+ */
+#ifndef EASYWEB2
     unsigned int    mask = (unsigned int)*_mask;
+#else
+    unsigned int    mask = _mask->sig[0];
+#endif
 
 	return __sigsuspend(0, 0, mask);
 }

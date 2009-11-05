@@ -19,8 +19,31 @@
 
 struct siginfo;
 
+/*
+ * easyweb2:
+ *  09-08-15
+ *   o Update sigset_t type for compatibility with kernel >= 2.6.30
+ */
+#ifndef EASYWEB2
 #define NSIG 32
 typedef unsigned long sigset_t;
+#else
+#define _NSIG		64
+
+#ifdef __i386__
+# define _NSIG_BPW	32
+#else
+# define _NSIG_BPW	64
+#endif
+
+#define _NSIG_WORDS	(_NSIG / _NSIG_BPW)
+
+typedef unsigned long old_sigset_t;		/* at least 32 bits */
+
+typedef struct {
+ unsigned long sig[_NSIG_WORDS];
+} sigset_t;
+#endif
 
 #endif
 

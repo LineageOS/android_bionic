@@ -117,6 +117,7 @@ extern int pipe(int *);
 extern int chroot(const char *);
 extern int symlink(const char *, const char *);
 extern int readlink(const char *, char *, size_t);
+extern int readlinkat(int, const char *, char *, size_t);
 extern int chown(const char *, uid_t, gid_t);
 extern int fchown(int, uid_t, gid_t);
 extern int lchown(const char *, uid_t, gid_t);
