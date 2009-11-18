@@ -147,8 +147,8 @@ struct soinfo
 extern soinfo libdl_info;
 
 /* these must all be powers of two */
-#define LIBBASE 0x80000000
-#define LIBLAST 0x90000000
+#define LIBBASE 0x40000000
+#define LIBLAST 0x50000000
 #define LIBINC  0x00100000
 
 
