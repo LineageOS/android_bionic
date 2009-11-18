@@ -149,13 +149,17 @@
 #  define __ARM_HAVE_PC_INTERWORK
 #endif
 
-/* define __ARM_HAVE_LDREX_STREX for ARMv6 and ARMv7 architecure to be
- * used in replacement of depricated swp instruction
- */
+/* support of LDREX/STREX instructions */
 #if __ARM_ARCH__ >= 6
-#  define __ARM_HAVE_LDREX_STREX
+#   define __ARM_HAVE_LDREX_STREX 1
 #endif
 
+/* support of ARMv7 memory barrier instructions */
+#if __ARM_ARCH__ >= 7
+#   define __ARM_HAVE_DMB 1
+#   define __ARM_HAVE_DSB 1
+#   define __ARM_HAVE_ISB 1
+#endif
 
 /* Assembly-only macros */
 

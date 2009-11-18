@@ -26,6 +26,7 @@
  * SUCH DAMAGE.
  */
 #include <sys/linux-syscalls.h>
+#include <machine/cpu-features.h>
 
 .global __atomic_cmpxchg
 .type __atomic_cmpxchg, %function
@@ -148,7 +149,11 @@ __atomic_swap:
     teq     r3, #0
     bne     1b
     mov     r0, r2
-    mcr     p15, 0, r0, c7, c10, 5 /* or, use dmb */
+#if defined (__ARM_HAVE_DMB)
+    dmb
+#else
+    mcr     p15, 0, r0, c7, c10, 5
+#endif
 #else
     swp     r0, r0, [r1]
 #endif
