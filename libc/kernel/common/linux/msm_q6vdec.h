@@ -209,4 +209,3 @@ struct vdec_dec_attributes {
 };
 
 #endif
-

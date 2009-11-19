@@ -54,9 +54,9 @@
 
 #define MSM_CAM_IOCTL_SET_CROP   _IOW(MSM_CAM_IOCTL_MAGIC, 18, struct crop_info *)
 
-#define MSM_CAM_IOCTL_PP   _IOW(MSM_CAM_IOCTL_MAGIC, 19, uint8_t *)
+#define MSM_CAM_IOCTL_PICT_PP   _IOW(MSM_CAM_IOCTL_MAGIC, 19, uint8_t *)
 
-#define MSM_CAM_IOCTL_PP_DONE   _IOW(MSM_CAM_IOCTL_MAGIC, 20, struct msm_snapshot_pp_status *)
+#define MSM_CAM_IOCTL_PICT_PP_DONE   _IOW(MSM_CAM_IOCTL_MAGIC, 20, struct msm_snapshot_pp_status *)
 
 #define MSM_CAM_IOCTL_SENSOR_IO_CFG   _IOW(MSM_CAM_IOCTL_MAGIC, 21, struct sensor_cfg_data *)
 
@@ -70,13 +70,15 @@
 
 #define MSM_CAM_IOCTL_CTRL_COMMAND_2   _IOW(MSM_CAM_IOCTL_MAGIC, 24, struct msm_ctrl_cmd *)
 
+#define MSM_CAM_IOCTL_AF_CTRL   _IOR(MSM_CAM_IOCTL_MAGIC, 25, struct msm_ctrl_cmt_t *)
+#define MSM_CAM_IOCTL_AF_CTRL_DONE   _IOW(MSM_CAM_IOCTL_MAGIC, 26, struct msm_ctrl_cmt_t *)
+
 #define MAX_SENSOR_NUM 3
 #define MAX_SENSOR_NAME 32
 
-#define PP_SNAP 1
-#define PP_RAW_SNAP (1<<1)
-#define PP_PREV (1<<2)
-#define PP_MASK (PP_SNAP|PP_RAW_SNAP|PP_PREV)
+#define PP_SNAP 0x01
+#define PP_RAW_SNAP ((0x01)<<1)
+#define PP_PREV ((0x01)<<2)
 
 #define MSM_CAM_CTRL_CMD_DONE 0
 #define MSM_CAM_SENSOR_VFE_CMD 1
@@ -156,7 +158,7 @@ struct camera_enable_cmd {
 #define MSM_PMEM_OUTPUT1 0
 #define MSM_PMEM_OUTPUT2 1
 #define MSM_PMEM_OUTPUT1_OUTPUT2 2
-#define MSM_PMEM_THUMBNAIL 3
+#define MSM_PMEM_THUMBAIL 3
 #define MSM_PMEM_MAINIMG 4
 #define MSM_PMEM_RAW_MAINIMG 5
 #define MSM_PMEM_AEC_AWB 6
@@ -174,8 +176,6 @@ struct msm_pmem_info {
  int type;
  int fd;
  void *vaddr;
- uint32_t offset;
- uint32_t len;
  uint32_t y_off;
  uint32_t cbcr_off;
  uint8_t active;
@@ -230,8 +230,11 @@ struct msm_stats_buf {
 #define MSM_V4L2_GET_CTRL 5
 #define MSM_V4L2_SET_CTRL 6
 #define MSM_V4L2_QUERY 7
-#define MSM_V4L2_MAX 8
+#define MSM_V4L2_GET_CROP 8
+#define MSM_V4L2_SET_CROP 9
+#define MSM_V4L2_MAX 10
 
+#define V4L2_CAMERA_EXIT 43
 struct crop_info {
  void *info;
  int len;
@@ -293,15 +296,12 @@ struct msm_snapshot_pp_status {
 #define CAMERA_EFFECT_MONO 1
 #define CAMERA_EFFECT_NEGATIVE 2
 #define CAMERA_EFFECT_SOLARIZE 3
-#define CAMERA_EFFECT_PASTEL 4
-#define CAMERA_EFFECT_MOSAIC 5
-#define CAMERA_EFFECT_RESIZE 6
-#define CAMERA_EFFECT_SEPIA 7
-#define CAMERA_EFFECT_POSTERIZE 8
-#define CAMERA_EFFECT_WHITEBOARD 9
-#define CAMERA_EFFECT_BLACKBOARD 10
-#define CAMERA_EFFECT_AQUA 11
-#define CAMERA_EFFECT_MAX 12
+#define CAMERA_EFFECT_SEPIA 4
+#define CAMERA_EFFECT_POSTERIZE 5
+#define CAMERA_EFFECT_WHITEBOARD 6
+#define CAMERA_EFFECT_BLACKBOARD 7
+#define CAMERA_EFFECT_AQUA 8
+#define CAMERA_EFFECT_MAX 9
 
 struct sensor_pict_fps {
  uint16_t prevfps;
@@ -357,6 +357,6 @@ struct sensor_cfg_data {
 struct msm_camsensor_info {
  char name[MAX_SENSOR_NAME];
  uint8_t flash_enabled;
+ int8_t total_steps;
 };
 #endif
-

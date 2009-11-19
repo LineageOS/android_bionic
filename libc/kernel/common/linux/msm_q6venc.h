@@ -16,9 +16,9 @@
 
 struct venc_buf {
  unsigned int src_id;
- int fd;
- unsigned long offset;
- unsigned long size;
+ unsigned int fd;
+ unsigned int offset;
+ unsigned int size;
 };
 
 struct q6_init_config {
@@ -38,7 +38,6 @@ struct q6_init_config {
  unsigned short enc_frame_width_inmb;
  unsigned short dvs_frame_height;
  unsigned short dvs_frame_width;
-
  unsigned int ref_frame_buf1_phy;
  unsigned int ref_frame_buf2_phy;
  unsigned int rlc_buf1_phy;
@@ -55,8 +54,8 @@ struct init_config {
 };
 
 struct q6_encode_param {
- unsigned int luma_addr;
- unsigned int chroma_addr;
+ unsigned int y_addr_phy;
+ unsigned int uv_addr_phy;
  unsigned int x_offset;
  unsigned int y_offset;
  unsigned int frame_rho_budget;
@@ -66,7 +65,7 @@ struct q6_encode_param {
 
 struct encode_param {
  struct venc_buf y_addr;
- unsigned long uv_offset;
+ struct venc_buf uv_addr;
  struct q6_encode_param q6_encode_param;
 };
 
@@ -106,4 +105,3 @@ struct frame_type {
 #define VENC_IOCTL_STOP_ENCODE _IO(VENC_IOCTL_MAGIC, 8)
 
 #endif
-

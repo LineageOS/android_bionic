@@ -13,10 +13,24 @@
 #define _MSM_MDP_H_
 
 #include <linux/types.h>
+#include <linux/fb.h>
 
 #define MSMFB_IOCTL_MAGIC 'm'
 #define MSMFB_GRP_DISP _IOW(MSMFB_IOCTL_MAGIC, 1, unsigned int)
 #define MSMFB_BLIT _IOW(MSMFB_IOCTL_MAGIC, 2, unsigned int)
+#define MSMFB_SUSPEND_SW_REFRESHER _IOW(MSMFB_IOCTL_MAGIC, 128, unsigned int)
+#define MSMFB_RESUME_SW_REFRESHER _IOW(MSMFB_IOCTL_MAGIC, 129, unsigned int)
+#define MSMFB_CURSOR _IOW(MSMFB_IOCTL_MAGIC, 130, struct fb_cursor)
+#define MSMFB_SET_LUT _IOW(MSMFB_IOCTL_MAGIC, 131, struct fb_cmap)
+#define MSMFB_HISTOGRAM _IOWR(MSMFB_IOCTL_MAGIC, 132, struct mdp_histogram)
+
+#define MSMFB_GET_CCS_MATRIX _IOWR(MSMFB_IOCTL_MAGIC, 133, struct mdp_ccs)
+#define MSMFB_SET_CCS_MATRIX _IOW(MSMFB_IOCTL_MAGIC, 134, struct mdp_ccs)
+#define MSMFB_OVERLAY_SET _IOWR(MSMFB_IOCTL_MAGIC, 135,   struct mdp_overlay)
+#define MSMFB_OVERLAY_UNSET _IOW(MSMFB_IOCTL_MAGIC, 136, unsigned int)
+#define MSMFB_OVERLAY_PLAY _IOW(MSMFB_IOCTL_MAGIC, 137,   struct msmfb_overlay_data)
+
+#define MDP_IMGTYPE2_START 0x10000
 
 enum {
  MDP_RGB_565,
@@ -30,8 +44,10 @@ enum {
  MDP_Y_CBCR_H2V1,
  MDP_RGBA_8888,
  MDP_BGRA_8888,
- MDP_RGBX_8888,
- MDP_IMGTYPE_LIMIT
+ MDP_IMGTYPE_LIMIT,
+ MDP_BGR_565 = MDP_IMGTYPE2_START,
+ MDP_FB_FORMAT,
+ MDP_IMGTYPE_LIMIT2
 };
 
 enum {
@@ -47,7 +63,9 @@ enum {
 #define MDP_ROT_270 (MDP_ROT_90|MDP_FLIP_UD|MDP_FLIP_LR)
 #define MDP_DITHER 0x8
 #define MDP_BLUR 0x10
-#define MDP_BLEND_FG_PREMULT 0x20000
+
+#define MDP_DEINTERLACE 0x80000000
+#define MDP_SHARPENING 0x40000000
 
 #define MDP_TRANSP_NOP 0xffffffff
 #define MDP_ALPHA_NOP 0xff
@@ -67,6 +85,18 @@ struct mdp_img {
  int memory_id;
 };
 
+#define MDP_CCS_RGB2YUV 0
+#define MDP_CCS_YUV2RGB 1
+
+#define MDP_CCS_SIZE 9
+#define MDP_BV_SIZE 3
+
+struct mdp_ccs {
+ int direction;
+ uint16_t ccs[MDP_CCS_SIZE];
+ uint16_t bv[MDP_BV_SIZE];
+};
+
 struct mdp_blit_req {
  struct mdp_img src;
  struct mdp_img dst;
@@ -75,6 +105,7 @@ struct mdp_blit_req {
  uint32_t alpha;
  uint32_t transp_mask;
  uint32_t flags;
+ int sharpening_strength;
 };
 
 struct mdp_blit_req_list {
@@ -82,5 +113,47 @@ struct mdp_blit_req_list {
  struct mdp_blit_req req[];
 };
 
-#endif
+enum {
+ MDP_ZORDER_BASELAYER,
+ MDP_ZORDER_STAGE0,
+ MDP_ZORDER_STAGE1,
+ MDP_ZORDER_STAGE2
+};
 
+struct msmfb_data {
+ uint32_t offset;
+ int memory_id;
+ int id;
+};
+
+struct msmfb_overlay_data {
+ uint32_t id;
+ struct msmfb_data data;
+};
+
+struct msmfb_img {
+ uint32_t width;
+ uint32_t height;
+ uint32_t format;
+};
+
+struct mdp_overlay {
+ struct msmfb_img src;
+ struct mdp_rect src_rect;
+ struct mdp_rect dst_rect;
+ uint32_t z_order;
+ uint32_t alpha;
+ uint32_t transp_mask;
+ uint32_t flags;
+ uint32_t id;
+};
+
+struct mdp_histogram {
+ uint32_t frame_cnt;
+ uint32_t bin_cnt;
+ uint32_t *r;
+ uint32_t *g;
+ uint32_t *b;
+};
+
+#endif
