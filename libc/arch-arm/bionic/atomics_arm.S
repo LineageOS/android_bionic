@@ -139,7 +139,12 @@ __atomic_inc:
 
 /* r0(new) r1(addr) -> r0(old) */
 __atomic_swap:
-    swp     r0, r0, [r1]
+1:
+    .word 0xe1912f9f        /* ldrex   r2, [r1] */
+    .word 0xe1813f90        /* strex   r3, r0, [r1] */
+    cmp     r3, #0
+    bne     1b
+    mov     r0, r2
     bx      lr
 
 /* __futex_wait(*ftx, val, *timespec) */
