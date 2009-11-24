@@ -57,6 +57,7 @@
 #define AUDIO_SET_STREAM_CONFIG _IOW(AUDIO_IOCTL_MAGIC, 40,   struct msm_audio_stream_config)
 #define AUDIO_GET_STREAM_CONFIG _IOR(AUDIO_IOCTL_MAGIC, 41,   struct msm_audio_stream_config)
 
+#define AUDIO_GET_SESSION_ID _IOR(AUDIO_IOCTL_MAGIC, 42, unsigned short)
 #define AUDIO_MAX_COMMON_IOCTL_NUM 100
 
 #define AUDIO_ENABLE_AUDPRE _IOW(AUDIO_IOCTL_MAGIC, 11, unsigned)
