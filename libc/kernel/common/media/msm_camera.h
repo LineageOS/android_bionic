@@ -79,6 +79,7 @@
 #define PP_SNAP 0x01
 #define PP_RAW_SNAP ((0x01)<<1)
 #define PP_PREV ((0x01)<<2)
+#define PP_MASK (PP_SNAP|PP_RAW_SNAP|PP_PREV)
 
 #define MSM_CAM_CTRL_CMD_DONE 0
 #define MSM_CAM_SENSOR_VFE_CMD 1
@@ -158,7 +159,7 @@ struct camera_enable_cmd {
 #define MSM_PMEM_OUTPUT1 0
 #define MSM_PMEM_OUTPUT2 1
 #define MSM_PMEM_OUTPUT1_OUTPUT2 2
-#define MSM_PMEM_THUMBAIL 3
+#define MSM_PMEM_THUMBNAIL 3
 #define MSM_PMEM_MAINIMG 4
 #define MSM_PMEM_RAW_MAINIMG 5
 #define MSM_PMEM_AEC_AWB 6
@@ -168,7 +169,7 @@ struct camera_enable_cmd {
 #define FRAME_PREVIEW_OUTPUT1 0
 #define FRAME_PREVIEW_OUTPUT2 1
 #define FRAME_SNAPSHOT 2
-#define FRAME_THUMBAIL 3
+#define FRAME_THUMBNAIL 3
 #define FRAME_RAW_SNAPSHOT 4
 #define FRAME_MAX 5
 
@@ -176,6 +177,8 @@ struct msm_pmem_info {
  int type;
  int fd;
  void *vaddr;
+ uint32_t offset;
+ uint32_t len;
  uint32_t y_off;
  uint32_t cbcr_off;
  uint8_t active;
