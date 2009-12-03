@@ -88,7 +88,19 @@ extern int __set_tls(void *ptr);
 
 /* get the TLS */
 #ifdef __arm__
-#  define __get_tls() ( *((volatile void **) 0xffff0ff0) )
+/* Linux kernel helpers for its TLS implementation */
+/* For performance reasons, avoid calling the kernel helper
+ * Note that HAVE_ARM_TLS_REGISTER is build-specific
+ * (it must match your kernel configuration)
+ */
+#  ifdef HAVE_ARM_TLS_REGISTER
+#    define __get_tls() \
+    ({ register unsigned int __val asm("r0"); \
+       asm ("mrc p15, 0, r0, c13, c0, 3" : "=r"(__val) ); \
+       (volatile void*)__val; })
+#  else /* !HAVE_ARM_TLS_REGISTER */
+#    define __get_tls() ( *((volatile void **) 0xffff0ff0) )
+#  endif
 #else
 extern void*  __get_tls( void );
 #endif

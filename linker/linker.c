@@ -51,6 +51,7 @@
 
 #include "ba.h"
 
+#define ALLOW_SYMBOLS_FROM_MAIN 1
 #define SO_MAX 96
 
 /* Assume average path length of 64 and max 8 paths */
@@ -86,6 +87,27 @@ static soinfo sopool[SO_MAX];
 static soinfo *freelist = NULL;
 static soinfo *solist = &libdl_info;
 static soinfo *sonext = &libdl_info;
+#if ALLOW_SYMBOLS_FROM_MAIN
+static soinfo *somain; /* main process, always the one after libdl_info */
+#endif
+
+
+/* Set up for the buddy allocator managing the prelinked libraries. */
+static struct ba_bits ba_prelink_bitmap[(LIBLAST - LIBBASE) / LIBINC];
+static struct ba ba_prelink = {
+    .base = LIBBASE,
+    .size = LIBLAST - LIBBASE,
+    .min_alloc = LIBINC,
+    /* max_order will be determined automatically */
+    .bitmap = ba_prelink_bitmap,
+    .num_entries = sizeof(ba_prelink_bitmap)/sizeof(ba_prelink_bitmap[0]),
+};
+
+static inline int validate_soinfo(soinfo *si)
+{
+    return (si >= sopool && si < sopool + SO_MAX) ||
+        si == &libdl_info;
+}
 
 static char ldpaths_buf[LDPATH_BUFSIZE];
 static const char *ldpaths[LDPATH_MAX + 1];
@@ -152,6 +174,7 @@ static void insert_soinfo_into_debug_map(soinfo * info)
     map = &(info->linkmap);
     map->l_addr = info->base;
     map->l_name = (char*) info->name;
+    map->l_ld = (uintptr_t)info->dynamic;
 
     /* Stick the new library at the end of the list.
      * gdb tends to care more about libc than it does
@@ -344,7 +367,7 @@ _Unwind_Ptr dl_unwind_find_exidx(_Unwind_Ptr pc, int *pcount)
    *pcount = 0;
     return NULL;
 }
-#elif defined(ANDROID_X86_LINKER)
+#elif defined(ANDROID_X86_LINKER) || defined(ANDROID_SH_LINKER)
 /* Here, we only have to provide a callback to iterate across all the
  * loaded libraries. gcc_eh does the rest. */
 int
@@ -421,53 +444,98 @@ _do_lookup_in_so(soinfo *si, const char *name, unsigned *elf_hash)
     return _elf_lookup (si, *elf_hash, name);
 }
 
-/* This is used by dl_sym() */
-Elf32_Sym *lookup_in_library(soinfo *si, const char *name)
-{
-    unsigned unused = 0;
-    return _do_lookup_in_so(si, name, &unused);
-}
-
 static Elf32_Sym *
-_do_lookup(soinfo *user_si, const char *name, unsigned *base)
+_do_lookup(soinfo *si, const char *name, unsigned *base)
 {
     unsigned elf_hash = 0;
-    Elf32_Sym *s = NULL;
-    soinfo *si;
+    Elf32_Sym *s;
+    unsigned *d;
+    soinfo *lsi = si;
 
     /* Look for symbols in the local scope first (the object who is
      * searching). This happens with C++ templates on i386 for some
      * reason. */
-    if (user_si) {
-        s = _do_lookup_in_so(user_si, name, &elf_hash);
-        if (s != NULL)
-            *base = user_si->base;
-    }
+    s = _do_lookup_in_so(si, name, &elf_hash);
+    if(s != NULL)
+        goto done;
 
-    for(si = solist; (s == NULL) && (si != NULL); si = si->next)
-    {
-        if((si->flags & FLAG_ERROR) || (si == user_si))
-            continue;
-        s = _do_lookup_in_so(si, name, &elf_hash);
-        if (s != NULL) {
-            *base = si->base;
-            break;
+    for(d = si->dynamic; *d; d += 2) {
+        if(d[0] == DT_NEEDED){
+            lsi = (soinfo *)d[1];
+            if (!validate_soinfo(lsi)) {
+                DL_ERR("%5d bad DT_NEEDED pointer in %s",
+                       pid, si->name);
+                return 0;
+            }
+
+            DEBUG("%5d %s: looking up %s in %s\n",
+                  pid, si->name, name, lsi->name);
+            s = _do_lookup_in_so(lsi, name, &elf_hash);
+            if(s != NULL)
+                goto done;
         }
     }
 
-    if (s != NULL) {
-        TRACE_TYPE(LOOKUP, "%5d %s s->st_value = 0x%08x, "
-                   "si->base = 0x%08x\n", pid, name, s->st_value, si->base);
+#if ALLOW_SYMBOLS_FROM_MAIN
+    /* If we are resolving relocations while dlopen()ing a library, it's OK for
+     * the library to resolve a symbol that's defined in the executable itself,
+     * although this is rare and is generally a bad idea.
+     */
+    if (somain) {
+        lsi = somain;
+        DEBUG("%5d %s: looking up %s in executable %s\n",
+              pid, si->name, name, lsi->name);
+        s = _do_lookup_in_so(lsi, name, &elf_hash);
+    }
+#endif
+
+done:
+    if(s != NULL) {
+        TRACE_TYPE(LOOKUP, "%5d si %s sym %s s->st_value = 0x%08x, "
+                   "found in %s, base = 0x%08x\n",
+                   pid, si->name, name, s->st_value, lsi->name, lsi->base);
+        *base = lsi->base;
         return s;
     }
 
     return 0;
 }
 
-/* This is used by dl_sym() */
-Elf32_Sym *lookup(const char *name, unsigned *base)
+/* This is used by dl_sym().  It performs symbol lookup only within the
+   specified soinfo object and not in any of its dependencies.
+ */
+Elf32_Sym *lookup_in_library(soinfo *si, const char *name)
 {
-    return _do_lookup(NULL, name, base);
+    unsigned unused = 0;
+    return _do_lookup_in_so(si, name, &unused);
+}
+
+/* This is used by dl_sym().  It performs a global symbol lookup.
+ */
+Elf32_Sym *lookup(const char *name, soinfo **found)
+{
+    unsigned elf_hash = 0;
+    Elf32_Sym *s = NULL;
+    soinfo *si;
+
+    for(si = solist; (s == NULL) && (si != NULL); si = si->next)
+    {
+        if(si->flags & FLAG_ERROR)
+            continue;
+        s = _do_lookup_in_so(si, name, &elf_hash);
+        if (s != NULL) {
+            *found = si;
+            break;
+        }
+    }
+
+    if(s != NULL) {
+        TRACE_TYPE(LOOKUP, "%5d %s s->st_value = 0x%08x, "
+                   "si->base = 0x%08x\n", pid, name, s->st_value, si->base);
+        return s;
+    }
+
+    return 0;
 }
 
 #if 0
@@ -728,14 +796,14 @@ alloc_mem_region(soinfo *si)
        for it from the buddy allocator, which manages the area between
        LIBBASE and LIBLAST.
     */
-    si->ba_index = ba_allocate(si->size);
+    si->ba_index = ba_allocate(&ba_prelink, si->size);
     if(si->ba_index >= 0) {
-        si->base = ba_start_addr(si->ba_index);
+        si->base = ba_start_addr(&ba_prelink, si->ba_index);
         PRINT("%5d mapping library '%s' at %08x (index %d) " \
               "through buddy allocator.\n",
               pid, si->name, si->base, si->ba_index);
         if (reserve_mem_region(si) < 0) {
-            ba_free(si->ba_index);
+            ba_free(&ba_prelink, si->ba_index);
             si->ba_index = -1;
             si->base = 0;
             goto err;
@@ -1031,7 +1099,7 @@ load_library(const char *name)
     /* Now actually load the library's segments into right places in memory */
     if (load_segments(fd, &__header[0], si) < 0) {
         if (si->ba_index >= 0) {
-            ba_free(si->ba_index);
+            ba_free(&ba_prelink, si->ba_index);
             si->ba_index = -1;
         }
         goto fail;
@@ -1085,7 +1153,10 @@ soinfo *find_library(const char *name)
 
     for(si = solist; si != 0; si = si->next){
         if(!strcmp(bname, si->name)) {
-            if(si->flags & FLAG_ERROR) return 0;
+            if(si->flags & FLAG_ERROR) {
+                DL_ERR("%5d '%s' failed to load previously", pid, bname);
+                return NULL;
+            }
             if(si->flags & FLAG_LINKED) return si;
             DL_ERR("OOPS: %5d recursive link to '%s'", pid, si->name);
             return NULL;
@@ -1113,14 +1184,16 @@ unsigned unload_library(soinfo *si)
 
         for(d = si->dynamic; *d; d += 2) {
             if(d[0] == DT_NEEDED){
-                TRACE("%5d %s needs to unload %s\n", pid,
-                      si->name, si->strtab + d[1]);
-                soinfo *lsi = find_library(si->strtab + d[1]);
-                if(lsi)
+                soinfo *lsi = (soinfo *)d[1];
+                d[1] = 0;
+                if (validate_soinfo(lsi)) {
+                    TRACE("%5d %s needs to unload %s\n", pid,
+                          si->name, lsi->name);
                     unload_library(lsi);
+                }
                 else
-                    DL_ERR("%5d could not unload '%s'",
-                          pid, si->strtab + d[1]);
+                    DL_ERR("%5d %s: could not unload dependent library",
+                           pid, si->name);
             }
         }
 
@@ -1129,7 +1202,7 @@ unsigned unload_library(soinfo *si)
             PRINT("%5d releasing library '%s' address space at %08x "\
                   "through buddy allocator.\n",
                   pid, si->name, si->base);
-            ba_free(si->ba_index);
+            ba_free(&ba_prelink, si->ba_index);
         }
         notify_gdb_of_unload(si);
         free_info(si);
@@ -1180,9 +1253,13 @@ static int reloc_library(soinfo *si, Elf32_Rel *rel, unsigned count)
                 return -1;
             }
 #endif
-            if ((s->st_shndx == SHN_UNDEF) && (s->st_value != 0)) {
-                DL_ERR("%5d In '%s', shndx=%d && value=0x%08x. We do not "
-                      "handle this yet", pid, si->name, s->st_shndx,
+            // st_shndx==SHN_UNDEF means an undefined symbol.
+            // st_value should be 0 then, except that the low bit of st_value is
+            // used to indicate whether the symbol points to an ARM or thumb function,
+            // and should be ignored in the following check.
+            if ((s->st_shndx == SHN_UNDEF) && ((s->st_value & ~1) != 0)) {
+                DL_ERR("%5d In '%s', symbol=%s shndx=%d && value=0x%08x. We do not "
+                      "handle this yet", pid, si->name, sym_name, s->st_shndx,
                       s->st_value);
                 return -1;
             }
@@ -1292,6 +1369,100 @@ static int reloc_library(soinfo *si, Elf32_Rel *rel, unsigned count)
     }
     return 0;
 }
+
+#if defined(ANDROID_SH_LINKER)
+static int reloc_library_a(soinfo *si, Elf32_Rela *rela, unsigned count)
+{
+    Elf32_Sym *symtab = si->symtab;
+    const char *strtab = si->strtab;
+    Elf32_Sym *s;
+    unsigned base;
+    Elf32_Rela *start = rela;
+    unsigned idx;
+
+    for (idx = 0; idx < count; ++idx) {
+        unsigned type = ELF32_R_TYPE(rela->r_info);
+        unsigned sym = ELF32_R_SYM(rela->r_info);
+        unsigned reloc = (unsigned)(rela->r_offset + si->base);
+        unsigned sym_addr = 0;
+        char *sym_name = NULL;
+
+        DEBUG("%5d Processing '%s' relocation at index %d\n", pid,
+              si->name, idx);
+        if(sym != 0) {
+            sym_name = (char *)(strtab + symtab[sym].st_name);
+            s = _do_lookup(si, sym_name, &base);
+            if(s == 0) {
+                DL_ERR("%5d cannot locate '%s'...", pid, sym_name);
+                return -1;
+            }
+#if 0
+            if((base == 0) && (si->base != 0)){
+                    /* linking from libraries to main image is bad */
+                DL_ERR("%5d cannot locate '%s'...",
+                       pid, strtab + symtab[sym].st_name);
+                return -1;
+            }
+#endif
+            if ((s->st_shndx == SHN_UNDEF) && (s->st_value != 0)) {
+                DL_ERR("%5d In '%s', shndx=%d && value=0x%08x. We do not "
+                      "handle this yet", pid, si->name, s->st_shndx,
+                      s->st_value);
+                return -1;
+            }
+            sym_addr = (unsigned)(s->st_value + base);
+            COUNT_RELOC(RELOC_SYMBOL);
+        } else {
+            s = 0;
+        }
+
+/* TODO: This is ugly. Split up the relocations by arch into
+ * different files.
+ */
+        switch(type){
+        case R_SH_JUMP_SLOT:
+            COUNT_RELOC(RELOC_ABSOLUTE);
+            MARK(rela->r_offset);
+            TRACE_TYPE(RELO, "%5d RELO JMP_SLOT %08x <- %08x %s\n", pid,
+                       reloc, sym_addr, sym_name);
+            *((unsigned*)reloc) = sym_addr;
+            break;
+        case R_SH_GLOB_DAT:
+            COUNT_RELOC(RELOC_ABSOLUTE);
+            MARK(rela->r_offset);
+            TRACE_TYPE(RELO, "%5d RELO GLOB_DAT %08x <- %08x %s\n", pid,
+                       reloc, sym_addr, sym_name);
+            *((unsigned*)reloc) = sym_addr;
+            break;
+        case R_SH_DIR32:
+            COUNT_RELOC(RELOC_ABSOLUTE);
+            MARK(rela->r_offset);
+            TRACE_TYPE(RELO, "%5d RELO DIR32 %08x <- %08x %s\n", pid,
+                       reloc, sym_addr, sym_name);
+            *((unsigned*)reloc) += sym_addr;
+            break;
+        case R_SH_RELATIVE:
+            COUNT_RELOC(RELOC_RELATIVE);
+            MARK(rela->r_offset);
+            if(sym){
+                DL_ERR("%5d odd RELATIVE form...", pid);
+                return -1;
+            }
+            TRACE_TYPE(RELO, "%5d RELO RELATIVE %08x <- +%08x\n", pid,
+                       reloc, si->base);
+            *((unsigned*)reloc) += si->base;
+            break;
+
+        default:
+            DL_ERR("%5d unknown reloc type %d @ %p (%d)",
+                  pid, type, rela, (int) (rela - start));
+            return -1;
+        }
+        rela++;
+    }
+    return 0;
+}
+#endif /* ANDROID_SH_LINKER */
 
 
 /* Please read the "Initialization and Termination functions" functions.
@@ -1545,24 +1716,40 @@ static int link_image(soinfo *si, unsigned wr_offset)
         case DT_SYMTAB:
             si->symtab = (Elf32_Sym *) (si->base + *d);
             break;
+#if !defined(ANDROID_SH_LINKER)
         case DT_PLTREL:
             if(*d != DT_REL) {
                 DL_ERR("DT_RELA not supported");
                 goto fail;
             }
             break;
+#endif
+#ifdef ANDROID_SH_LINKER
+        case DT_JMPREL:
+            si->plt_rela = (Elf32_Rela*) (si->base + *d);
+            break;
+        case DT_PLTRELSZ:
+            si->plt_rela_count = *d / sizeof(Elf32_Rela);
+            break;
+#else
         case DT_JMPREL:
             si->plt_rel = (Elf32_Rel*) (si->base + *d);
             break;
         case DT_PLTRELSZ:
             si->plt_rel_count = *d / 8;
             break;
+#endif
         case DT_REL:
             si->rel = (Elf32_Rel*) (si->base + *d);
             break;
         case DT_RELSZ:
             si->rel_count = *d / 8;
             break;
+#ifdef ANDROID_SH_LINKER
+        case DT_RELASZ:
+            si->rela_count = *d / sizeof(Elf32_Rela);
+             break;
+#endif
         case DT_PLTGOT:
             /* Save this in case we decide to do lazy binding. We don't yet. */
             si->plt_got = (unsigned *)(si->base + *d);
@@ -1571,9 +1758,15 @@ static int link_image(soinfo *si, unsigned wr_offset)
             // Set the DT_DEBUG entry to the addres of _r_debug for GDB
             *d = (int) &_r_debug;
             break;
+#ifdef ANDROID_SH_LINKER
         case DT_RELA:
+            si->rela = (Elf32_Rela *) (si->base + *d);
+            break;
+#else
+         case DT_RELA:
             DL_ERR("%5d DT_RELA not supported", pid);
             goto fail;
+#endif
         case DT_INIT:
             si->init_func = (void (*)(void))(si->base + *d);
             DEBUG("%5d %s constructors (init func) found at %p\n",
@@ -1638,6 +1831,14 @@ static int link_image(soinfo *si, unsigned wr_offset)
                        pid, si->strtab + d[1], si->name, tmp_err_buf);
                 goto fail;
             }
+            /* Save the soinfo of the loaded DT_NEEDED library in the payload
+               of the DT_NEEDED entry itself, so that we can retrieve the
+               soinfo directly later from the dynamic segment.  This is a hack,
+               but it allows us to map from DT_NEEDED to soinfo efficiently
+               later on when we resolve relocations, trying to look up a symgol
+               with dlsym().
+            */
+            d[1] = (unsigned)lsi;
             lsi->refcount++;
         }
     }
@@ -1652,6 +1853,19 @@ static int link_image(soinfo *si, unsigned wr_offset)
         if(reloc_library(si, si->rel, si->rel_count))
             goto fail;
     }
+
+#ifdef ANDROID_SH_LINKER
+    if(si->plt_rela) {
+        DEBUG("[ %5d relocating %s plt ]\n", pid, si->name );
+        if(reloc_library_a(si, si->plt_rela, si->plt_rela_count))
+            goto fail;
+    }
+    if(si->rela) {
+        DEBUG("[ %5d relocating %s ]\n", pid, si->name );
+        if(reloc_library_a(si, si->rela, si->rela_count))
+            goto fail;
+    }
+#endif /* ANDROID_SH_LINKER */
 
     si->flags |= FLAG_LINKED;
     DEBUG("[ %5d finished linking %s ]\n", pid, si->name);
@@ -1825,7 +2039,7 @@ unsigned __linker_init(unsigned **elfdata)
         vecs += 2;
     }
 
-    ba_init();
+    ba_init(&ba_prelink);
 
     si->base = 0;
     si->dynamic = (unsigned *)-1;
@@ -1842,6 +2056,14 @@ unsigned __linker_init(unsigned **elfdata)
         write(2, errmsg, sizeof(errmsg));
         exit(-1);
     }
+
+#if ALLOW_SYMBOLS_FROM_MAIN
+    /* Set somain after we've loaded all the libraries in order to prevent
+     * linking of symbols back to the main image, which is not set up at that
+     * point yet.
+     */
+    somain = si;
+#endif
 
 #if TIMING
     gettimeofday(&t1,NULL);

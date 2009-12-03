@@ -74,7 +74,7 @@ const char *dlerror(void)
 
 void *dlsym(void *handle, const char *symbol)
 {
-    unsigned base;
+    soinfo *found;
     Elf32_Sym *sym;
     unsigned bind;
 
@@ -90,19 +90,19 @@ void *dlsym(void *handle, const char *symbol)
     }
 
     if(handle == RTLD_DEFAULT) {
-        sym = lookup(symbol, &base);
+        sym = lookup(symbol, &found);
     } else if(handle == RTLD_NEXT) {
-        sym = lookup(symbol, &base);
+        sym = lookup(symbol, &found);
     } else {
-        sym = lookup_in_library((soinfo*) handle, symbol);
-        base = ((soinfo*) handle)->base;
+        found = (soinfo*)handle;
+        sym = lookup_in_library(found, symbol);
     }
 
     if(likely(sym != 0)) {
         bind = ELF32_ST_BIND(sym->st_info);
 
         if(likely((bind == STB_GLOBAL) && (sym->st_shndx != 0))) {
-            unsigned ret = sym->st_value + base;
+            unsigned ret = sym->st_value + found->base;
             pthread_mutex_unlock(&dl_lock);
             return (void*)ret;
         }
@@ -132,6 +132,12 @@ int dlclose(void *handle)
                       "dlopen\0dlclose\0dlsym\0dlerror\0dl_unwind_find_exidx\0"
 
 #elif defined(ANDROID_X86_LINKER)
+//                     0000000 00011111 111112 22222222 2333333333344444
+//                     0123456 78901234 567890 12345678 9012345678901234
+#define ANDROID_LIBDL_STRTAB \
+                      "dlopen\0dlclose\0dlsym\0dlerror\0dl_iterate_phdr\0"
+
+#elif defined(ANDROID_SH_LINKER)
 //                     0000000 00011111 111112 22222222 2333333333344444
 //                     0123456 78901234 567890 12345678 9012345678901234
 #define ANDROID_LIBDL_STRTAB \
@@ -176,6 +182,12 @@ static Elf32_Sym libdl_symtab[] = {
       st_shndx: 1,
     },
 #elif defined(ANDROID_X86_LINKER)
+    { st_name: 29,
+      st_value: (Elf32_Addr) &dl_iterate_phdr,
+      st_info: STB_GLOBAL << 4,
+      st_shndx: 1,
+    },
+#elif defined(ANDROID_SH_LINKER)
     { st_name: 29,
       st_value: (Elf32_Addr) &dl_iterate_phdr,
       st_info: STB_GLOBAL << 4,
