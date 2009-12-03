@@ -113,18 +113,13 @@ struct mdp_blit_req_list {
  struct mdp_blit_req req[];
 };
 
-enum {
- MDP_ZORDER_BASELAYER,
- MDP_ZORDER_STAGE0,
- MDP_ZORDER_STAGE1,
- MDP_ZORDER_STAGE2
-};
-
 struct msmfb_data {
  uint32_t offset;
  int memory_id;
  int id;
 };
+
+#define MSMFB_NEW_REQUEST -1
 
 struct msmfb_overlay_data {
  uint32_t id;
@@ -142,6 +137,7 @@ struct mdp_overlay {
  struct mdp_rect src_rect;
  struct mdp_rect dst_rect;
  uint32_t z_order;
+ uint32_t is_fg;
  uint32_t alpha;
  uint32_t transp_mask;
  uint32_t flags;
