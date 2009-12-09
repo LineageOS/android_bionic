@@ -131,19 +131,37 @@ struct msm_camera_cfg_cmd {
 #define CMD_PICT_T_AXI_CFG 4
 #define CMD_PICT_M_AXI_CFG 5
 #define CMD_RAW_PICT_AXI_CFG 6
-#define CMD_STATS_AXI_CFG 7
-#define CMD_STATS_AF_AXI_CFG 8
-#define CMD_FRAME_BUF_RELEASE 9
-#define CMD_PREV_BUF_CFG 10
-#define CMD_SNAP_BUF_RELEASE 11
-#define CMD_SNAP_BUF_CFG 12
-#define CMD_STATS_DISABLE 13
-#define CMD_STATS_AEC_AWB_ENABLE 14
-#define CMD_STATS_AF_ENABLE 15
-#define CMD_STATS_BUF_RELEASE 16
-#define CMD_STATS_AF_BUF_RELEASE 17
-#define CMD_STATS_ENABLE 18
-#define UPDATE_STATS_INVALID 19
+
+#define CMD_FRAME_BUF_RELEASE 7
+#define CMD_PREV_BUF_CFG 8
+#define CMD_SNAP_BUF_RELEASE 9
+#define CMD_SNAP_BUF_CFG 10
+#define CMD_STATS_DISABLE 11
+#define CMD_STATS_AEC_AWB_ENABLE 12
+#define CMD_STATS_AF_ENABLE 13
+#define CMD_STATS_AEC_ENABLE 14
+#define CMD_STATS_AWB_ENABLE 15
+#define CMD_STATS_ENABLE 16
+
+#define CMD_STATS_AXI_CFG 17
+#define CMD_STATS_AEC_AXI_CFG 18
+#define CMD_STATS_AF_AXI_CFG 19
+#define CMD_STATS_AWB_AXI_CFG 20
+#define CMD_STATS_RS_AXI_CFG 21
+#define CMD_STATS_CS_AXI_CFG 22
+#define CMD_STATS_IHIST_AXI_CFG 23
+#define CMD_STATS_SKIN_AXI_CFG 24
+
+#define CMD_STATS_BUF_RELEASE 25
+#define CMD_STATS_AEC_BUF_RELEASE 26
+#define CMD_STATS_AF_BUF_RELEASE 27
+#define CMD_STATS_AWB_BUF_RELEASE 28
+#define CMD_STATS_RS_BUF_RELEASE 29
+#define CMD_STATS_CS_BUF_RELEASE 30
+#define CMD_STATS_IHIST_BUF_RELEASE 31
+#define CMD_STATS_SKIN_BUF_RELEASE 32
+
+#define UPDATE_STATS_INVALID 33
 
 struct msm_vfe_cfg_cmd {
  int cmd_type;
@@ -164,7 +182,23 @@ struct camera_enable_cmd {
 #define MSM_PMEM_RAW_MAINIMG 5
 #define MSM_PMEM_AEC_AWB 6
 #define MSM_PMEM_AF 7
-#define MSM_PMEM_MAX 8
+#define MSM_PMEM_AEC 8
+#define MSM_PMEM_AWB 9
+#define MSM_PMEM_RS 10
+#define MSM_PMEM_CS 11
+#define MSM_PMEM_IHIST 12
+#define MSM_PMEM_SKIN 13
+#define MSM_PMEM_MAX 14
+
+#define STAT_AEAW 0
+#define STAT_AEC 1
+#define STAT_AF 2
+#define STAT_AWB 3
+#define STAT_RS 4
+#define STAT_CS 5
+#define STAT_IHIST 6
+#define STAT_SKIN 7
+#define STAT_MAX 8
 
 #define FRAME_PREVIEW_OUTPUT1 0
 #define FRAME_PREVIEW_OUTPUT2 1
@@ -214,10 +248,6 @@ struct msm_frame {
  void *cropinfo;
  int croplen;
 };
-
-#define STAT_AEAW 0
-#define STAT_AF 1
-#define STAT_MAX 2
 
 struct msm_stats_buf {
  int type;
