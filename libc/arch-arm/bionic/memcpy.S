@@ -260,20 +260,31 @@ cached_aligned32:
          *
          */
 
+#if __ARM_ARCH__ == 5
         // Align the preload register to a cache-line because the cpu does
         // "critical word first" (the first word requested is loaded first).
         bic         r12, r1, #0x1F
         add         r12, r12, #64
+#endif
 
 1:      ldmia       r1!, { r4-r11 }
+
+#if __ARM_ARCH__ == 5
         PLD         (r12, #64)
+#else
+        PLD         (r1, #64)
+#endif
+
         subs        r2, r2, #32
 
+#if __ARM_ARCH__ == 5
         // NOTE: if r12 is more than 64 ahead of r1, the following ldrhi
         // for ARM9 preload will not be safely guarded by the preceding subs.
         // When it is safely guarded the only possibility to have SIGSEGV here
         // is because the caller overstates the length.
         ldrhi       r3, [r12], #32      /* cheap ARM9 preload */
+#endif
+
         stmia       r0!, { r4-r11 }
 		bhs         1b
 
