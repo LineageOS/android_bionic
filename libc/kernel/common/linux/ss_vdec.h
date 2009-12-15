@@ -400,6 +400,9 @@ struct vdec_picsize {
 struct vdec_seqheader {
  uint8_t *ptr_seqheader;
  uint32_t seq_header_len;
+ int pmem_fd;
+ uint32_t pmem_offset;
+
 };
 
 struct vdec_mberror {
