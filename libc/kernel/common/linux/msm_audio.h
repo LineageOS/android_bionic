@@ -54,10 +54,15 @@
 #define AUDIO_SET_VOLUME_PATH _IOW(AUDIO_IOCTL_MAGIC, 38,   struct msm_vol_info)
 #define AUDIO_SET_MAX_VOL_ALL _IOW(AUDIO_IOCTL_MAGIC, 39, unsigned)
 
+#define AUDIO_UPDATE_ACDB _IOW(AUDIO_IOCTL_MAGIC, 64, unsigned)
+#define AUDIO_START_VOICE _IOW(AUDIO_IOCTL_MAGIC, 65, unsigned)
+#define AUDIO_STOP_VOICE _IOW(AUDIO_IOCTL_MAGIC, 66, unsigned)
+
 #define AUDIO_SET_STREAM_CONFIG _IOW(AUDIO_IOCTL_MAGIC, 40,   struct msm_audio_stream_config)
 #define AUDIO_GET_STREAM_CONFIG _IOR(AUDIO_IOCTL_MAGIC, 41,   struct msm_audio_stream_config)
 
 #define AUDIO_GET_SESSION_ID _IOR(AUDIO_IOCTL_MAGIC, 42, unsigned short)
+
 #define AUDIO_MAX_COMMON_IOCTL_NUM 100
 
 #define AUDIO_ENABLE_AUDPRE _IOW(AUDIO_IOCTL_MAGIC, 11, unsigned)
