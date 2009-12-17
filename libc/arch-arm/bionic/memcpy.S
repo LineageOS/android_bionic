@@ -38,7 +38,7 @@
         .align 4
 
 /* a prefetch distance of 4 cache-lines works best experimentally */
-#define CACHE_LINE_SIZE     64
+#define CACHE_LINE_SIZE     32
 #define PREFETCH_DISTANCE   (CACHE_LINE_SIZE*4)
 
 memcpy:
