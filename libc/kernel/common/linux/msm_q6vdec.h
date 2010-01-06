@@ -26,6 +26,13 @@
 #define VDEC_IOCTL_CLOSE _IO(VDEC_IOCTL_MAGIC, 8)
 #define VDEC_IOCTL_FREEBUFFERS _IOW(VDEC_IOCTL_MAGIC, 9, struct vdec_buf_info)
 #define VDEC_IOCTL_GETDECATTRIBUTES _IOR(VDEC_IOCTL_MAGIC, 10,   struct vdec_dec_attributes)
+#define VDEC_IOCTL_INITIALIZE_V3 _IOWR(VDEC_IOCTL_MAGIC, 11,   struct vdec_init_v3)
+#define VDEC_IOCTL_SETBUFFERS_V3 _IOW(VDEC_IOCTL_MAGIC, 12,  struct vdec_buffer_v3)
+#define VDEC_IOCTL_FREEBUFFERS_V3 _IOW(VDEC_IOCTL_MAGIC, 13,  struct vdec_buffer_v3)
+#define VDEC_IOCTL_GETDECATTRIBUTES_V3 _IOR(VDEC_IOCTL_MAGIC, 14,   struct vdec_dec_attributes)
+#define VDEC_IOCTL_GETINTERNALBUFREQ _IOWR(VDEC_IOCTL_MAGIC, 15,   struct vdec_intbuf_req)
+#define VDEC_IOCTL_GETPROPERTY _IOR(VDEC_IOCTL_MAGIC, 16,   union vdec_property)
+#define VDEC_IOCTL_SETPROPERTY _IOW(VDEC_IOCTL_MAGIC, 17,   union vdec_property)
 
 enum {
  VDEC_FRAME_DECODE_OK,
@@ -50,12 +57,23 @@ enum {
  VDEC_BUFFER_TYPE_OUTPUT,
  VDEC_BUFFER_TYPE_INTERNAL1,
  VDEC_BUFFER_TYPE_INTERNAL2,
+ VDEC_BUFFER_TYPE_INTERNAL
 };
 
 enum {
  VDEC_QUEUE_SUCCESS,
  VDEC_QUEUE_FAILED,
  VDEC_QUEUE_BADSTATE,
+};
+
+enum {
+ VDEC_PROPERTY_FOURCC,
+ VDEC_PROPERTY_PROFILE,
+ VDEC_PROPERTY_LEVEL,
+ VDEC_PROPERTY_DIMENSION,
+ VDEC_PROPERTY_CWIN,
+ VDEC_PROPERTY_INPUT_BUF_REQ,
+ VDEC_PROPERTY_OUTPUT_BUF_REQ
 };
 
 struct vdec_input_buf_info {
@@ -82,6 +100,13 @@ struct vdec_buf_req {
  struct vdec_buf_desc dec_req2;
 };
 
+struct vdec_buf_req_v3 {
+ u32 max_input_queue_size;
+ struct vdec_buf_desc input;
+ struct vdec_buf_desc output;
+ u32 num_internal_buffers;
+};
+
 struct vdec_region_info {
  u32 src_id;
  u32 offset;
@@ -102,6 +127,23 @@ struct vdec_config {
  u32 reserved;
 };
 
+struct vdec_config_v3 {
+ u32 fourcc;
+ u32 width;
+ u32 height;
+ u32 order;
+ u32 notify_enable;
+ u32 vc1_rowbase;
+ u32 h264_startcode_detect;
+ u32 h264_nal_len_size;
+ u32 postproc_flag;
+ u32 fruc_enable;
+ struct vdec_region_info seq_hdr;
+ u32 seq_hdr_len;
+ u32 color_format;
+ u32 reserved;
+};
+
 struct vdec_vc1_panscan_regions {
  int num;
  int width[4];
@@ -115,6 +157,11 @@ struct vdec_cropping_window {
  u32 y1;
  u32 x2;
  u32 y2;
+};
+
+struct vdec_rectangle {
+ u32 width;
+ u32 height;
 };
 
 struct vdec_frame_info {
@@ -152,9 +199,22 @@ struct vdec_buf_info {
  u32 islast;
 };
 
+struct vdec_buf_info_v3 {
+ u32 buf_type;
+ u32 index;
+ struct vdec_region_info region;
+ u32 num_buf;
+ u32 islast;
+};
+
 struct vdec_buffer {
  u32 pmem_id;
  struct vdec_buf_info buf;
+};
+
+struct vdec_buffer_v3 {
+ u32 pmem_id;
+ struct vdec_buf_info_v3 buf;
 };
 
 struct vdec_sequence {
@@ -165,6 +225,10 @@ struct vdec_sequence {
 struct vdec_config_sps {
  struct vdec_config cfg;
  struct vdec_sequence seq;
+};
+struct vdec_config_sps_v3 {
+ struct vdec_config_v3 cfg;
+ int seq_fd;
 };
 
 #define VDEC_MSG_REUSEINPUTBUFFER 1
@@ -184,6 +248,11 @@ struct vdec_msg {
 struct vdec_init {
  struct vdec_config_sps sps_cfg;
  struct vdec_buf_req *buf_req;
+};
+
+struct vdec_init_v3 {
+ struct vdec_config_sps_v3 sps_cfg;
+ struct vdec_buf_req_v3 *buf_req;
 };
 
 struct vdec_input_buf {
@@ -206,6 +275,37 @@ struct vdec_dec_attributes {
  struct vdec_buf_desc output;
  struct vdec_buf_desc dec_req1;
  struct vdec_buf_desc dec_req2;
+};
+struct vdec_dec_attributes_v3 {
+ u32 fourcc;
+ u32 profile;
+ u32 level;
+ u32 dec_pic_width;
+ u32 dec_pic_height;
+ struct vdec_cropping_window cwin;
+ struct vdec_buf_desc input;
+ struct vdec_buf_desc output;
+};
+
+union vdec_property {
+ u32 fourcc;
+ u32 profile;
+ u32 level;
+ struct vdec_rectangle dim;
+ struct vdec_cropping_window cwin;
+ struct vdec_buf_desc input;
+ struct vdec_buf_desc output;
+ u32 def_type;
+};
+
+struct vdec_intbuf_desc {
+ u32 num_actual_internal_buf;
+ u32 internal_buf_req_length;
+};
+struct vdec_intbuf_req {
+ u32 num_internal_buf;
+ struct vdec_intbuf_desc *buf_desc;
+ struct vdec_buf_desc *internal_buf_req;
 };
 
 #endif
