@@ -34,14 +34,14 @@ enum venc_state_type {
 };
 
 enum venc_event_type_enum {
- VENC_EVENT_UNKNOWN_STATUS,
  VENC_EVENT_START_STATUS,
  VENC_EVENT_STOP_STATUS,
  VENC_EVENT_SUSPEND_STATUS,
  VENC_EVENT_RESUME_STATUS,
  VENC_EVENT_FLUSH_STATUS,
  VENC_EVENT_RELEASE_INPUT,
- VENC_EVENT_DELIVER_OUTPUT
+ VENC_EVENT_DELIVER_OUTPUT,
+ VENC_EVENT_UNKNOWN_STATUS
 };
 
 enum venc_status_code {
@@ -93,8 +93,8 @@ enum venc_error_code {
 };
 
 enum venc_mem_region_enum {
- VENC_EBI1,
- VENC_SMI
+ VENC_PMEM_EBI1,
+ VENC_PMEM_SMI
 };
 
 struct venc_buf_type {
@@ -114,14 +114,6 @@ struct venc_frame_rate {
  unsigned int frame_rate_den;
 };
 
-struct venc_frame_quality {
- unsigned int frame_rate_num;
- unsigned int frame_rate_den;
- unsigned int bitrate;
- unsigned int min_qp;
- unsigned int max_qp;
-};
-
 struct venc_slice_info {
  unsigned int slice_mode;
  unsigned int units_per_slice;
@@ -136,14 +128,20 @@ struct venc_common_config {
  unsigned int rotation_angle;
  unsigned int intra_period;
  unsigned int rate_control;
- struct venc_frame_quality frame_quality;
+ struct venc_frame_rate frame_rate;
+ unsigned int bitrate;
+ struct venc_qp_range qp_range;
  unsigned int iframe_qp;
  unsigned int pframe_qp;
  struct venc_slice_info slice_config;
+};
+
+struct venc_nonio_buf_config {
  struct venc_buf_type recon_buf1;
  struct venc_buf_type recon_buf2;
  struct venc_buf_type wb_buf;
- void *callback_event;
+ struct venc_buf_type cmd_buf;
+ struct venc_buf_type vlc_buf;
 };
 
 struct venc_mpeg4_config {
@@ -191,6 +189,8 @@ struct venc_buffer {
 struct venc_buffers {
  struct venc_pmem recon_buf[VENC_MAX_RECON_BUFFERS];
  struct venc_pmem wb_buf;
+ struct venc_pmem cmd_buf;
+ struct venc_pmem vlc_buf;
 };
 
 struct venc_buffer_flush {
@@ -217,6 +217,13 @@ union venc_codec_config {
 };
 
 struct venc_q6_config {
+ struct venc_common_config config_params;
+ union venc_codec_config codec_params;
+ struct venc_nonio_buf_config buf_params;
+ void *callback_event;
+};
+
+struct venc_hdr_config {
  struct venc_common_config config_params;
  union venc_codec_config codec_params;
 };
