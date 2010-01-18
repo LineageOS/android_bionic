@@ -132,10 +132,10 @@ if not os.path.exists(arm_unistd):
 # with two distinct unistd_32.h and unistd_64.h definition files.
 # take care of this here
 #
-x86_unistd = linux_root + "/include/asm-i386/unistd.h"
+x86_unistd = linux_root + "/include/asm-i386/unistd_32.h"
 if not os.path.exists(x86_unistd):
     x86_unistd1 = x86_unistd
-    x86_unistd = linux_root + "/include/asm-x86/unistd_32.h"
+    x86_unistd = linux_root + "/include/asm-x86/unistd.h"
     if not os.path.exists(x86_unistd):
         print "WEIRD: could not locate the i386/x86 unistd.h header file"
         print "tried searching in '%s' and '%s'" % (x86_unistd1, x86_unistd)

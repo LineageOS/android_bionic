@@ -235,8 +235,8 @@ int     klogctl:syslog(int, char *, int)   103
 #  09-08-15
 #   o Add system calls needed by udev daemon
 #
-int     readlinkat(int, const char *, char *, size_t)  305
-int 	signalfd(int, const sigset_t *, int) 321
+int     readlinkat(int, const char *, char *, size_t)  332,305
+int 	signalfd(int, const sigset_t *, int) 349,321
  
 # futex
 int	futex(void *, int, int, void *, void *, int) 240
@@ -255,3 +255,10 @@ int     poll(struct pollfd *, unsigned int, long)  168
 # ARM-specific ARM_NR_BASE == 0x0f0000 == 983040
 int     __set_tls:ARM_set_tls(void*)                                 983045,-1
 int     cacheflush:ARM_cacheflush(long start, long end, long flags)  983042,-1
+
+# busybox: 2010-01-17
+int	stime(time_t *)	25
+int	swapon(const char *, int)	87
+int	swapoff(const char *)	115
+int	sysinfo(struct sysinfo *)	116
+pid_t	getsid(pid_t pid)	147
