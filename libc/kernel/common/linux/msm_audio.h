@@ -47,28 +47,26 @@
 #define AUDIO_SET_PCM_CONFIG _IOW(AUDIO_IOCTL_MAGIC, 31, unsigned)
 #define AUDIO_SWITCH_DEVICE _IOW(AUDIO_IOCTL_MAGIC, 32, unsigned)
 #define AUDIO_SET_MUTE _IOW(AUDIO_IOCTL_MAGIC, 33, unsigned)
-#define AUDIO_GET_STREAM_INFO _IOR(AUDIO_IOCTL_MAGIC, 34,   struct msm_audio_bitstream_info)
-#define AUDIO_SET_PAN _IOW(AUDIO_IOCTL_MAGIC, 35, unsigned)
-#define AUDIO_SET_QCONCERT_PLUS _IOW(AUDIO_IOCTL_MAGIC, 36, unsigned)
-#define AUDIO_SET_MBADRC _IOW(AUDIO_IOCTL_MAGIC, 37, unsigned)
-#define AUDIO_SET_VOLUME_PATH _IOW(AUDIO_IOCTL_MAGIC, 38,   struct msm_vol_info)
-#define AUDIO_SET_MAX_VOL_ALL _IOW(AUDIO_IOCTL_MAGIC, 39, unsigned)
+#define AUDIO_UPDATE_ACDB _IOW(AUDIO_IOCTL_MAGIC, 34, unsigned)
+#define AUDIO_START_VOICE _IOW(AUDIO_IOCTL_MAGIC, 35, unsigned)
+#define AUDIO_STOP_VOICE _IOW(AUDIO_IOCTL_MAGIC, 36, unsigned)
+#define AUDIO_REINIT_ACDB _IOW(AUDIO_IOCTL_MAGIC, 39, unsigned)
 
-#define AUDIO_UPDATE_ACDB _IOW(AUDIO_IOCTL_MAGIC, 64, unsigned)
-#define AUDIO_START_VOICE _IOW(AUDIO_IOCTL_MAGIC, 65, unsigned)
-#define AUDIO_STOP_VOICE _IOW(AUDIO_IOCTL_MAGIC, 66, unsigned)
-
-#define AUDIO_SET_STREAM_CONFIG _IOW(AUDIO_IOCTL_MAGIC, 40,   struct msm_audio_stream_config)
-#define AUDIO_GET_STREAM_CONFIG _IOR(AUDIO_IOCTL_MAGIC, 41,   struct msm_audio_stream_config)
-
-#define AUDIO_GET_SESSION_ID _IOR(AUDIO_IOCTL_MAGIC, 42, unsigned short)
+#define AUDIO_SET_STREAM_CONFIG _IOW(AUDIO_IOCTL_MAGIC, 80,   struct msm_audio_stream_config)
+#define AUDIO_GET_STREAM_CONFIG _IOR(AUDIO_IOCTL_MAGIC, 81,   struct msm_audio_stream_config)
+#define AUDIO_GET_SESSION_ID _IOR(AUDIO_IOCTL_MAGIC, 82, unsigned short)
+#define AUDIO_GET_STREAM_INFO _IOR(AUDIO_IOCTL_MAGIC, 83,   struct msm_audio_bitstream_info)
+#define AUDIO_SET_PAN _IOW(AUDIO_IOCTL_MAGIC, 84, unsigned)
+#define AUDIO_SET_QCONCERT_PLUS _IOW(AUDIO_IOCTL_MAGIC, 85, unsigned)
+#define AUDIO_SET_MBADRC _IOW(AUDIO_IOCTL_MAGIC, 86, unsigned)
+#define AUDIO_SET_VOLUME_PATH _IOW(AUDIO_IOCTL_MAGIC, 87,   struct msm_vol_info)
+#define AUDIO_SET_MAX_VOL_ALL _IOW(AUDIO_IOCTL_MAGIC, 88, unsigned)
+#define AUDIO_ENABLE_AUDPRE _IOW(AUDIO_IOCTL_MAGIC, 89, unsigned)
+#define AUDIO_SET_AGC _IOW(AUDIO_IOCTL_MAGIC, 90, unsigned)
+#define AUDIO_SET_NS _IOW(AUDIO_IOCTL_MAGIC, 91, unsigned)
+#define AUDIO_SET_TX_IIR _IOW(AUDIO_IOCTL_MAGIC, 92, unsigned)
 
 #define AUDIO_MAX_COMMON_IOCTL_NUM 100
-
-#define AUDIO_ENABLE_AUDPRE _IOW(AUDIO_IOCTL_MAGIC, 11, unsigned)
-#define AUDIO_SET_AGC _IOW(AUDIO_IOCTL_MAGIC, 12, unsigned)
-#define AUDIO_SET_NS _IOW(AUDIO_IOCTL_MAGIC, 13, unsigned)
-#define AUDIO_SET_TX_IIR _IOW(AUDIO_IOCTL_MAGIC, 14, unsigned)
 
 #define HANDSET_MIC 0x01
 #define HANDSET_SPKR 0x02
