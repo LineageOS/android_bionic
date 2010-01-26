@@ -19,6 +19,7 @@
 #define VENC_FLAG_EOS 0x00000001
 #define VENC_FLAG_END_OF_FRAME 0x00000010
 #define VENC_FLAG_SYNC_FRAME 0x00000020
+#define VENC_FLAG_EXTRA_DATA 0x00000040
 #define VENC_FLAG_CODEC_CONFIG 0x00000080
 
 enum venc_flush_type {
@@ -119,6 +120,17 @@ struct venc_slice_info {
  unsigned int units_per_slice;
 };
 
+struct venc_extra_data {
+ unsigned int slice_extra_data_flag;
+ unsigned int slice_client_data1;
+ unsigned int slice_client_data2;
+ unsigned int slice_client_data3;
+ unsigned int none_extra_data_flag;
+ unsigned int none_client_data1;
+ unsigned int none_client_data2;
+ unsigned int none_client_data3;
+};
+
 struct venc_common_config {
  unsigned int standard;
  unsigned int input_frame_height;
@@ -134,6 +146,7 @@ struct venc_common_config {
  unsigned int iframe_qp;
  unsigned int pframe_qp;
  struct venc_slice_info slice_config;
+ struct venc_extra_data extra_data;
 };
 
 struct venc_nonio_buf_config {
@@ -152,6 +165,7 @@ struct venc_mpeg4_config {
  unsigned int hec_interval;
  unsigned int data_partition;
  unsigned int short_header;
+ unsigned int rvlc_enable;
 };
 
 struct venc_h263_config {
