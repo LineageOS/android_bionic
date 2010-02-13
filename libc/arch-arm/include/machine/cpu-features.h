@@ -149,14 +149,6 @@
 #  define __ARM_HAVE_PC_INTERWORK
 #endif
 
-/* define _ARM_HAVE_LDREX_STREX for ARMv6 and ARMv7 architecure to be
- * used in replacement of depricated swp instruction
- */
-#if __ARM_ARCH__ >= 6
-#  define _ARM_HAVE_LDREX_STREX
-#endif
-
-
 /* Assembly-only macros */
 
 /* define a handy PLD(address) macro since the cache preload

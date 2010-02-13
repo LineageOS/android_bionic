@@ -88,7 +88,6 @@ extern int __set_tls(void *ptr);
 
 /* get the TLS */
 #ifdef __arm__
-/* Linux kernel helpers for its TLS implementation */
 /* For performance reasons, avoid calling the kernel helper
  * Note that HAVE_ARM_TLS_REGISTER is build-specific
  * (it must match your kernel configuration)

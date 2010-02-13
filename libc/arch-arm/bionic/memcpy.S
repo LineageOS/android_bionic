@@ -1,7 +1,6 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
  * All rights reserved.
- * Copyright (c) 2009, Code Aurora Forum. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -39,7 +38,7 @@
         .align 4
 
 /* a prefetch distance of 4 cache-lines works best experimentally */
-#define CACHE_LINE_SIZE     32
+#define CACHE_LINE_SIZE     64
 #define PREFETCH_DISTANCE   (CACHE_LINE_SIZE*4)
 
 memcpy:
@@ -245,8 +244,8 @@ cached_aligned32:
         blo         less_than_32_left
 
         /*
-         * We preload a cache-line up to 32 bytes ahead. On the 926, this will
-         * stall only until the requested world is fetched, but the linefill 
+         * We preload a cache-line up to 64 bytes ahead. On the 926, this will
+         * stall only until the requested world is fetched, but the linefill
          * continues in the the background.
          * While the linefill is going, we write our previous cache-line
          * into the write-buffer (which should have some free space).
@@ -261,15 +260,24 @@ cached_aligned32:
          *
          */
 
+        // Align the preload register to a cache-line because the cpu does
+        // "critical word first" (the first word requested is loaded first).
+        bic         r12, r1, #0x1F
+        add         r12, r12, #64
+
 1:      ldmia       r1!, { r4-r11 }
-        PLD         [r1, #32]
+        PLD         (r12, #64)
         subs        r2, r2, #32
 
+        // NOTE: if r12 is more than 64 ahead of r1, the following ldrhi
+        // for ARM9 preload will not be safely guarded by the preceding subs.
+        // When it is safely guarded the only possibility to have SIGSEGV here
+        // is because the caller overstates the length.
+        ldrhi       r3, [r12], #32      /* cheap ARM9 preload */
         stmia       r0!, { r4-r11 }
-        blo         2f
-        b           1b
-		
-2:      add         r2, r2, #32
+		bhs         1b
+
+        add         r2, r2, #32
 
 
 
