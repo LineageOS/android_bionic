@@ -349,10 +349,40 @@ void endpwent(void)
 {
 }
 
-struct mntent* getmntent(FILE* f)
+struct mntent *getmntent_r(FILE *fp, struct mntent *mnt, char *buf, int buflen)
 {
-    fprintf(stderr, "FIX ME! implement getmntent() %s:%d\n", __FILE__, __LINE__);
-    return NULL;
+	char *tokp = NULL, *s;
+
+	do {
+		if (!fgets(buf, buflen, fp))
+			return NULL;
+		tokp = 0;
+		s = strtok_r(buf, " \t\n", &tokp);
+	} while (!s || *s == '#');
+
+	mnt->mnt_fsname = s;
+	mnt->mnt_freq = mnt->mnt_passno = 0;
+	if (!(mnt->mnt_dir = strtok_r(NULL, " \t\n", &tokp)))
+		return NULL;
+	if (!(mnt->mnt_type = strtok_r(NULL, " \t\n", &tokp)))
+		return NULL;
+	if (!(mnt->mnt_opts = strtok_r(NULL, " \t\n", &tokp)))
+		mnt->mnt_opts = "";
+	else if ((s = strtok_r(NULL, " \t\n", &tokp)))
+	{
+		mnt->mnt_freq = atoi(s);
+		if ((s = strtok_r(NULL, " \t\n", &tokp)))
+			mnt->mnt_passno = atoi(s);
+	}
+
+	return mnt;
+}
+
+struct mntent *getmntent(FILE *fp)
+{
+	static struct mntent mnt;
+	static char buf[256];
+	return getmntent_r(fp, &mnt, buf, 256);
 }
 
 char* ttyname(int fd)
