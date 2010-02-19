@@ -255,6 +255,16 @@ struct msm_snd_device_list {
  struct msm_snd_device_info *list;
 };
 
+struct msm_dtmf_config {
+ uint16_t path;
+ uint16_t dtmf_hi;
+ uint16_t dtmf_low;
+ uint16_t duration;
+ uint16_t tx_gain;
+ uint16_t rx_gain;
+ uint16_t mixing;
+};
+
 #define AUDIO_ROUTE_STREAM_VOICE_RX 0
 #define AUDIO_ROUTE_STREAM_VOICE_TX 1
 #define AUDIO_ROUTE_STREAM_PLAYBACK 2
