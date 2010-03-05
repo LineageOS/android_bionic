@@ -35,6 +35,9 @@ else
     LOCAL_CFLAGS += -DANDROID_X86_LINKER
   endif
 endif
+ifeq ($(TARGET_HAVE_TEGRA_ERRATA_657451),true)
+    LOCAL_CFLAGS += -DHAVE_TEGRA_ERRATA_657451
+endif
 
 LOCAL_MODULE:= linker
 

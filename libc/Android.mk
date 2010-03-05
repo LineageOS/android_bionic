@@ -498,6 +498,9 @@ ifeq ($(TARGET_ARCH),arm)
       libc_common_cflags += -DPLDSIZE=$(TARGET_SCORPION_BIONIC_PLDSIZE)
     endif
   endif
+  ifeq ($(TARGET_HAVE_TEGRA_ERRATA_657451),true)
+    libc_common_cflags += -DHAVE_TEGRA_ERRATA_657451
+  endif
 else # !arm
   ifeq ($(TARGET_ARCH),x86)
     libc_crt_target_cflags :=
