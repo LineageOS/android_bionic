@@ -508,6 +508,9 @@ ifeq ($(TARGET_ARCH),arm)
   ifeq ($(ARCH_ARM_HAVE_TLS_REGISTER),true)
     libc_common_cflags += -DHAVE_ARM_TLS_REGISTER
   endif
+  ifeq ($(TARGET_HAVE_TEGRA_ERRATA_657451),true)
+    libc_common_cflags += -DHAVE_TEGRA_ERRATA_657451
+  endif
 else # !arm
   ifeq ($(TARGET_ARCH),x86)
     libc_crt_target_cflags := -m32
