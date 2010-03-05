@@ -51,6 +51,7 @@
 #define AUDIO_START_VOICE _IOW(AUDIO_IOCTL_MAGIC, 35, unsigned)
 #define AUDIO_STOP_VOICE _IOW(AUDIO_IOCTL_MAGIC, 36, unsigned)
 #define AUDIO_REINIT_ACDB _IOW(AUDIO_IOCTL_MAGIC, 39, unsigned)
+#define AUDIO_OUTPORT_FLUSH _IOW(AUDIO_IOCTL_MAGIC, 40, unsigned short)
 
 #define AUDIO_SET_STREAM_CONFIG _IOW(AUDIO_IOCTL_MAGIC, 80,   struct msm_audio_stream_config)
 #define AUDIO_GET_STREAM_CONFIG _IOR(AUDIO_IOCTL_MAGIC, 81,   struct msm_audio_stream_config)
