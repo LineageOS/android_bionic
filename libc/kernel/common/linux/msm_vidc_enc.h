@@ -9,8 +9,8 @@
  ***
  ****************************************************************************
  ****************************************************************************/
-#ifndef _SS_VIDEOENCODER_H
-#define _SS_VIDEOENCODER_H
+#ifndef _MSM_VIDC_ENC_H_
+#define _MSM_VIDC_ENC_H_
 
 #include <linux/types.h>
 #include <linux/ioctl.h>

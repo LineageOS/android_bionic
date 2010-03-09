@@ -9,8 +9,8 @@
  ***
  ****************************************************************************
  ****************************************************************************/
-#ifndef _SS_VIDEO_DECODER_H_
-#define _SS_VIDEO_DECODER_H_
+#ifndef _MSM_VIDC_DEC_H_
+#define _MSM_VIDC_DEC_H_
 
 #include <linux/types.h>
 #include <linux/ioctl.h>
