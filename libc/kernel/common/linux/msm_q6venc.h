@@ -99,52 +99,52 @@ enum venc_mem_region_enum {
 };
 
 struct venc_buf_type {
- unsigned int region;
- unsigned int phys;
- unsigned int size;
+ u32 region;
+ u32 phys;
+ u32 size;
  int offset;
 };
 
 struct venc_qp_range {
- unsigned int min_qp;
- unsigned int max_qp;
+ u32 min_qp;
+ u32 max_qp;
 };
 
 struct venc_frame_rate {
- unsigned int frame_rate_num;
- unsigned int frame_rate_den;
+ u32 frame_rate_num;
+ u32 frame_rate_den;
 };
 
 struct venc_slice_info {
- unsigned int slice_mode;
- unsigned int units_per_slice;
+ u32 slice_mode;
+ u32 units_per_slice;
 };
 
 struct venc_extra_data {
- unsigned int slice_extra_data_flag;
- unsigned int slice_client_data1;
- unsigned int slice_client_data2;
- unsigned int slice_client_data3;
- unsigned int none_extra_data_flag;
- unsigned int none_client_data1;
- unsigned int none_client_data2;
- unsigned int none_client_data3;
+ u32 slice_extra_data_flag;
+ u32 slice_client_data1;
+ u32 slice_client_data2;
+ u32 slice_client_data3;
+ u32 none_extra_data_flag;
+ u32 none_client_data1;
+ u32 none_client_data2;
+ u32 none_client_data3;
 };
 
 struct venc_common_config {
- unsigned int standard;
- unsigned int input_frame_height;
- unsigned int input_frame_width;
- unsigned int output_frame_height;
- unsigned int output_frame_width;
- unsigned int rotation_angle;
- unsigned int intra_period;
- unsigned int rate_control;
+ u32 standard;
+ u32 input_frame_height;
+ u32 input_frame_width;
+ u32 output_frame_height;
+ u32 output_frame_width;
+ u32 rotation_angle;
+ u32 intra_period;
+ u32 rate_control;
  struct venc_frame_rate frame_rate;
- unsigned int bitrate;
+ u32 bitrate;
  struct venc_qp_range qp_range;
- unsigned int iframe_qp;
- unsigned int pframe_qp;
+ u32 iframe_qp;
+ u32 pframe_qp;
  struct venc_slice_info slice_config;
  struct venc_extra_data extra_data;
 };
@@ -158,45 +158,45 @@ struct venc_nonio_buf_config {
 };
 
 struct venc_mpeg4_config {
- unsigned int profile;
- unsigned int level;
- unsigned int time_resolution;
- unsigned int ac_prediction;
- unsigned int hec_interval;
- unsigned int data_partition;
- unsigned int short_header;
- unsigned int rvlc_enable;
+ u32 profile;
+ u32 level;
+ u32 time_resolution;
+ u32 ac_prediction;
+ u32 hec_interval;
+ u32 data_partition;
+ u32 short_header;
+ u32 rvlc_enable;
 };
 
 struct venc_h263_config {
- unsigned int profile;
- unsigned int level;
+ u32 profile;
+ u32 level;
 };
 
 struct venc_h264_config {
- unsigned int profile;
- unsigned int level;
- unsigned int max_nal;
- unsigned int idr_period;
+ u32 profile;
+ u32 level;
+ u32 max_nal;
+ u32 idr_period;
 };
 
 struct venc_pmem {
  int src;
  int fd;
- unsigned int offset;
+ u32 offset;
  void *virt;
  void *phys;
- unsigned int size;
+ u32 size;
 };
 
 struct venc_buffer {
  unsigned char *ptr_buffer;
- unsigned int size;
- unsigned int len;
- unsigned int offset;
+ u32 size;
+ u32 len;
+ u32 offset;
  long long time_stamp;
- unsigned int flags;
- unsigned int client_data;
+ u32 flags;
+ u32 client_data;
 
 };
 
@@ -208,7 +208,7 @@ struct venc_buffers {
 };
 
 struct venc_buffer_flush {
- unsigned int flush_mode;
+ u32 flush_mode;
 };
 
 union venc_msg_data {
@@ -218,10 +218,10 @@ union venc_msg_data {
 };
 
 struct venc_msg {
- unsigned int status_code;
- unsigned int msg_code;
+ u32 status_code;
+ u32 msg_code;
  union venc_msg_data msg_data;
- unsigned int msg_data_size;
+ u32 msg_data_size;
 };
 
 union venc_codec_config {
@@ -251,6 +251,11 @@ struct venc_seq_config {
  int size;
  struct venc_pmem buf;
  struct venc_q6_config q6_config;
+};
+
+struct venc_version {
+ u32 major;
+ u32 minor;
 };
 
 #define VENC_IOCTL_MAGIC 'V'
@@ -290,5 +295,7 @@ struct venc_seq_config {
 #define VENC_IOCTL_SET_TARGET_BITRATE   _IOW(VENC_IOCTL_MAGIC, 17, int)
 
 #define VENC_IOCTL_SET_QP_RANGE   _IOW(VENC_IOCTL_MAGIC, 18, struct venc_qp_range)
+
+#define VENC_IOCTL_GET_VERSION   _IOR(VENC_IOCTL_MAGIC, 19, struct venc_version)
 
 #endif
