@@ -27,8 +27,9 @@
  */
 #include <unistd.h>
 #include <signal.h>
+#include <pthread.h>
 
 int raise(int signum)
 {
-    return kill(getpid(), signum);
+    return pthread_kill(pthread_self(), signum);
 }
