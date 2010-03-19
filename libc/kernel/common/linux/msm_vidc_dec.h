@@ -129,6 +129,7 @@ struct vdec_ioctl_msg {
 #define VDEC_IOCTL_CMD_FLUSH _IOW(VDEC_IOCTL_MAGIC, 24, struct vdec_ioctl_msg)
 
 #define VDEC_IOCTL_GET_NEXT_MSG   _IOR(VDEC_IOCTL_MAGIC, 25, struct vdec_ioctl_msg)
+#define VDEC_IOCTL_STOP_NEXT_MSG  _IO(VDEC_IOCTL_MAGIC, 26)
 
 enum vdec_picture {
  PICTURE_TYPE_I,
