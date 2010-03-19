@@ -275,4 +275,22 @@ struct msm_audio_route_config {
  uint32_t stream_id;
  uint32_t dev_id;
 };
+
+#define AUDIO_MAX_EQ_BANDS 12
+
+struct msm_audio_eq_band {
+ uint16_t band_idx;
+ uint32_t filter_type;
+ uint32_t center_freq_hz;
+ uint32_t filter_gain;
+
+ uint32_t q_factor;
+} __attribute__ ((packed));
+
+struct msm_audio_eq_stream_config {
+ uint32_t enable;
+ uint32_t num_bands;
+ struct msm_audio_eq_band eq_bands[AUDIO_MAX_EQ_BANDS];
+} __attribute__ ((packed));
+
 #endif
