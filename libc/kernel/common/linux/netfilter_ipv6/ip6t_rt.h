@@ -14,8 +14,7 @@
 
 #define IP6T_RT_HOPS 16
 
-struct ip6t_rt
-{
+struct ip6t_rt {
  u_int32_t rt_type;
  u_int32_t segsleft[2];
  u_int32_t hdrlen;

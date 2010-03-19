@@ -13,6 +13,9 @@
 #define __LINUX_BRIDGE_NETFILTER_H
 
 #include <linux/netfilter.h>
+#include <linux/if_ether.h>
+#include <linux/if_vlan.h>
+#include <linux/if_pppox.h>
 
 #define NF_BR_PRE_ROUTING 0
 

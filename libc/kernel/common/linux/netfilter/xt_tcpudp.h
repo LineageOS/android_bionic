@@ -12,14 +12,15 @@
 #ifndef _XT_TCPUDP_H
 #define _XT_TCPUDP_H
 
-struct xt_tcp
-{
- u_int16_t spts[2];
- u_int16_t dpts[2];
- u_int8_t option;
- u_int8_t flg_mask;
- u_int8_t flg_cmp;
- u_int8_t invflags;
+#include <linux/types.h>
+
+struct xt_tcp {
+ __u16 spts[2];
+ __u16 dpts[2];
+ __u8 option;
+ __u8 flg_mask;
+ __u8 flg_cmp;
+ __u8 invflags;
 };
 
 #define XT_TCP_INV_SRCPT 0x01  
@@ -28,11 +29,10 @@ struct xt_tcp
 #define XT_TCP_INV_OPTION 0x08  
 #define XT_TCP_INV_MASK 0x0F  
 
-struct xt_udp
-{
- u_int16_t spts[2];
- u_int16_t dpts[2];
- u_int8_t invflags;
+struct xt_udp {
+ __u16 spts[2];
+ __u16 dpts[2];
+ __u8 invflags;
 };
 
 #define XT_UDP_INV_SRCPT 0x01  

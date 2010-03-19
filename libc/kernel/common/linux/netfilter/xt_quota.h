@@ -17,11 +17,14 @@ enum xt_quota_flags {
 };
 #define XT_QUOTA_MASK 0x1
 
+struct xt_quota_priv;
+
 struct xt_quota_info {
  u_int32_t flags;
  u_int32_t pad;
+
  aligned_u64 quota;
- struct xt_quota_info *master;
+ struct xt_quota_priv *master;
 };
 
 #endif

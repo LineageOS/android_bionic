@@ -22,7 +22,7 @@ typedef struct ipq_packet_msg {
  unsigned int hook;
  char indev_name[IFNAMSIZ];
  char outdev_name[IFNAMSIZ];
- unsigned short hw_protocol;
+ __be16 hw_protocol;
  unsigned short hw_type;
  unsigned char hw_addrlen;
  unsigned char hw_addr[8];
