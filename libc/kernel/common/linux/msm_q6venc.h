@@ -220,8 +220,8 @@ union venc_msg_data {
 struct venc_msg {
  u32 status_code;
  u32 msg_code;
- union venc_msg_data msg_data;
  u32 msg_data_size;
+ union venc_msg_data msg_data;
 };
 
 union venc_codec_config {
