@@ -12,6 +12,7 @@
 #ifndef _ARPTABLES_H
 #define _ARPTABLES_H
 
+#include <linux/types.h>
 #include <linux/compiler.h>
 #include <linux/netfilter_arp.h>
 
@@ -19,8 +20,6 @@
 
 #define ARPT_FUNCTION_MAXNAMELEN XT_FUNCTION_MAXNAMELEN
 #define ARPT_TABLE_MAXNAMELEN XT_TABLE_MAXNAMELEN
-#define arpt_target xt_target
-#define arpt_table xt_table
 
 #define ARPT_DEV_ADDR_LEN_MAX 16
 
@@ -39,10 +38,10 @@ struct arpt_arp {
  struct arpt_devaddr_info src_devaddr;
  struct arpt_devaddr_info tgt_devaddr;
 
- u_int16_t arpop, arpop_mask;
+ __be16 arpop, arpop_mask;
 
- u_int16_t arhrd, arhrd_mask;
- u_int16_t arpro, arpro_mask;
+ __be16 arhrd, arhrd_mask;
+ __be16 arpro, arpro_mask;
 
  char iniface[IFNAMSIZ], outiface[IFNAMSIZ];
  unsigned char iniface_mask[IFNAMSIZ], outiface_mask[IFNAMSIZ];
@@ -84,25 +83,23 @@ struct arpt_entry
  unsigned char elems[0];
 };
 
-#define ARPT_CTL_OFFSET 32
-#define ARPT_BASE_CTL (XT_BASE_CTL+ARPT_CTL_OFFSET)
+#define ARPT_BASE_CTL 96
 
-#define ARPT_SO_SET_REPLACE (XT_SO_SET_REPLACE+ARPT_CTL_OFFSET)
-#define ARPT_SO_SET_ADD_COUNTERS (XT_SO_SET_ADD_COUNTERS+ARPT_CTL_OFFSET)
-#define ARPT_SO_SET_MAX (XT_SO_SET_MAX+ARPT_CTL_OFFSET)
+#define ARPT_SO_SET_REPLACE (ARPT_BASE_CTL)
+#define ARPT_SO_SET_ADD_COUNTERS (ARPT_BASE_CTL + 1)
+#define ARPT_SO_SET_MAX ARPT_SO_SET_ADD_COUNTERS
 
-#define ARPT_SO_GET_INFO (XT_SO_GET_INFO+ARPT_CTL_OFFSET)
-#define ARPT_SO_GET_ENTRIES (XT_SO_GET_ENTRIES+ARPT_CTL_OFFSET)
+#define ARPT_SO_GET_INFO (ARPT_BASE_CTL)
+#define ARPT_SO_GET_ENTRIES (ARPT_BASE_CTL + 1)
 
-#define ARPT_SO_GET_REVISION_TARGET (XT_SO_GET_REVISION_TARGET+ARPT_CTL_OFFSET)
-#define ARPT_SO_GET_MAX (XT_SO_GET_REVISION_TARGET+ARPT_CTL_OFFSET)
+#define ARPT_SO_GET_REVISION_TARGET (ARPT_BASE_CTL + 3)
+#define ARPT_SO_GET_MAX (ARPT_SO_GET_REVISION_TARGET)
 
 #define ARPT_CONTINUE XT_CONTINUE
 
 #define ARPT_RETURN XT_RETURN
 
-struct arpt_getinfo
-{
+struct arpt_getinfo {
 
  char name[ARPT_TABLE_MAXNAMELEN];
 
@@ -117,8 +114,7 @@ struct arpt_getinfo
  unsigned int size;
 };
 
-struct arpt_replace
-{
+struct arpt_replace {
 
  char name[ARPT_TABLE_MAXNAMELEN];
 
@@ -140,9 +136,9 @@ struct arpt_replace
 };
 
 #define arpt_counters_info xt_counters_info
+#define arpt_counters xt_counters
 
-struct arpt_get_entries
-{
+struct arpt_get_entries {
 
  char name[ARPT_TABLE_MAXNAMELEN];
 
@@ -155,5 +151,5 @@ struct arpt_get_entries
 
 #define ARPT_ERROR_TARGET XT_ERROR_TARGET
 
-#define ARPT_ENTRY_ITERATE(entries, size, fn, args...)  ({   unsigned int __i;   int __ret = 0;   struct arpt_entry *__entry;     for (__i = 0; __i < (size); __i += __entry->next_offset) {   __entry = (void *)(entries) + __i;     __ret = fn(__entry , ## args);   if (__ret != 0)   break;   }   __ret;  })
+#define ARPT_ENTRY_ITERATE(entries, size, fn, args...)   XT_ENTRY_ITERATE(struct arpt_entry, entries, size, fn, ## args)
 #endif

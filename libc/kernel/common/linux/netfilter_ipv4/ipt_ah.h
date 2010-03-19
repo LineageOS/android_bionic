@@ -12,8 +12,7 @@
 #ifndef _IPT_AH_H
 #define _IPT_AH_H
 
-struct ipt_ah
-{
+struct ipt_ah {
  u_int32_t spis[2];
  u_int8_t invflags;
 };
