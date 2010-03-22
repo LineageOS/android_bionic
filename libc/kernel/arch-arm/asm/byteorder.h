@@ -17,6 +17,9 @@
 
 static inline __attribute_const__ __u32 ___arch__swab32(__u32 x)
 {
+#if __ARM_ARCH__ >= 6
+ __asm__("rev %0, %0" : "+r"(x));
+#else
  __u32 t;
 
 #ifndef __thumb__
@@ -30,6 +33,7 @@ static inline __attribute_const__ __u32 ___arch__swab32(__u32 x)
  x = (x << 24) | (x >> 8);
  t &= ~0x00FF0000;
  x ^= (t >> 8);
+#endif
 
  return x;
 }
