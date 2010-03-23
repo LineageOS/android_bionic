@@ -104,6 +104,7 @@
 #define __NR_nanosleep                    (__NR_SYSCALL_BASE + 162)
 #define __NR_getitimer                    (__NR_SYSCALL_BASE + 105)
 #define __NR_setitimer                    (__NR_SYSCALL_BASE + 104)
+#define __NR_adjtimex                     (__NR_SYSCALL_BASE + 124)
 #define __NR_sigprocmask                  (__NR_SYSCALL_BASE + 126)
 #define __NR_sigsuspend                   (__NR_SYSCALL_BASE + 72)
 #define __NR_rt_sigaction                 (__NR_SYSCALL_BASE + 174)
