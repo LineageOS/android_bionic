@@ -323,7 +323,8 @@ struct msm_snapshot_pp_status {
 #define CFG_GET_PICT_P_PL 25
 #define CFG_GET_AF_MAX_STEPS 26
 #define CFG_GET_PICT_MAX_EXP_LC 27
-#define CFG_MAX 28
+#define CFG_SEND_WB_INFO 28
+#define CFG_MAX 29
 
 #define MOVE_NEAR 0
 #define MOVE_FAR 1
@@ -368,6 +369,11 @@ struct fps_cfg {
  uint32_t pict_fps_div;
 };
 
+struct wb_info_cfg {
+ uint16_t red_gain;
+ uint16_t green_gain;
+ uint16_t blue_gain;
+};
 struct sensor_cfg_data {
  int cfgtype;
  int mode;
@@ -387,6 +393,7 @@ struct sensor_cfg_data {
  struct exp_gain_cfg exp_gain;
  struct focus_cfg focus;
  struct fps_cfg fps;
+ struct wb_info_cfg wb_info;
  } cfg;
 };
 
