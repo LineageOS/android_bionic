@@ -292,7 +292,8 @@ libc_common_src_files += \
 	arch-arm/bionic/setjmp.S \
 	arch-arm/bionic/sigsetjmp.S \
 	arch-arm/bionic/strlen.S \
-	arch-arm/bionic/strcpy.c.arm \
+	arch-arm/bionic/strcpy.S \
+	arch-arm/bionic/strcmp.S \
 	arch-arm/bionic/syscall.S \
 	string/memmove.c.arm \
 	string/bcopy.c \
