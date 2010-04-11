@@ -12,15 +12,16 @@
 #ifndef _NF_CONNTRACK_FTP_H
 #define _NF_CONNTRACK_FTP_H
 
-enum nf_ct_ftp_type {
+enum ip_ct_ftp_type
+{
 
- NF_CT_FTP_PORT,
+ IP_CT_FTP_PORT,
 
- NF_CT_FTP_PASV,
+ IP_CT_FTP_PASV,
 
- NF_CT_FTP_EPRT,
+ IP_CT_FTP_EPRT,
 
- NF_CT_FTP_EPSV,
+ IP_CT_FTP_EPSV,
 };
 
 #endif

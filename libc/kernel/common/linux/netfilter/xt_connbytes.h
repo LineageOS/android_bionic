@@ -12,8 +12,6 @@
 #ifndef _XT_CONNBYTES_H
 #define _XT_CONNBYTES_H
 
-#include <linux/types.h>
-
 enum xt_connbytes_what {
  XT_CONNBYTES_PKTS,
  XT_CONNBYTES_BYTES,
@@ -26,12 +24,13 @@ enum xt_connbytes_direction {
  XT_CONNBYTES_DIR_BOTH,
 };
 
-struct xt_connbytes_info {
+struct xt_connbytes_info
+{
  struct {
  aligned_u64 from;
  aligned_u64 to;
  } count;
- __u8 what;
- __u8 direction;
+ u_int8_t what;
+ u_int8_t direction;
 };
 #endif
