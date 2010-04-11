@@ -12,16 +12,18 @@
 #ifndef _XT_SECMARK_H_target
 #define _XT_SECMARK_H_target
 
+#include <linux/types.h>
+
 #define SECMARK_MODE_SEL 0x01  
 #define SECMARK_SELCTX_MAX 256
 
 struct xt_secmark_target_selinux_info {
- u_int32_t selsid;
+ __u32 selsid;
  char selctx[SECMARK_SELCTX_MAX];
 };
 
 struct xt_secmark_target_info {
- u_int8_t mode;
+ __u8 mode;
  union {
  struct xt_secmark_target_selinux_info sel;
  } u;

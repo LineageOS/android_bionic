@@ -471,7 +471,7 @@ _do_lookup(soinfo *si, const char *name, unsigned *base)
             DEBUG("%5d %s: looking up %s in %s\n",
                   pid, si->name, name, lsi->name);
             s = _do_lookup_in_so(lsi, name, &elf_hash);
-            if(s != NULL)
+            if ((s != NULL) && (s->st_shndx != SHN_UNDEF))
                 goto done;
         }
     }
@@ -536,6 +536,40 @@ Elf32_Sym *lookup(const char *name, soinfo **found)
     }
 
     return 0;
+}
+
+soinfo *find_containing_library(void *addr)
+{
+    soinfo *si;
+
+    for(si = solist; si != NULL; si = si->next)
+    {
+        if((unsigned)addr >= si->base && (unsigned)addr - si->base < si->size) {
+            return si;
+        }
+    }
+
+    return NULL;
+}
+
+Elf32_Sym *find_containing_symbol(void *addr, soinfo *si)
+{
+    unsigned int i;
+    unsigned soaddr = (unsigned)addr - si->base;
+
+    /* Search the library's symbol table for any defined symbol which
+     * contains this address */
+    for(i=0; i<si->nchain; i++) {
+        Elf32_Sym *sym = &si->symtab[i];
+
+        if(sym->st_shndx != SHN_UNDEF &&
+           soaddr >= sym->st_value &&
+           soaddr < sym->st_value + sym->st_size) {
+            return sym;
+        }
+    }
+
+    return NULL;
 }
 
 #if 0
@@ -1294,6 +1328,13 @@ static int reloc_library(soinfo *si, Elf32_Rel *rel, unsigned count)
             TRACE_TYPE(RELO, "%5d RELO ABS %08x <- %08x %s\n", pid,
                        reloc, sym_addr, sym_name);
             *((unsigned*)reloc) += sym_addr;
+            break;
+        case R_ARM_REL32:
+            COUNT_RELOC(RELOC_RELATIVE);
+            MARK(rel->r_offset);
+            TRACE_TYPE(RELO, "%5d RELO REL32 %08x <- %08x - %08x %s\n", pid,
+                       reloc, sym_addr, rel->r_offset, sym_name);
+            *((unsigned*)reloc) += sym_addr - rel->r_offset;
             break;
 #elif defined(ANDROID_X86_LINKER)
         case R_386_JUMP_SLOT:

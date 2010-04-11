@@ -171,7 +171,6 @@ libc_common_src_files := \
 	stdlib/tolower_.c \
 	stdlib/toupper_.c \
 	stdlib/wchar.c \
-	string/bcopy.c \
 	string/index.c \
 	string/memccpy.c \
 	string/memchr.c \
@@ -182,9 +181,7 @@ libc_common_src_files := \
 	string/strcasestr.c \
 	string/strcat.c \
 	string/strchr.c \
-	string/strcmp.c \
 	string/strcoll.c \
-	string/strcpy.c \
 	string/strcspn.c \
 	string/strdup.c \
 	string/strerror.c \
@@ -192,7 +189,6 @@ libc_common_src_files := \
 	string/strlcat.c \
 	string/strlcpy.c \
 	string/strncat.c \
-	string/strncmp.c \
 	string/strncpy.c \
 	string/strndup.c \
 	string/strnlen.c \
@@ -292,14 +288,25 @@ libc_common_src_files += \
 	arch-arm/bionic/tkill.S \
 	arch-arm/bionic/memcmp.S \
 	arch-arm/bionic/memcmp16.S \
-	arch-arm/bionic/memcpy.S \
 	arch-arm/bionic/memset.S \
 	arch-arm/bionic/setjmp.S \
 	arch-arm/bionic/sigsetjmp.S \
-	arch-arm/bionic/strlen.c.arm \
+	arch-arm/bionic/strlen.S \
+	arch-arm/bionic/strcpy.S \
+	arch-arm/bionic/strcmp.S \
 	arch-arm/bionic/syscall.S \
 	string/memmove.c.arm \
+	string/bcopy.c \
+	string/strncmp.c \
 	unistd/socketcalls.c
+
+ifeq ($(ALLOW_LGPL),true)
+libc_common_src_files += \
+	arch-arm/bionic/memcpy-neon.S
+else # !allow_lgpl
+libc_common_src_files += \
+	arch-arm/bionic/memcpy.S
+endif
 
 # These files need to be arm so that gdbserver
 # can set breakpoints in them without messing
@@ -329,11 +336,17 @@ libc_common_src_files += \
 	arch-x86/bionic/setjmp.S \
 	arch-x86/bionic/_setjmp.S \
 	arch-x86/bionic/vfork.S \
-	arch-x86/string/bzero.S \
-	arch-x86/string/memset.S \
-	arch-x86/string/memcmp.S \
-	arch-x86/string/memcpy.S \
+	arch-x86/bionic/syscall.S \
+	arch-x86/string/bcopy_wrapper.S \
+	arch-x86/string/memcpy_wrapper.S \
+	arch-x86/string/memmove_wrapper.S \
+	arch-x86/string/bzero_wrapper.S \
+	arch-x86/string/memcmp_wrapper.S \
+	arch-x86/string/memset_wrapper.S \
+	arch-x86/string/strcmp_wrapper.S \
+	arch-x86/string/strncmp_wrapper.S \
 	arch-x86/string/strlen.S \
+	arch-x86/string/strcpy.S \
 	string/memmove.c \
 	bionic/pthread.c \
 	bionic/pthread-timers.c \
@@ -366,6 +379,9 @@ libc_common_src_files += \
 	arch-sh/bionic/__set_tls.c \
 	arch-sh/bionic/__get_tls.c \
 	arch-sh/bionic/ffs.S \
+	string/bcopy.c \
+	string/strcmp.c \
+	string/strncmp.c \
 	string/memcmp.c \
 	string/strlen.c \
 	bionic/eabi.c \
@@ -413,6 +429,10 @@ ifeq ($(TARGET_ARCH),arm)
 else # !arm
   ifeq ($(TARGET_ARCH),x86)
     libc_crt_target_cflags := -m32
+
+    # Enable recent IA friendly memory routines (such as for Atom)
+    # These will not work on the earlier x86 machines
+    libc_common_cflags += -mtune=i686 -DUSE_SSSE3 -DUSE_SSE2
   endif # x86
 endif # !arm
 

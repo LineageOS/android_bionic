@@ -597,13 +597,12 @@ int pthread_join(pthread_t thid, void ** ret_val)
 
     for (thread = gThreadList; thread != NULL; thread = thread->next)
         if (thread == (pthread_internal_t*)thid)
-            break;
+            goto FoundIt;
 
-    if (!thread) {
-        pthread_mutex_unlock(&gThreadListLock);
-        return ESRCH;
-    }
+    pthread_mutex_unlock(&gThreadListLock);
+    return ESRCH;
 
+FoundIt:
     if (thread->attr.flags & PTHREAD_ATTR_FLAG_DETACHED) {
         pthread_mutex_unlock(&gThreadListLock);
         return EINVAL;
@@ -1675,7 +1674,11 @@ int pthread_kill(pthread_t tid, int sig)
     int  old_errno = errno;
     pthread_internal_t * thread = (pthread_internal_t *)tid;
 
+    if (!thread)
+        return ESRCH;
+
     ret = tkill(thread->kernel_id, sig);
+
     if (ret < 0) {
         ret = errno;
         errno = old_errno;

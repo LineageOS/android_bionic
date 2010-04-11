@@ -12,6 +12,7 @@
 #ifndef _IP6_TABLES_H
 #define _IP6_TABLES_H
 
+#include <linux/types.h>
 #include <linux/compiler.h>
 #include <linux/netfilter_ipv6.h>
 
@@ -62,8 +63,7 @@ struct ip6t_ip6 {
 #define IP6T_INV_PROTO XT_INV_PROTO
 #define IP6T_INV_MASK 0x7F  
 
-struct ip6t_entry
-{
+struct ip6t_entry {
  struct ip6t_ip6 ipv6;
 
  unsigned int nfcache;
@@ -79,17 +79,38 @@ struct ip6t_entry
  unsigned char elems[0];
 };
 
-#define IP6T_BASE_CTL XT_BASE_CTL
+struct ip6t_standard {
+ struct ip6t_entry entry;
+ struct ip6t_standard_target target;
+};
 
-#define IP6T_SO_SET_REPLACE XT_SO_SET_REPLACE
-#define IP6T_SO_SET_ADD_COUNTERS XT_SO_SET_ADD_COUNTERS
-#define IP6T_SO_SET_MAX XT_SO_SET_MAX
+struct ip6t_error_target {
+ struct ip6t_entry_target target;
+ char errorname[IP6T_FUNCTION_MAXNAMELEN];
+};
 
-#define IP6T_SO_GET_INFO XT_SO_GET_INFO
-#define IP6T_SO_GET_ENTRIES XT_SO_GET_ENTRIES
-#define IP6T_SO_GET_REVISION_MATCH XT_SO_GET_REVISION_MATCH
-#define IP6T_SO_GET_REVISION_TARGET XT_SO_GET_REVISION_TARGET
-#define IP6T_SO_GET_MAX XT_SO_GET_REVISION_TARGET
+struct ip6t_error {
+ struct ip6t_entry entry;
+ struct ip6t_error_target target;
+};
+
+#define IP6T_ENTRY_INIT(__size)  {   .target_offset = sizeof(struct ip6t_entry),   .next_offset = (__size),  }
+
+#define IP6T_STANDARD_INIT(__verdict)  {   .entry = IP6T_ENTRY_INIT(sizeof(struct ip6t_standard)),   .target = XT_TARGET_INIT(IP6T_STANDARD_TARGET,   sizeof(struct ip6t_standard_target)),   .target.verdict = -(__verdict) - 1,  }
+
+#define IP6T_ERROR_INIT  {   .entry = IP6T_ENTRY_INIT(sizeof(struct ip6t_error)),   .target = XT_TARGET_INIT(IP6T_ERROR_TARGET,   sizeof(struct ip6t_error_target)),   .target.errorname = "ERROR",  }
+
+#define IP6T_BASE_CTL 64
+
+#define IP6T_SO_SET_REPLACE (IP6T_BASE_CTL)
+#define IP6T_SO_SET_ADD_COUNTERS (IP6T_BASE_CTL + 1)
+#define IP6T_SO_SET_MAX IP6T_SO_SET_ADD_COUNTERS
+
+#define IP6T_SO_GET_INFO (IP6T_BASE_CTL)
+#define IP6T_SO_GET_ENTRIES (IP6T_BASE_CTL + 1)
+#define IP6T_SO_GET_REVISION_MATCH (IP6T_BASE_CTL + 4)
+#define IP6T_SO_GET_REVISION_TARGET (IP6T_BASE_CTL + 5)
+#define IP6T_SO_GET_MAX IP6T_SO_GET_REVISION_TARGET
 
 #define IP6T_CONTINUE XT_CONTINUE
 
@@ -110,8 +131,7 @@ struct ip6t_entry
 #define IP6T_UDP_INV_DSTPT XT_UDP_INV_DSTPT
 #define IP6T_UDP_INV_MASK XT_UDP_INV_MASK
 
-struct ip6t_icmp
-{
+struct ip6t_icmp {
  u_int8_t type;
  u_int8_t code[2];
  u_int8_t invflags;
@@ -119,24 +139,22 @@ struct ip6t_icmp
 
 #define IP6T_ICMP_INV 0x01  
 
-struct ip6t_getinfo
-{
+struct ip6t_getinfo {
 
  char name[IP6T_TABLE_MAXNAMELEN];
 
  unsigned int valid_hooks;
 
- unsigned int hook_entry[NF_IP6_NUMHOOKS];
+ unsigned int hook_entry[NF_INET_NUMHOOKS];
 
- unsigned int underflow[NF_IP6_NUMHOOKS];
+ unsigned int underflow[NF_INET_NUMHOOKS];
 
  unsigned int num_entries;
 
  unsigned int size;
 };
 
-struct ip6t_replace
-{
+struct ip6t_replace {
 
  char name[IP6T_TABLE_MAXNAMELEN];
 
@@ -146,9 +164,9 @@ struct ip6t_replace
 
  unsigned int size;
 
- unsigned int hook_entry[NF_IP6_NUMHOOKS];
+ unsigned int hook_entry[NF_INET_NUMHOOKS];
 
- unsigned int underflow[NF_IP6_NUMHOOKS];
+ unsigned int underflow[NF_INET_NUMHOOKS];
 
  unsigned int num_counters;
 
@@ -159,8 +177,7 @@ struct ip6t_replace
 
 #define ip6t_counters_info xt_counters_info
 
-struct ip6t_get_entries
-{
+struct ip6t_get_entries {
 
  char name[IP6T_TABLE_MAXNAMELEN];
 
@@ -173,6 +190,6 @@ struct ip6t_get_entries
 
 #define IP6T_ERROR_TARGET XT_ERROR_TARGET
 
-#define IP6T_MATCH_ITERATE(e, fn, args...)  ({   unsigned int __i;   int __ret = 0;   struct ip6t_entry_match *__m;     for (__i = sizeof(struct ip6t_entry);   __i < (e)->target_offset;   __i += __m->u.match_size) {   __m = (void *)(e) + __i;     __ret = fn(__m , ## args);   if (__ret != 0)   break;   }   __ret;  })
-#define IP6T_ENTRY_ITERATE(entries, size, fn, args...)  ({   unsigned int __i;   int __ret = 0;   struct ip6t_entry *__e;     for (__i = 0; __i < (size); __i += __e->next_offset) {   __e = (void *)(entries) + __i;     __ret = fn(__e , ## args);   if (__ret != 0)   break;   }   __ret;  })
+#define IP6T_MATCH_ITERATE(e, fn, args...)   XT_MATCH_ITERATE(struct ip6t_entry, e, fn, ## args)
+#define IP6T_ENTRY_ITERATE(entries, size, fn, args...)   XT_ENTRY_ITERATE(struct ip6t_entry, entries, size, fn, ## args)
 #endif
