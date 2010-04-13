@@ -42,8 +42,8 @@ typedef struct prop_msg prop_msg;
 
 #define PROP_SERVICE_NAME "property_service"
 
-/* #define PROP_MAX_ENTRIES 247 */
-/* 247 -> 32620 bytes (<32768) */
+/* #define PROP_MAX_ENTRIES 226 */
+/* 226 -> 32664 bytes (<32768) */
 
 #define TOC_NAME_LEN(toc)       ((toc) >> 24)
 #define TOC_TO_INFO(area, toc)  ((prop_info*) (((char*) area) + ((toc) & 0xFFFFFF)))
