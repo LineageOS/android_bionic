@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (C) 2010 0xlab - htpp://0xlab.org/
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -81,6 +82,19 @@ __atomic_cmpxchg:
     stmdb   sp!, {r4, lr}
     mov     r4, r0          /* r4 = save oldvalue */
 1: @ atomic_cmpxchg
+#ifdef __thumb2__
+/* Thumb-2 comes with ldrex/strex instruction.  However, it lacks of barrier
+   instructions, so using the kernel helper is still required.  */
+    ldr     r3, [r2]
+    cmp     r3, r4
+    bne     2f
+    mov     r0, r4
+    movw    r3, #0x0FC0
+    movt    r3, #0xFFFF
+    blx     r3
+    bcc     1b
+    mov     r3, r4
+#else
     mov     r3, #kernel_atomic_base
     add     lr, pc, #4
     mov     r0, r4          /* r0 = oldvalue */
@@ -89,6 +103,7 @@ __atomic_cmpxchg:
     ldr     r3, [r2]        /* swap not made, see if it's because *ptr!=oldvalue */
     cmp     r3, r4
     beq     1b
+#endif
 2: @ atomic_cmpxchg
     ldmia   sp!, {r4, lr}
     bx      lr
