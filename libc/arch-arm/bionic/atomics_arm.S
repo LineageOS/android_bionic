@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- * Copyright (C) 2010 0xlab - htpp://0xlab.org/
+ * Copyright (C) 2010 0xlab - http://0xlab.org/
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
