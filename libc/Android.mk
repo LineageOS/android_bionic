@@ -297,7 +297,6 @@ libc_common_src_files += \
 	arch-arm/bionic/syscall.S \
 	string/memmove.c.arm \
 	string/bcopy.c \
-	string/strcmp.c \
 	string/strncmp.c \
 	unistd/socketcalls.c
 
@@ -382,7 +381,6 @@ libc_common_src_files += \
 	arch-sh/bionic/__get_tls.c \
 	arch-sh/bionic/ffs.S \
 	string/bcopy.c \
-	string/strcmp.c \
 	string/strncmp.c \
 	string/memcmp.c \
 	string/strlen.c \
