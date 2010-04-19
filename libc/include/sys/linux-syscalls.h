@@ -105,6 +105,7 @@
 #define __NR_nanosleep                    (__NR_SYSCALL_BASE + 162)
 #define __NR_getitimer                    (__NR_SYSCALL_BASE + 105)
 #define __NR_setitimer                    (__NR_SYSCALL_BASE + 104)
+#define __NR_adjtimex                     (__NR_SYSCALL_BASE + 124)
 #define __NR_sigaction                    (__NR_SYSCALL_BASE + 67)
 #define __NR_sigprocmask                  (__NR_SYSCALL_BASE + 126)
 #define __NR_sigsuspend                   (__NR_SYSCALL_BASE + 72)
@@ -131,6 +132,10 @@
 #define __NR_sysinfo                      (__NR_SYSCALL_BASE + 116)
 #define __NR_futex                        (__NR_SYSCALL_BASE + 240)
 #define __NR_poll                         (__NR_SYSCALL_BASE + 168)
+#define __NR_stime                        (__NR_SYSCALL_BASE + 25)
+#define __NR_swapon                       (__NR_SYSCALL_BASE + 87)
+#define __NR_swapoff                      (__NR_SYSCALL_BASE + 115)
+#define __NR_getsid                       (__NR_SYSCALL_BASE + 147)
 
 #ifdef __arm__
 #define __NR_exit_group                   (__NR_SYSCALL_BASE + 248)

@@ -137,6 +137,7 @@ int              __timer_gettime (timer_t, struct itimerspec*);
 int              __timer_getoverrun (timer_t);
 int              __timer_delete (timer_t);
 int              utimes (const char*, const struct timeval tvp[2]);
+int              adjtimex (struct timex *);
 int              sigaction (int, const struct sigaction *, struct sigaction *);
 int              sigprocmask (int, const sigset_t *, sigset_t *);
 int              __sigsuspend (int unused1, int unused2, unsigned mask);
@@ -205,6 +206,10 @@ int              poll (struct pollfd *, unsigned int, long);
 int              eventfd (unsigned int, int);
 int              __set_tls (void*);
 int              cacheflush (long start, long end, long flags);
+int              stime (time_t *);
+int              swapon (const char *, int);
+int              swapoff (const char *);
+pid_t            getsid (pid_t pid);
 #ifdef __cplusplus
 }
 #endif
