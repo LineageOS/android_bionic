@@ -198,6 +198,11 @@ int              inotify_rm_watch (int, unsigned int);
 int              poll (struct pollfd *, unsigned int, long);
 int              __set_tls (void*);
 int              cacheflush (long start, long end, long flags);
+int              stime (time_t *);
+int              swapon (const char *, int);
+int              swapoff (const char *);
+int              sysinfo (struct sysinfo *);
+pid_t            getsid (pid_t pid);
 #ifdef __cplusplus
 }
 #endif
