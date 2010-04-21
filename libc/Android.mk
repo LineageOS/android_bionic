@@ -300,10 +300,15 @@ libc_common_src_files += \
 	string/strncmp.c \
 	unistd/socketcalls.c
 
+ifeq ($(ARCH_ARM_HAVE_NEON),true)
 ifeq ($(ALLOW_LGPL),true)
 libc_common_src_files += \
 	arch-arm/bionic/memcpy-neon.S
 else # !allow_lgpl
+libc_common_src_files += \
+	arch-arm/bionic/memcpy.S
+endif
+else # !arch_arm_have_neon
 libc_common_src_files += \
 	arch-arm/bionic/memcpy.S
 endif
