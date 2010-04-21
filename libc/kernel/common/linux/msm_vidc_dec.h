@@ -131,6 +131,9 @@ struct vdec_ioctl_msg {
 #define VDEC_IOCTL_GET_NEXT_MSG   _IOR(VDEC_IOCTL_MAGIC, 25, struct vdec_ioctl_msg)
 #define VDEC_IOCTL_STOP_NEXT_MSG  _IO(VDEC_IOCTL_MAGIC, 26)
 
+#define VDEC_IOCTL_GET_NUMBER_INSTANCES _IOR(VDEC_IOCTL_MAGIC, 27, struct vdec_ioctl_msg)
+
+
 enum vdec_picture {
  PICTURE_TYPE_I,
  PICTURE_TYPE_P,
