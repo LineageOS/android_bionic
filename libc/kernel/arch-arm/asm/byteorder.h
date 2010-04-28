@@ -12,6 +12,7 @@
 #ifndef __ASM_ARM_BYTEORDER_H
 #define __ASM_ARM_BYTEORDER_H
 
+#include <machine/cpu-features.h>
 #include <linux/compiler.h>
 #include <asm/types.h>
 
