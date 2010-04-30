@@ -12,9 +12,13 @@
 #ifndef __LINUX_MSM_CAMERA_H
 #define __LINUX_MSM_CAMERA_H
 
+#ifdef MSM_CAMERA_BIONIC
+#include <sys/types.h>
+#endif
 #include <linux/types.h>
 #include <asm/sizes.h>
 #include <linux/ioctl.h>
+#include <linux/time.h>
 
 #define MSM_CAM_IOCTL_MAGIC 'm'
 
@@ -167,6 +171,10 @@ struct msm_camera_cfg_cmd {
 #define CMD_AXI_CFG_PREVIEW 36
 #define CMD_AXI_CFG_VIDEO 37
 
+#define CMD_STATS_IHIST_ENABLE 38
+#define CMD_STATS_RS_ENABLE 39
+#define CMD_STATS_CS_ENABLE 40
+
 struct msm_vfe_cfg_cmd {
  int cmd_type;
  uint16_t length;
@@ -244,12 +252,14 @@ struct outputCfg {
 #define MSM_FRAME_PREV_1 0
 #define MSM_FRAME_PREV_2 1
 #define MSM_FRAME_ENC 2
+
 #define OUTPUT_TYPE_P 1
 #define OUTPUT_TYPE_T 2
 #define OUTPUT_TYPE_S 3
 #define OUTPUT_TYPE_V 4
 
 struct msm_frame {
+ struct timespec ts;
  int path;
  unsigned long buffer;
  uint32_t y_off;
@@ -368,7 +378,6 @@ struct fps_cfg {
  uint16_t fps_div;
  uint32_t pict_fps_div;
 };
-
 struct wb_info_cfg {
  uint16_t red_gain;
  uint16_t green_gain;
