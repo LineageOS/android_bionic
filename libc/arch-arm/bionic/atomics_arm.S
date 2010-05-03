@@ -27,6 +27,12 @@
  * SUCH DAMAGE.
  */
 #include <sys/linux-syscalls.h>
+#include <machine/cpu-features.h>
+
+
+#if defined(__thumb2__)
+.syntax unified
+#endif
 
 .global __atomic_cmpxchg
 .global __atomic_swap

@@ -50,6 +50,11 @@
 
 	.text
 
+#if defined(__thumb2__)
+	.syntax unified
+	.thumb
+#endif
+
 	.global strcmp
 	.type strcmp, %function
 	.align 4
