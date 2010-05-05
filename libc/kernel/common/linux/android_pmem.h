@@ -41,6 +41,8 @@
 #define PMEM_CLEAN_CACHES _IOW(PMEM_IOCTL_MAGIC, 12, unsigned int)
 #define PMEM_INV_CACHES _IOW(PMEM_IOCTL_MAGIC, 13, unsigned int)
 
+#define PMEM_GET_FREE_SPACE _IOW(PMEM_IOCTL_MAGIC, 14, unsigned int)
+#define PMEM_ALLOCATE_ALIGNED _IOW(PMEM_IOCTL_MAGIC, 15, unsigned int)
 struct pmem_region {
  unsigned long offset;
  unsigned long len;
@@ -52,5 +54,14 @@ struct pmem_addr {
  unsigned long length;
 };
 
-#endif
+struct pmem_freespace {
+ unsigned long total;
+ unsigned long largest;
+};
 
+struct pmem_allocation {
+ unsigned long size;
+ unsigned int align;
+};
+
+#endif
