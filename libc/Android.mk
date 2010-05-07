@@ -288,7 +288,6 @@ libc_common_src_files += \
 	arch-arm/bionic/tkill.S \
 	arch-arm/bionic/memcmp.S \
 	arch-arm/bionic/memcmp16.S \
-	arch-arm/bionic/memset-neon.S \
 	arch-arm/bionic/setjmp.S \
 	arch-arm/bionic/sigsetjmp.S \
 	arch-arm/bionic/strlen.S \
@@ -301,6 +300,8 @@ libc_common_src_files += \
 	unistd/socketcalls.c
 
 ifeq ($(ARCH_ARM_HAVE_NEON),true)
+libc_common_src_files += \
+	arch-arm/bionic/memset-neon.S
 ifeq ($(ALLOW_LGPL),true)
 libc_common_src_files += \
 	arch-arm/bionic/memcpy-neon.S
@@ -310,7 +311,8 @@ libc_common_src_files += \
 endif
 else # !arch_arm_have_neon
 libc_common_src_files += \
-	arch-arm/bionic/memcpy.S
+	arch-arm/bionic/memcpy.S \
+	arch-arm/bionic/memset.S
 endif
 
 # These files need to be arm so that gdbserver
