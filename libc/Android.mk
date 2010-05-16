@@ -294,6 +294,8 @@ libc_common_src_files += \
 	arch-arm/bionic/strcpy.S \
 	arch-arm/bionic/strcmp.S \
 	arch-arm/bionic/syscall.S \
+	arch-arm/bionic/sigaction.c \
+	arch-arm/bionic/__sig_restorer.S \
 	string/memmove.c.arm \
 	string/bcopy.c \
 	string/strncmp.c \
