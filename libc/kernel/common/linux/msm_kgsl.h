@@ -49,10 +49,6 @@ struct kgsl_devmemstore {
  unsigned int sbz;
  volatile unsigned int eoptimestamp;
  unsigned int sbz2;
- volatile unsigned int ts_cmp_enable;
- unsigned int sbz3;
- volatile unsigned int ref_wait_ts;
- unsigned int sbz4;
 };
 
 #define KGSL_DEVICE_MEMSTORE_OFFSET(field)   offsetof(struct kgsl_devmemstore, field)
@@ -69,8 +65,7 @@ enum kgsl_property_type {
  KGSL_PROP_DEVICE_POWER = 0x00000003,
  KGSL_PROP_SHMEM = 0x00000004,
  KGSL_PROP_SHMEM_APERTURES = 0x00000005,
- KGSL_PROP_MMU_ENABLE = 0x00000006,
- KGSL_PROP_INTERRUPT_WAITS = 0x00000007,
+ KGSL_PROP_MMU_ENABLE = 0x00000006
 };
 
 struct kgsl_shadowprop {
@@ -79,9 +74,19 @@ struct kgsl_shadowprop {
  unsigned int flags;
 };
 
+struct kgsl_platform_data {
+ unsigned int high_axi_2d;
+ unsigned int high_axi_3d;
+ unsigned int max_grp2d_freq;
+ int (*set_grp2d_async)(void);
+ unsigned int max_grp3d_freq;
+ int (*set_grp3d_async)(void);
+};
+
 #define KGSL_IOC_TYPE 0x09
 
 struct kgsl_device_getproperty {
+ unsigned int device_id;
  unsigned int type;
  void *value;
  unsigned int sizebytes;
@@ -90,6 +95,7 @@ struct kgsl_device_getproperty {
 #define IOCTL_KGSL_DEVICE_GETPROPERTY   _IOWR(KGSL_IOC_TYPE, 0x2, struct kgsl_device_getproperty)
 
 struct kgsl_device_regread {
+ unsigned int device_id;
  unsigned int offsetwords;
  unsigned int value;
 };
@@ -97,6 +103,7 @@ struct kgsl_device_regread {
 #define IOCTL_KGSL_DEVICE_REGREAD   _IOWR(KGSL_IOC_TYPE, 0x3, struct kgsl_device_regread)
 
 struct kgsl_device_waittimestamp {
+ unsigned int device_id;
  unsigned int timestamp;
  unsigned int timeout;
 };
@@ -104,6 +111,7 @@ struct kgsl_device_waittimestamp {
 #define IOCTL_KGSL_DEVICE_WAITTIMESTAMP   _IOW(KGSL_IOC_TYPE, 0x6, struct kgsl_device_waittimestamp)
 
 struct kgsl_ringbuffer_issueibcmds {
+ unsigned int device_id;
  unsigned int drawctxt_id;
  unsigned int ibaddr;
  unsigned int sizedwords;
@@ -114,6 +122,7 @@ struct kgsl_ringbuffer_issueibcmds {
 #define IOCTL_KGSL_RINGBUFFER_ISSUEIBCMDS   _IOWR(KGSL_IOC_TYPE, 0x10, struct kgsl_ringbuffer_issueibcmds)
 
 struct kgsl_cmdstream_readtimestamp {
+ unsigned int device_id;
  unsigned int type;
  unsigned int timestamp;
 };
@@ -121,6 +130,7 @@ struct kgsl_cmdstream_readtimestamp {
 #define IOCTL_KGSL_CMDSTREAM_READTIMESTAMP   _IOR(KGSL_IOC_TYPE, 0x11, struct kgsl_cmdstream_readtimestamp)
 
 struct kgsl_cmdstream_freememontimestamp {
+ unsigned int device_id;
  unsigned int gpuaddr;
  unsigned int type;
  unsigned int timestamp;
@@ -129,6 +139,7 @@ struct kgsl_cmdstream_freememontimestamp {
 #define IOCTL_KGSL_CMDSTREAM_FREEMEMONTIMESTAMP   _IOR(KGSL_IOC_TYPE, 0x12, struct kgsl_cmdstream_freememontimestamp)
 
 struct kgsl_drawctxt_create {
+ unsigned int device_id;
  unsigned int flags;
  unsigned int drawctxt_id;
 };
@@ -136,6 +147,7 @@ struct kgsl_drawctxt_create {
 #define IOCTL_KGSL_DRAWCTXT_CREATE   _IOWR(KGSL_IOC_TYPE, 0x13, struct kgsl_drawctxt_create)
 
 struct kgsl_drawctxt_destroy {
+ unsigned int device_id;
  unsigned int drawctxt_id;
 };
 
@@ -196,11 +208,29 @@ struct kgsl_sharedmem_from_vmalloc {
 #define IOCTL_KGSL_SHAREDMEM_FLUSH_CACHE   _IOW(KGSL_IOC_TYPE, 0x24, struct kgsl_sharedmem_free)
 
 struct kgsl_drawctxt_set_bin_base_offset {
+ unsigned int device_id;
  unsigned int drawctxt_id;
  unsigned int offset;
 };
 
 #define IOCTL_KGSL_DRAWCTXT_SET_BIN_BASE_OFFSET   _IOW(KGSL_IOC_TYPE, 0x25, struct kgsl_drawctxt_set_bin_base_offset)
 
-#endif
+enum kgsl_cmdwindow_type {
+ KGSL_CMDWINDOW_MIN = 0x00000000,
+ KGSL_CMDWINDOW_2D = 0x00000000,
+ KGSL_CMDWINDOW_3D = 0x00000001,
+ KGSL_CMDWINDOW_MMU = 0x00000002,
+ KGSL_CMDWINDOW_ARBITER = 0x000000FF,
+ KGSL_CMDWINDOW_MAX = 0x000000FF,
+};
 
+struct kgsl_cmdwindow_write {
+ unsigned int device_id;
+ enum kgsl_cmdwindow_type target;
+ unsigned int addr;
+ unsigned int data;
+};
+
+#define IOCTL_KGSL_CMDWINDOW_WRITE   _IOW(KGSL_IOC_TYPE, 0x2e, struct kgsl_cmdwindow_write)
+
+#endif

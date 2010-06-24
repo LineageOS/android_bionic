@@ -12,9 +12,13 @@
 #ifndef __LINUX_MSM_CAMERA_H
 #define __LINUX_MSM_CAMERA_H
 
+#ifdef MSM_CAMERA_BIONIC
+#include <sys/types.h>
+#endif
 #include <linux/types.h>
 #include <asm/sizes.h>
 #include <linux/ioctl.h>
+#include <linux/time.h>
 
 #define MSM_CAM_IOCTL_MAGIC 'm'
 
@@ -54,9 +58,9 @@
 
 #define MSM_CAM_IOCTL_SET_CROP   _IOW(MSM_CAM_IOCTL_MAGIC, 18, struct crop_info *)
 
-#define MSM_CAM_IOCTL_PP   _IOW(MSM_CAM_IOCTL_MAGIC, 19, uint8_t *)
+#define MSM_CAM_IOCTL_PICT_PP   _IOW(MSM_CAM_IOCTL_MAGIC, 19, uint8_t *)
 
-#define MSM_CAM_IOCTL_PP_DONE   _IOW(MSM_CAM_IOCTL_MAGIC, 20, struct msm_snapshot_pp_status *)
+#define MSM_CAM_IOCTL_PICT_PP_DONE   _IOW(MSM_CAM_IOCTL_MAGIC, 20, struct msm_snapshot_pp_status *)
 
 #define MSM_CAM_IOCTL_SENSOR_IO_CFG   _IOW(MSM_CAM_IOCTL_MAGIC, 21, struct sensor_cfg_data *)
 
@@ -70,14 +74,15 @@
 
 #define MSM_CAM_IOCTL_CTRL_COMMAND_2   _IOW(MSM_CAM_IOCTL_MAGIC, 24, struct msm_ctrl_cmd *)
 
-#define MSM_CAM_IOCTL_ENABLE_OUTPUT_IND   _IOW(MSM_CAM_IOCTL_MAGIC, 25, uint32_t *)
+#define MSM_CAM_IOCTL_AF_CTRL   _IOR(MSM_CAM_IOCTL_MAGIC, 25, struct msm_ctrl_cmt_t *)
+#define MSM_CAM_IOCTL_AF_CTRL_DONE   _IOW(MSM_CAM_IOCTL_MAGIC, 26, struct msm_ctrl_cmt_t *)
 
 #define MAX_SENSOR_NUM 3
 #define MAX_SENSOR_NAME 32
 
-#define PP_SNAP 1
-#define PP_RAW_SNAP (1<<1)
-#define PP_PREV (1<<2)
+#define PP_SNAP 0x01
+#define PP_RAW_SNAP ((0x01)<<1)
+#define PP_PREV ((0x01)<<2)
 #define PP_MASK (PP_SNAP|PP_RAW_SNAP|PP_PREV)
 
 #define MSM_CAM_CTRL_CMD_DONE 0
@@ -130,19 +135,45 @@ struct msm_camera_cfg_cmd {
 #define CMD_PICT_T_AXI_CFG 4
 #define CMD_PICT_M_AXI_CFG 5
 #define CMD_RAW_PICT_AXI_CFG 6
-#define CMD_STATS_AXI_CFG 7
-#define CMD_STATS_AF_AXI_CFG 8
-#define CMD_FRAME_BUF_RELEASE 9
-#define CMD_PREV_BUF_CFG 10
-#define CMD_SNAP_BUF_RELEASE 11
-#define CMD_SNAP_BUF_CFG 12
-#define CMD_STATS_DISABLE 13
-#define CMD_STATS_AEC_AWB_ENABLE 14
-#define CMD_STATS_AF_ENABLE 15
-#define CMD_STATS_BUF_RELEASE 16
-#define CMD_STATS_AF_BUF_RELEASE 17
-#define CMD_STATS_ENABLE 18
-#define UPDATE_STATS_INVALID 19
+
+#define CMD_FRAME_BUF_RELEASE 7
+#define CMD_PREV_BUF_CFG 8
+#define CMD_SNAP_BUF_RELEASE 9
+#define CMD_SNAP_BUF_CFG 10
+#define CMD_STATS_DISABLE 11
+#define CMD_STATS_AEC_AWB_ENABLE 12
+#define CMD_STATS_AF_ENABLE 13
+#define CMD_STATS_AEC_ENABLE 14
+#define CMD_STATS_AWB_ENABLE 15
+#define CMD_STATS_ENABLE 16
+
+#define CMD_STATS_AXI_CFG 17
+#define CMD_STATS_AEC_AXI_CFG 18
+#define CMD_STATS_AF_AXI_CFG 19
+#define CMD_STATS_AWB_AXI_CFG 20
+#define CMD_STATS_RS_AXI_CFG 21
+#define CMD_STATS_CS_AXI_CFG 22
+#define CMD_STATS_IHIST_AXI_CFG 23
+#define CMD_STATS_SKIN_AXI_CFG 24
+
+#define CMD_STATS_BUF_RELEASE 25
+#define CMD_STATS_AEC_BUF_RELEASE 26
+#define CMD_STATS_AF_BUF_RELEASE 27
+#define CMD_STATS_AWB_BUF_RELEASE 28
+#define CMD_STATS_RS_BUF_RELEASE 29
+#define CMD_STATS_CS_BUF_RELEASE 30
+#define CMD_STATS_IHIST_BUF_RELEASE 31
+#define CMD_STATS_SKIN_BUF_RELEASE 32
+
+#define UPDATE_STATS_INVALID 33
+#define CMD_AXI_CFG_SNAP_GEMINI 34
+#define CMD_AXI_CFG_SNAP 35
+#define CMD_AXI_CFG_PREVIEW 36
+#define CMD_AXI_CFG_VIDEO 37
+
+#define CMD_STATS_IHIST_ENABLE 38
+#define CMD_STATS_RS_ENABLE 39
+#define CMD_STATS_CS_ENABLE 40
 
 struct msm_vfe_cfg_cmd {
  int cmd_type;
@@ -163,12 +194,30 @@ struct camera_enable_cmd {
 #define MSM_PMEM_RAW_MAINIMG 5
 #define MSM_PMEM_AEC_AWB 6
 #define MSM_PMEM_AF 7
-#define MSM_PMEM_MAX 8
+#define MSM_PMEM_AEC 8
+#define MSM_PMEM_AWB 9
+#define MSM_PMEM_RS 10
+#define MSM_PMEM_CS 11
+#define MSM_PMEM_IHIST 12
+#define MSM_PMEM_SKIN 13
+#define MSM_PMEM_VIDEO 14
+#define MSM_PMEM_PREVIEW 15
+#define MSM_PMEM_MAX 16
+
+#define STAT_AEAW 0
+#define STAT_AEC 1
+#define STAT_AF 2
+#define STAT_AWB 3
+#define STAT_RS 4
+#define STAT_CS 5
+#define STAT_IHIST 6
+#define STAT_SKIN 7
+#define STAT_MAX 8
 
 #define FRAME_PREVIEW_OUTPUT1 0
 #define FRAME_PREVIEW_OUTPUT2 1
 #define FRAME_SNAPSHOT 2
-#define FRAME_THUMBAIL 3
+#define FRAME_THUMBNAIL 3
 #define FRAME_RAW_SNAPSHOT 4
 #define FRAME_MAX 5
 
@@ -180,7 +229,7 @@ struct msm_pmem_info {
  uint32_t len;
  uint32_t y_off;
  uint32_t cbcr_off;
- uint8_t vfe_can_write;
+ uint8_t active;
 };
 
 struct outputCfg {
@@ -193,17 +242,24 @@ struct outputCfg {
 
 #define OUTPUT_1 0
 #define OUTPUT_2 1
-#define OUTPUT_1_AND_2 2
-#define CAMIF_TO_AXI_VIA_OUTPUT_2 3
-#define OUTPUT_1_AND_CAMIF_TO_AXI_VIA_OUTPUT_2 4
-#define OUTPUT_2_AND_CAMIF_TO_AXI_VIA_OUTPUT_1 5
-#define LAST_AXI_OUTPUT_MODE_ENUM = OUTPUT_2_AND_CAMIF_TO_AXI_VIA_OUTPUT_1 6
+#define OUTPUT_1_AND_2 2  
+#define OUTPUT_1_AND_3 3  
+#define CAMIF_TO_AXI_VIA_OUTPUT_2 4
+#define OUTPUT_1_AND_CAMIF_TO_AXI_VIA_OUTPUT_2 5
+#define OUTPUT_2_AND_CAMIF_TO_AXI_VIA_OUTPUT_1 6
+#define LAST_AXI_OUTPUT_MODE_ENUM = OUTPUT_2_AND_CAMIF_TO_AXI_VIA_OUTPUT_1 7
 
 #define MSM_FRAME_PREV_1 0
 #define MSM_FRAME_PREV_2 1
 #define MSM_FRAME_ENC 2
 
+#define OUTPUT_TYPE_P 1
+#define OUTPUT_TYPE_T 2
+#define OUTPUT_TYPE_S 3
+#define OUTPUT_TYPE_V 4
+
 struct msm_frame {
+ struct timespec ts;
  int path;
  unsigned long buffer;
  uint32_t y_off;
@@ -213,10 +269,6 @@ struct msm_frame {
  void *cropinfo;
  int croplen;
 };
-
-#define STAT_AEAW 0
-#define STAT_AF 1
-#define STAT_MAX 2
 
 struct msm_stats_buf {
  int type;
@@ -232,8 +284,11 @@ struct msm_stats_buf {
 #define MSM_V4L2_GET_CTRL 5
 #define MSM_V4L2_SET_CTRL 6
 #define MSM_V4L2_QUERY 7
-#define MSM_V4L2_MAX 8
+#define MSM_V4L2_GET_CROP 8
+#define MSM_V4L2_SET_CROP 9
+#define MSM_V4L2_MAX 10
 
+#define V4L2_CAMERA_EXIT 43
 struct crop_info {
  void *info;
  int len;
@@ -278,7 +333,8 @@ struct msm_snapshot_pp_status {
 #define CFG_GET_PICT_P_PL 25
 #define CFG_GET_AF_MAX_STEPS 26
 #define CFG_GET_PICT_MAX_EXP_LC 27
-#define CFG_MAX 28
+#define CFG_SEND_WB_INFO 28
+#define CFG_MAX 29
 
 #define MOVE_NEAR 0
 #define MOVE_FAR 1
@@ -295,15 +351,12 @@ struct msm_snapshot_pp_status {
 #define CAMERA_EFFECT_MONO 1
 #define CAMERA_EFFECT_NEGATIVE 2
 #define CAMERA_EFFECT_SOLARIZE 3
-#define CAMERA_EFFECT_PASTEL 4
-#define CAMERA_EFFECT_MOSAIC 5
-#define CAMERA_EFFECT_RESIZE 6
-#define CAMERA_EFFECT_SEPIA 7
-#define CAMERA_EFFECT_POSTERIZE 8
-#define CAMERA_EFFECT_WHITEBOARD 9
-#define CAMERA_EFFECT_BLACKBOARD 10
-#define CAMERA_EFFECT_AQUA 11
-#define CAMERA_EFFECT_MAX 12
+#define CAMERA_EFFECT_SEPIA 4
+#define CAMERA_EFFECT_POSTERIZE 5
+#define CAMERA_EFFECT_WHITEBOARD 6
+#define CAMERA_EFFECT_BLACKBOARD 7
+#define CAMERA_EFFECT_AQUA 8
+#define CAMERA_EFFECT_MAX 9
 
 struct sensor_pict_fps {
  uint16_t prevfps;
@@ -325,7 +378,11 @@ struct fps_cfg {
  uint16_t fps_div;
  uint32_t pict_fps_div;
 };
-
+struct wb_info_cfg {
+ uint16_t red_gain;
+ uint16_t green_gain;
+ uint16_t blue_gain;
+};
 struct sensor_cfg_data {
  int cfgtype;
  int mode;
@@ -345,6 +402,7 @@ struct sensor_cfg_data {
  struct exp_gain_cfg exp_gain;
  struct focus_cfg focus;
  struct fps_cfg fps;
+ struct wb_info_cfg wb_info;
  } cfg;
 };
 
@@ -359,6 +417,6 @@ struct sensor_cfg_data {
 struct msm_camsensor_info {
  char name[MAX_SENSOR_NAME];
  uint8_t flash_enabled;
+ int8_t total_steps;
 };
 #endif
-
