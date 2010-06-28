@@ -17,3 +17,5 @@
 ifneq ($(TARGET_SIMULATOR),true)
   include $(call all-subdir-makefiles)
 endif
+
+CYANOGEN_BIONIC := true
