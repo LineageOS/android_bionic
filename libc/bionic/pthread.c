@@ -1833,21 +1833,45 @@ int pthread_kill(pthread_t tid, int sig)
 
 extern int __rt_sigprocmask(int, const sigset_t *, sigset_t *, size_t);
 
+/* <asm/signal.h> defines sigset_t differently when you're in the
+ * kernel or in the C library.
+ *
+ * in the kernel, this is an array of 2 32-bit unsigned longs
+ * in the C library, this is a single 32-bit unsigned long
+ *
+ * moreover, the kernel implementation of rt_sigprocmask doesn't
+ * accept anything except kernel-sized signal sets (probably a bug !)
+ *
+ * we thus need to create a fake kernel sigset !!
+ */
 int pthread_sigmask(int how, const sigset_t *set, sigset_t *oset)
 {
     /* pthread_sigmask must return the error code, but the syscall
-     * will set errno instead and return 0/-1
-     */
+    * will set errno instead and return 0/-1
+    */
+    sigset_t kernelMaskIn[2];
     int ret, old_errno = errno;
 
-    ret = __rt_sigprocmask(how, set, oset, _NSIG / 8);
+    kernelMaskIn[0] = *set;
+    kernelMaskIn[1] = 0;
+
+    if (oset)
+    {
+      sigset_t kernelMaskOut[2];
+      ret = __rt_sigprocmask(how, kernelMaskIn, kernelMaskOut, sizeof(kernelMaskIn));
+      *oset = kernelMaskOut[0];
+    }
+    else
+    {
+      ret = __rt_sigprocmask(how, kernelMaskIn, NULL, sizeof(kernelMaskIn));
+    }
+
     if (ret < 0)
         ret = errno;
 
     errno = old_errno;
     return ret;
 }
-
 
 int pthread_getcpuclockid(pthread_t  tid, clockid_t  *clockid)
 {
