@@ -83,8 +83,8 @@
 #define VDEC_IOCTL_MAGIC 'v'
 
 struct vdec_ioctl_msg {
- void *inputparam;
- void *outputparam;
+ void __user *in;
+ void __user *out;
 };
 
 #define VDEC_IOCTL_GET_PROFILE_LEVEL_SUPPORTED   _IOWR(VDEC_IOCTL_MAGIC, 0, struct vdec_ioctl_msg)
@@ -153,17 +153,17 @@ struct vdec_allocatorproperty {
  uint32_t mincount;
  uint32_t maxcount;
  uint32_t actualcount;
- uint32_t buffer_size;
+ size_t buffer_size;
  uint32_t alignment;
  uint32_t buf_poolid;
 };
 
 struct vdec_bufferpayload {
- uint8_t *bufferaddr;
- uint32_t buffer_len;
+ void __user *bufferaddr;
+ size_t buffer_len;
  int pmem_fd;
- uint32_t offset;
- uint32_t mmaped_size;
+ size_t offset;
+ size_t mmaped_size;
 };
 
 struct vdec_setbuffer_cmd {
@@ -404,40 +404,39 @@ struct vdec_picsize {
 };
 
 struct vdec_seqheader {
- uint8_t *ptr_seqheader;
- uint32_t seq_header_len;
+ void __user *ptr_seqheader;
+ size_t seq_header_len;
  int pmem_fd;
- uint32_t pmem_offset;
+ size_t pmem_offset;
 };
 
 struct vdec_mberror {
- uint8_t *ptr_errormap;
- uint32_t err_mapsize;
+ void __user *ptr_errormap;
+ size_t err_mapsize;
 };
 
 struct vdec_input_frameinfo {
- uint8_t *bufferaddr;
- uint32_t offset;
- uint32_t datalen;
+ void __user *bufferaddr;
+ size_t offset;
+ size_t datalen;
  uint32_t flags;
  int64_t timestamp;
  void *client_data;
  int pmem_fd;
- uint32_t pmem_offset;
+ size_t pmem_offset;
 };
 
 struct vdec_framesize {
- uint32_t n_left;
- uint32_t n_top;
- uint32_t n_right;
- uint32_t n_bottom;
+ uint32_t left;
+ uint32_t top;
+ uint32_t right;
+ uint32_t bottom;
 };
 
 struct vdec_output_frameinfo {
- uint8_t *phy_addr;
- uint8_t *bufferaddr;
- uint32_t offset;
- uint32_t len;
+ void __user *bufferaddr;
+ size_t offset;
+ size_t len;
  uint32_t flags;
  int64_t time_stamp;
  void *client_data;
@@ -454,7 +453,6 @@ struct vdec_msginfo {
  uint32_t status_code;
  uint32_t msgcode;
  union vdec_msgdata msgdata;
- uint32_t msgdatasize;
+ size_t msgdatasize;
 };
 #endif
-
