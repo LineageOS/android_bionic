@@ -29,6 +29,7 @@
 #define VDEC_IOCTL_GETVERSION _IOR(VDEC_IOCTL_MAGIC, 11, struct vdec_version)
 #define VDEC_IOCTL_SETPROPERTY _IOW(VDEC_IOCTL_MAGIC, 12, struct vdec_property_info)
 #define VDEC_IOCTL_GETPROPERTY _IOR(VDEC_IOCTL_MAGIC, 13, struct vdec_property_info)
+#define VDEC_IOCTL_PERFORMANCE_CHANGE_REQ  _IOW(VDEC_IOCTL_MAGIC, 14, unsigned int)
 
 enum {
  VDEC_FRAME_DECODE_OK,
@@ -78,6 +79,13 @@ enum vdec_property_id {
    VDEC_NUM_DAL_PORTS,
    VDEC_PRIORITY,
    VDEC_FRAME_ALIGNMENT
+};
+
+enum {
+ PERF_REQUEST_SET_MIN = 0,
+ PERF_REQUEST_LOWER,
+ PERF_REQUEST_RAISE,
+ PERF_REQUEST_SET_MAX
 };
 
 struct vdec_input_buf_info {
