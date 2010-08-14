@@ -25,6 +25,11 @@ enum vlan_ioctl_cmds {
  GET_VLAN_VID_CMD
 };
 
+enum vlan_flags {
+ VLAN_FLAG_REORDER_HDR = 0x1,
+ VLAN_FLAG_GVRP = 0x2,
+};
+
 enum vlan_name_types {
  VLAN_NAME_TYPE_PLUS_VID,
  VLAN_NAME_TYPE_RAW_PLUS_VID,
