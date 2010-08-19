@@ -74,22 +74,22 @@
 #define VEN_PROFILE_H264_HIGH 5 
 #define VEN_PROFILE_H263_BASELINE 6 
 
-#define VEN_LEVEL_MPEG4_0   0x1
-#define VEN_LEVEL_MPEG4_1   0x2
-#define VEN_LEVEL_MPEG4_2   0x3
-#define VEN_LEVEL_MPEG4_3   0x4
-#define VEN_LEVEL_MPEG4_4   0x5
-#define VEN_LEVEL_MPEG4_5   0x6
-#define VEN_LEVEL_MPEG4_3b  0x7
-#define VEN_LEVEL_MPEG4_6   0x8
+#define VEN_LEVEL_MPEG4_0  0x1
+#define VEN_LEVEL_MPEG4_1  0x2
+#define VEN_LEVEL_MPEG4_2  0x3
+#define VEN_LEVEL_MPEG4_3  0x4
+#define VEN_LEVEL_MPEG4_4  0x5
+#define VEN_LEVEL_MPEG4_5  0x6
+#define VEN_LEVEL_MPEG4_3b 0x7
+#define VEN_LEVEL_MPEG4_6  0x8
 
-#define VEN_LEVEL_H264_1    0x9
-#define VEN_LEVEL_H264_1b   0xA
-#define VEN_LEVEL_H264_1p1  0xB
-#define VEN_LEVEL_H264_1p2  0xC
-#define VEN_LEVEL_H264_1p3  0xD
-#define VEN_LEVEL_H264_2    0xE
-#define VEN_LEVEL_H264_2p1  0xF
+#define VEN_LEVEL_H264_1   0x9
+#define VEN_LEVEL_H264_1b  0xA
+#define VEN_LEVEL_H264_1p1 0xB
+#define VEN_LEVEL_H264_1p2 0xC
+#define VEN_LEVEL_H264_1p3 0xD
+#define VEN_LEVEL_H264_2   0xE
+#define VEN_LEVEL_H264_2p1 0xF
 #define VEN_LEVEL_H264_2p2 0x10
 #define VEN_LEVEL_H264_3   0x11
 #define VEN_LEVEL_H264_3p1 0x12
@@ -130,7 +130,8 @@
 #define VEN_FLUSH_ALL 3
 
 #define VEN_INPUTFMT_NV12 1 
-#define VEN_INPUTFMT_NV21 2 
+#define VEN_INPUTFMT_NV21 2
+#define VEN_INPUTFMT_NV12_16M2KA 3
 
 #define VEN_ROTATION_0 1 
 #define VEN_ROTATION_90 2 
@@ -400,4 +401,3 @@ struct venc_msg{
  unsigned long msgdata_size;
 };
 #endif
-
