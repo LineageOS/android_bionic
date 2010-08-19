@@ -149,8 +149,8 @@
 #define VEN_IOCTLBASE_ENC 0x850
 
 struct venc_ioctl_msg{
- void __user *in;
- void __user *out;
+ void *inputparam;
+ void *outputparam;
 };
 
 #define VEN_IOCTL_SET_INTF_VERSION   _IOW(VEN_IOCTLBASE_NENC, 0, struct venc_ioctl_msg)
@@ -277,7 +277,7 @@ struct venc_allocatorproperty{
 
 struct venc_bufferpayload{
  unsigned char *pbuffer;
- size_t sz;
+ unsigned long nsize;
  int fd;
  unsigned int offset;
  unsigned int maped_size;
@@ -286,7 +286,7 @@ struct venc_bufferpayload{
 
 struct venc_buffer{
  unsigned char *ptrbuffer;
- unsigned long sz;
+ unsigned long size;
  unsigned long len;
  unsigned long offset;
  long long timestamp;
