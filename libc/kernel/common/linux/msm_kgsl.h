@@ -199,7 +199,7 @@ struct kgsl_sharedmem_from_vmalloc {
  unsigned int gpuaddr;
  unsigned int hostptr;
 
- int force_no_low_watermark;
+ unsigned int flags;
 };
 
 #define IOCTL_KGSL_SHAREDMEM_FROM_VMALLOC   _IOWR(KGSL_IOC_TYPE, 0x23, struct kgsl_sharedmem_from_vmalloc)
