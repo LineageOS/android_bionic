@@ -45,8 +45,11 @@ struct mntent
 
 __BEGIN_DECLS
 
+FILE *setmntent(const char *, const char *);
 
 struct mntent* getmntent(FILE*);
+
+int endmntent(FILE*);
 
 __END_DECLS
 
