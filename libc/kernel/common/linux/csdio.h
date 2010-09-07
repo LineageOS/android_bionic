@@ -27,8 +27,10 @@
 #define CSDIO_IOC_CMD53 _IO(CSDIO_IOC_MAGIC, 8)
 #define CSDIO_IOC_ENABLE_ISR _IO(CSDIO_IOC_MAGIC, 9)
 #define CSDIO_IOC_DISABLE_ISR _IO(CSDIO_IOC_MAGIC, 10)
+#define CSDIO_IOC_SET_VDD _IO(CSDIO_IOC_MAGIC, 11)
+#define CSDIO_IOC_GET_VDD _IO(CSDIO_IOC_MAGIC, 12)
 
-#define CSDIO_IOC_MAXNR 10
+#define CSDIO_IOC_MAXNR 12
 
 struct csdio_cmd53_ctrl_t {
  uint32_t m_block_mode;
@@ -44,4 +46,3 @@ struct csdio_cmd52_ctrl_t {
 } __attribute__ ((packed));
 
 #endif
-
