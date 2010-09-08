@@ -134,6 +134,10 @@ struct vdec_ioctl_msg {
 
 #define VDEC_IOCTL_GET_NUMBER_INSTANCES   _IOR(VDEC_IOCTL_MAGIC, 27, struct vdec_ioctl_msg)
 
+#define VDEC_IOCTL_SET_PICTURE_ORDER   _IOW(VDEC_IOCTL_MAGIC, 28, struct vdec_ioctl_msg)
+
+#define VDEC_IOCTL_SET_FRAME_RATE   _IOW(VDEC_IOCTL_MAGIC, 29, struct vdec_ioctl_msg)
+
 enum vdec_picture {
  PICTURE_TYPE_I,
  PICTURE_TYPE_P,
@@ -396,6 +400,11 @@ enum vdec_output_fromat {
  VDEC_YUV_FORMAT_TILE_4x2 = 0x2
 };
 
+enum vdec_output_order {
+ VDEC_ORDER_DISPLAY = 0x1,
+ VDEC_ORDER_DECODE = 0x2
+};
+
 struct vdec_picsize {
  uint32_t frame_width;
  uint32_t frame_height;
@@ -455,4 +464,10 @@ struct vdec_msginfo {
  union vdec_msgdata msgdata;
  size_t msgdatasize;
 };
+
+struct vdec_framerate {
+ unsigned long fps_denominator;
+ unsigned long fps_numerator;
+};
+
 #endif
