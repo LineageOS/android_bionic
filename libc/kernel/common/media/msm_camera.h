@@ -68,17 +68,6 @@
 
 #define MSM_CAM_IOCTL_SENSOR_IO_CFG   _IOW(MSM_CAM_IOCTL_MAGIC, 21, struct sensor_cfg_data *)
 
-#define MSM_CAM_IOCTL_CONFIG_VPE   _IOW(MSM_CAM_IOCTL_MAGIC, 27, struct msm_camera_vpe_cfg_cmd *)
-
-#define MSM_CAM_IOCTL_AXI_VPE_CONFIG   _IOW(MSM_CAM_IOCTL_MAGIC, 28, struct msm_camera_vpe_cfg_cmd *)
-
-#define MSM_CAMERA_LED_OFF 0
-#define MSM_CAMERA_LED_LOW 1
-#define MSM_CAMERA_LED_HIGH 2
-
-#define MSM_CAMERA_STROBE_FLASH_NONE 0
-#define MSM_CAMERA_STROBE_FLASH_XENON 1
-
 #define MSM_CAM_IOCTL_FLASH_LED_CFG   _IOW(MSM_CAM_IOCTL_MAGIC, 22, unsigned *)
 
 #define MSM_CAM_IOCTL_UNBLOCK_POLL_FRAME   _IO(MSM_CAM_IOCTL_MAGIC, 23)
@@ -86,13 +75,27 @@
 #define MSM_CAM_IOCTL_CTRL_COMMAND_2   _IOW(MSM_CAM_IOCTL_MAGIC, 24, struct msm_ctrl_cmd *)
 
 #define MSM_CAM_IOCTL_AF_CTRL   _IOR(MSM_CAM_IOCTL_MAGIC, 25, struct msm_ctrl_cmt_t *)
+
 #define MSM_CAM_IOCTL_AF_CTRL_DONE   _IOW(MSM_CAM_IOCTL_MAGIC, 26, struct msm_ctrl_cmt_t *)
+
+#define MSM_CAM_IOCTL_CONFIG_VPE   _IOW(MSM_CAM_IOCTL_MAGIC, 27, struct msm_camera_vpe_cfg_cmd *)
+
+#define MSM_CAM_IOCTL_AXI_VPE_CONFIG   _IOW(MSM_CAM_IOCTL_MAGIC, 28, struct msm_camera_vpe_cfg_cmd *)
 
 #define MSM_CAM_IOCTL_STROBE_FLASH_CFG   _IOW(MSM_CAM_IOCTL_MAGIC, 29, uint32_t *)
 
 #define MSM_CAM_IOCTL_STROBE_FLASH_CHARGE   _IOW(MSM_CAM_IOCTL_MAGIC, 30, uint32_t *)
 
 #define MSM_CAM_IOCTL_STROBE_FLASH_RELEASE   _IO(MSM_CAM_IOCTL_MAGIC, 31)
+
+#define MSM_CAM_IOCTL_ERROR_CONFIG   _IOW(MSM_CAM_IOCTL_MAGIC, 32, uint32_t *)
+
+#define MSM_CAMERA_LED_OFF 0
+#define MSM_CAMERA_LED_LOW 1
+#define MSM_CAMERA_LED_HIGH 2
+
+#define MSM_CAMERA_STROBE_FLASH_NONE 0
+#define MSM_CAMERA_STROBE_FLASH_XENON 1
 
 #define MAX_SENSOR_NUM 3
 #define MAX_SENSOR_NAME 32
@@ -304,7 +307,10 @@ struct msm_frame {
 
  void *cropinfo;
  int croplen;
+ uint32_t error_code;
 };
+
+#define MSM_CAMERA_ERR_MASK (0xFFFFFFFF & 1)
 
 struct msm_stats_buf {
  int type;
