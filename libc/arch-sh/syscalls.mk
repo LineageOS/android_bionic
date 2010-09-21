@@ -151,6 +151,7 @@ syscall_src += arch-sh/syscalls/__syslog.S
 syscall_src += arch-sh/syscalls/init_module.S
 syscall_src += arch-sh/syscalls/delete_module.S
 syscall_src += arch-sh/syscalls/klogctl.S
+syscall_src += arch-sh/syscalls/set_tid_address.S
 syscall_src += arch-sh/syscalls/futex.S
 syscall_src += arch-sh/syscalls/epoll_create.S
 syscall_src += arch-sh/syscalls/epoll_ctl.S
