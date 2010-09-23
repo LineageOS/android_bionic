@@ -114,8 +114,8 @@ struct kgsl_device_waittimestamp {
 
 struct kgsl_ringbuffer_issueibcmds {
  unsigned int drawctxt_id;
- unsigned int ibaddr;
- unsigned int sizedwords;
+ unsigned int ibdesc_addr;
+ unsigned int numibs;
  unsigned int timestamp;
  unsigned int flags;
 };
