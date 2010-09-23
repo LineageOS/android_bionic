@@ -242,6 +242,7 @@ libc_common_src_files := \
 	bionic/libc_init_common.c \
 	bionic/logd_write.c \
 	bionic/md5.c \
+	bionic/mntent.c \
 	bionic/pututline.c \
 	bionic/realpath.c \
 	bionic/semaphore.c \
