@@ -17,6 +17,7 @@
 #define AUDIO_GET_MVS_CONFIG _IOW(AUDIO_IOCTL_MAGIC,   (AUDIO_MAX_COMMON_IOCTL_NUM + 0), unsigned)
 #define AUDIO_SET_MVS_CONFIG _IOR(AUDIO_IOCTL_MAGIC,   (AUDIO_MAX_COMMON_IOCTL_NUM + 1), unsigned)
 
+#define MVS_MODE_IS127 2
 #define MVS_MODE_AMR 5
 #define MVS_MODE_LINEAR_PCM 9
 #define MVS_MODE_PCM 12
@@ -43,6 +44,14 @@ enum msm_audio_amr_mode {
  MVS_AMR_MODE_UNDEF
 };
 
+enum msm_audio_voc_rate {
+ MVS_VOC_0_RATE,
+ MVS_VOC_8_RATE,
+ MVS_VOC_4_RATE,
+ MVS_VOC_2_RATE,
+ MVS_VOC_1_RATE
+};
+
 enum msm_audio_amr_frame_type {
  MVS_AMR_SPEECH_GOOD,
  MVS_AMR_SPEECH_DEGRADED,
@@ -52,7 +61,7 @@ enum msm_audio_amr_frame_type {
  MVS_AMR_SID_UPDATE,
  MVS_AMR_SID_BAD,
  MVS_AMR_NO_DATA,
- MVS_AMR_SPEECH_LOST,
+ MVS_AMR_SPEECH_LOST
 };
 
 struct msm_audio_mvs_config {
