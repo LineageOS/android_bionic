@@ -124,6 +124,7 @@
 #define VEN_RC_VBR_VFR 2
 #define VEN_RC_VBR_CFR 3
 #define VEN_RC_CBR_VFR 4
+#define VEN_RC_CBR_CFR 5
 
 #define VEN_FLUSH_INPUT 1
 #define VEN_FLUSH_OUTPUT 2
