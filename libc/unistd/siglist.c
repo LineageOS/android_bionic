@@ -28,6 +28,6 @@
 #include <signal.h>
 
 const char * const sys_siglist[NSIG] = {
-#define  __BIONIC_SIGDEF(x,y,z)   [ SIG##x ] = z,
+#define  __BIONIC_SIGDEF(x,y,z)   [ x ] = z,
 #include <sys/_sigdefs.h>
 };
