@@ -56,7 +56,6 @@ libc_common_src_files := \
 	unistd/siginterrupt.c \
 	unistd/siglist.c \
 	unistd/signal.c \
-	unistd/signame.c \
 	unistd/sigsetmask.c \
 	unistd/sigsuspend.c \
 	unistd/sigwait.c \
