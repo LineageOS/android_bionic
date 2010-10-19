@@ -97,7 +97,9 @@ struct mdp_blit_req {
 	uint32_t alpha;
 	uint32_t transp_mask;
 	uint32_t flags;
+#ifdef CONFIG_MSM_MDP40
 	int sharpening_strength;  /* -127 <--> 127, default 64 */
+#endif
 };
 
 struct mdp_blit_req_list {
