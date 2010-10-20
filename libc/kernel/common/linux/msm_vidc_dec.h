@@ -140,6 +140,12 @@ struct vdec_ioctl_msg {
 
 #define VDEC_IOCTL_SET_FRAME_RATE   _IOW(VDEC_IOCTL_MAGIC, 29, struct vdec_ioctl_msg)
 
+#define VDEC_IOCTL_SET_H264_MV_BUFFER   _IOW(VDEC_IOCTL_MAGIC, 30, struct vdec_ioctl_msg)
+
+#define VDEC_IOCTL_FREE_H264_MV_BUFFER   _IOW(VDEC_IOCTL_MAGIC, 31, struct vdec_ioctl_msg)
+
+#define VDEC_IOCTL_GET_MV_BUFFER_SIZE   _IOR(VDEC_IOCTL_MAGIC, 32, struct vdec_ioctl_msg)
+
 enum vdec_picture {
  PICTURE_TYPE_I,
  PICTURE_TYPE_P,
@@ -471,6 +477,20 @@ struct vdec_msginfo {
 struct vdec_framerate {
  unsigned long fps_denominator;
  unsigned long fps_numerator;
+};
+
+struct vdec_h264_mv{
+ size_t size;
+ int count;
+ int pmem_fd;
+ int offset;
+};
+
+struct vdec_mv_buff_size{
+ int width;
+ int height;
+ int size;
+ int alignment;
 };
 
 #endif

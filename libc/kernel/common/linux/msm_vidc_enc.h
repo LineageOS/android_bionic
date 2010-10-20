@@ -74,35 +74,35 @@
 #define VEN_PROFILE_H264_HIGH 5 
 #define VEN_PROFILE_H263_BASELINE 6 
 
-#define VEN_LEVEL_MPEG4_0  0x1
-#define VEN_LEVEL_MPEG4_1  0x2
-#define VEN_LEVEL_MPEG4_2  0x3
-#define VEN_LEVEL_MPEG4_3  0x4
-#define VEN_LEVEL_MPEG4_4  0x5
-#define VEN_LEVEL_MPEG4_5  0x6
-#define VEN_LEVEL_MPEG4_3b 0x7
-#define VEN_LEVEL_MPEG4_6  0x8
+#define VEN_LEVEL_MPEG4_0 0x1 
+#define VEN_LEVEL_MPEG4_1 0x2 
+#define VEN_LEVEL_MPEG4_2 0x3 
+#define VEN_LEVEL_MPEG4_3 0x4 
+#define VEN_LEVEL_MPEG4_4 0x5 
+#define VEN_LEVEL_MPEG4_5 0x6 
+#define VEN_LEVEL_MPEG4_3b 0x7 
+#define VEN_LEVEL_MPEG4_6 0x8 
 
-#define VEN_LEVEL_H264_1   0x9
-#define VEN_LEVEL_H264_1b  0xA
-#define VEN_LEVEL_H264_1p1 0xB
-#define VEN_LEVEL_H264_1p2 0xC
-#define VEN_LEVEL_H264_1p3 0xD
-#define VEN_LEVEL_H264_2   0xE
-#define VEN_LEVEL_H264_2p1 0xF
-#define VEN_LEVEL_H264_2p2 0x10
-#define VEN_LEVEL_H264_3   0x11
-#define VEN_LEVEL_H264_3p1 0x12
-#define VEN_LEVEL_H264_4   0x13
+#define VEN_LEVEL_H264_1 0x9 
+#define VEN_LEVEL_H264_1b 0xA 
+#define VEN_LEVEL_H264_1p1 0xB 
+#define VEN_LEVEL_H264_1p2 0xC 
+#define VEN_LEVEL_H264_1p3 0xD 
+#define VEN_LEVEL_H264_2 0xE 
+#define VEN_LEVEL_H264_2p1 0xF 
+#define VEN_LEVEL_H264_2p2 0x10 
+#define VEN_LEVEL_H264_3 0x11 
+#define VEN_LEVEL_H264_3p1 0x12 
+#define VEN_LEVEL_H264_4 0x13 
 
-#define VEN_LEVEL_H263_10  0x14
-#define VEN_LEVEL_H263_20  0x15
-#define VEN_LEVEL_H263_30  0x16
-#define VEN_LEVEL_H263_40  0x17
-#define VEN_LEVEL_H263_45  0x18
-#define VEN_LEVEL_H263_50  0x19
-#define VEN_LEVEL_H263_60  0x1A
-#define VEN_LEVEL_H263_70  0x1B
+#define VEN_LEVEL_H263_10 0x14 
+#define VEN_LEVEL_H263_20 0x15 
+#define VEN_LEVEL_H263_30 0x16 
+#define VEN_LEVEL_H263_40 0x17 
+#define VEN_LEVEL_H263_45 0x18 
+#define VEN_LEVEL_H263_50 0x19 
+#define VEN_LEVEL_H263_60 0x1A 
+#define VEN_LEVEL_H263_70 0x1B 
 
 #define VEN_ENTROPY_MODEL_CAVLC 1
 #define VEN_ENTROPY_MODEL_CABAC 2
@@ -131,8 +131,8 @@
 #define VEN_FLUSH_ALL 3
 
 #define VEN_INPUTFMT_NV12 1 
-#define VEN_INPUTFMT_NV21 2
-#define VEN_INPUTFMT_NV12_16M2KA 3
+#define VEN_INPUTFMT_NV21 2 
+#define VEN_INPUTFMT_NV12_16M2KA 3 
 
 #define VEN_ROTATION_0 1 
 #define VEN_ROTATION_90 2 
@@ -191,6 +191,12 @@ struct venc_ioctl_msg{
 #define VEN_IOCTL_CMD_RESUME _IO(VEN_IOCTLBASE_NENC, 18)
 
 #define VEN_IOCTL_CMD_STOP _IO(VEN_IOCTLBASE_NENC, 19)
+
+#define VEN_IOCTL_SET_RECON_BUFFER   _IOW(VEN_IOCTLBASE_NENC, 20, struct venc_ioctl_msg)
+
+#define VEN_IOCTL_FREE_RECON_BUFFER   _IOW(VEN_IOCTLBASE_NENC, 21, struct venc_ioctl_msg)
+
+#define VEN_IOCTL_GET_RECON_BUFFER_SIZE   _IOW(VEN_IOCTLBASE_NENC, 22, struct venc_ioctl_msg)
 
 #define VEN_IOCTL_SET_BASE_CFG   _IOW(VEN_IOCTLBASE_ENC, 1, struct venc_ioctl_msg)
 #define VEN_IOCTL_GET_BASE_CFG   _IOR(VEN_IOCTLBASE_ENC, 2, struct venc_ioctl_msg)
@@ -401,4 +407,18 @@ struct venc_msg{
  struct venc_buffer buf;
  unsigned long msgdata_size;
 };
+
+struct venc_recon_addr{
+ unsigned long buffer_size;
+ unsigned long pmem_fd;
+ unsigned long offset;
+};
+
+struct venc_recon_buff_size{
+ int width;
+ int height;
+ int size;
+ int alignment;
+};
+
 #endif
