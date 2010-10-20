@@ -71,6 +71,10 @@
 #define AUDIO_GET_BUF_CFG _IOW(AUDIO_IOCTL_MAGIC, 93, struct msm_audio_buf_cfg)
 #define AUDIO_SET_BUF_CFG _IOW(AUDIO_IOCTL_MAGIC, 94, struct msm_audio_buf_cfg)
 
+
+#define AUDIO_SET_ACDB_BLK _IOW(AUDIO_IOCTL_MAGIC, 95, struct msm_acdb_cmd_device)
+#define AUDIO_GET_ACDB_BLK _IOW(AUDIO_IOCTL_MAGIC, 96, struct msm_acdb_cmd_device)
+
 #define AUDIO_MAX_COMMON_IOCTL_NUM 100
 
 #define HANDSET_MIC 0x01
@@ -299,5 +303,16 @@ struct msm_audio_eq_stream_config {
  uint32_t num_bands;
  struct msm_audio_eq_band eq_bands[AUDIO_MAX_EQ_BANDS];
 } __attribute__ ((packed));
+
+struct msm_acdb_cmd_device {
+        uint32_t     command_id;
+        uint32_t     device_id;
+        uint32_t     network_id;
+        uint32_t     sample_rate_id;     /* Actual sample rate value */
+        uint32_t     interface_id;       /* See interface id's above */
+        uint32_t     algorithm_block_id; /* See enumerations above */
+        uint32_t     total_bytes;        /* Length in bytes used by buffer */
+        uint32_t     *phys_buf;          /* Physical Address of data */
+};
 
 #endif
