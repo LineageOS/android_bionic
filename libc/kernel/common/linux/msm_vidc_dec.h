@@ -72,10 +72,12 @@
 #define VDEC_BUFFERFLAG_EXTRADATA 0x00000040
 #define VDEC_BUFFERFLAG_CODECCONFIG 0x00000080
 
-#define VDEC_EXTRADATA_QP 0x00000001
-#define VDEC_EXTRADATA_SEI 0x00000002
-#define VDEC_EXTRADATA_VUI 0x00000004
-#define VDEC_EXTRADATA_MB_ERROR_MAP 0x00000008
+#define VDEC_EXTRADATA_NONE 0x001
+#define VDEC_EXTRADATA_QP 0x004
+#define VDEC_EXTRADATA_MB_ERROR_MAP 0x008
+#define VDEC_EXTRADATA_SEI 0x010
+#define VDEC_EXTRADATA_VUI 0x020
+#define VDEC_EXTRADATA_VC1 0x040
 
 #define VDEC_CMDBASE 0x800
 #define VDEC_CMD_SET_INTF_VERSION (VDEC_CMDBASE)
@@ -448,6 +450,7 @@ struct vdec_output_frameinfo {
  size_t len;
  uint32_t flags;
  int64_t time_stamp;
+ enum vdec_picture pic_type;
  void *client_data;
  void *input_frame_clientdata;
  struct vdec_framesize framesize;
