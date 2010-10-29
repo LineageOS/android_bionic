@@ -88,9 +88,11 @@
 
 #define MSM_CAM_IOCTL_STROBE_FLASH_RELEASE   _IO(MSM_CAM_IOCTL_MAGIC, 31)
 
-#define MSM_CAM_IOCTL_ERROR_CONFIG   _IOW(MSM_CAM_IOCTL_MAGIC, 32, uint32_t *)
+#define MSM_CAM_IOCTL_FLASH_CTRL   _IOW(MSM_CAM_IOCTL_MAGIC, 32, struct flash_ctrl_data *)
 
-#define MSM_CAM_IOCTL_ABORT_CAPTURE   _IO(MSM_CAM_IOCTL_MAGIC, 33)
+#define MSM_CAM_IOCTL_ERROR_CONFIG   _IOW(MSM_CAM_IOCTL_MAGIC, 33, uint32_t *)
+
+#define MSM_CAM_IOCTL_ABORT_CAPTURE   _IO(MSM_CAM_IOCTL_MAGIC, 34)
 
 #define MSM_CAMERA_LED_OFF 0
 #define MSM_CAMERA_LED_LOW 1
@@ -450,6 +452,30 @@ struct sensor_cfg_data {
  struct fps_cfg fps;
  struct wb_info_cfg wb_info;
  } cfg;
+};
+
+enum flash_type {
+ LED_FLASH,
+ STROBE_FLASH,
+};
+
+enum strobe_flash_ctrl_type {
+ STROBE_FLASH_CTRL_INIT,
+ STROBE_FLASH_CTRL_CHARGE,
+ STROBE_FLASH_CTRL_RELEASE
+};
+
+struct strobe_flash_ctrl_data {
+ enum strobe_flash_ctrl_type type;
+ int charge_en;
+};
+
+struct flash_ctrl_data {
+ int flashtype;
+ union {
+ int led_state;
+ struct strobe_flash_ctrl_data strobe_ctrl;
+ } ctrl_data;
 };
 
 #define GET_NAME 0
