@@ -37,8 +37,6 @@
 #include <errno.h>
 #include <ctype.h>
 
-#define MNTENT_LENGTH_MAX 400    //Buffer size for one record in mount entry file
-
 /** Thread-specific state for the stubs functions
  **/
 
@@ -52,9 +50,6 @@ typedef struct {
     char           app_name_buffer[32];
     char           group_name_buffer[32];
 } stubs_state_t;
-
-static struct mntent *mnt = NULL;
-char mntent_buf[MNTENT_LENGTH_MAX];    //Buffer to hold a record in mount entry file
 
 static void
 stubs_state_free( void*  _s )
@@ -352,133 +347,6 @@ struct netent* getnetbyname(const char *name)
 
 void endpwent(void)
 {
-}
-
-struct mntent* getmntent(FILE* f)
-{
-    int index = 0, i = 0, flag = 1;
-    char ch;
-    char *temp;
-    //Keeping count so that we don't over run the buffer size
-    int count = MNTENT_LENGTH_MAX;
-
-    if(mnt == NULL)
-        if(!(mnt = (struct mntent *)malloc(sizeof(struct mntent))))
-            return NULL;
-
-    mnt->mnt_fsname = mntent_buf;
-
-    if(f->_read(f->_cookie, &ch, 1) != 1)
-        return NULL;
-
-    // There are exactly 6 columns per record and so
-    // we are checking value of index against 6 here.
-    while(ch && (index < 6) && count) {
-        switch(index) {
-            case 0:
-                //Storing mounted device.
-                if(ch != ' ') {
-                    mnt->mnt_fsname[i++] = ch;
-                }
-                else {
-                    mnt->mnt_fsname[i++] = '\0';
-                    mnt->mnt_dir =  &(mnt->mnt_fsname[i]);
-                    i = 0;
-                    index++;
-                }
-                count--;
-                break;
-            case 1:
-                //Storing mount point.
-                if(ch != ' ') {
-                    mnt->mnt_dir[i++] = ch;
-                }
-                else {
-                    mnt->mnt_dir[i++] = '\0';
-                    mnt->mnt_type =  &(mnt->mnt_dir[i]);
-                    i = 0;
-                    index++;
-                }
-                count--;
-                break;
-            case 2:
-                //Storing file system type.
-                if(ch != ' ') {
-                    mnt->mnt_type[i++] = ch;
-                }
-                else {
-                    mnt->mnt_type[i++] = '\0';
-                    mnt->mnt_opts =  &(mnt->mnt_type[i]);
-                    i = 0;
-                    index++;
-                }
-                count--;
-                break;
-            case 3:
-                //Storing mount options.
-                if(ch != ' ') {
-                    mnt->mnt_opts[i++] = ch;
-                }
-                else {
-                    mnt->mnt_opts[i++] = '\0';
-                    temp =  &(mnt->mnt_opts[i]);
-                    i = 0;
-                    index++;
-                }
-                count--;
-                break;
-            case 4:
-                //Dummy value to match the format of /etc/mtab
-                if(ch != ' ') {
-                    temp[i++] = ch;
-                }
-                else {
-                    temp[i++] = '\0';
-                    mnt->mnt_freq = atoi(temp);
-                    temp = &(temp[i]);
-                    i = 0;
-                    index++;
-                }
-                count--;
-                break;
-            case 5:
-                //Dummy value to match the format of /etc/mtab
-                if(ch != '\n') {
-                    temp[i++] = ch;
-                }
-                else {
-                    temp[i++] = '\0';
-                    mnt->mnt_passno = atoi(temp);
-                    temp = &(temp[i]);
-                    i = 0;
-                    index++;
-                    flag = 0;
-                }
-                count--;
-                break;
-        }
-        if (flag)
-            f->_read(f->_cookie, &ch, 1);
-    }
-    if(!count && flag)
-        return NULL;
-
-    return mnt;
-}
-
-FILE* setmntent(const char *filename, const char *type)
-{
-    return fopen(filename,  type);
-}
-
-int endmntent(FILE* f)
-{
-    if(mnt) {
-        free(mnt);
-        mnt = NULL;
-    }
-    f->_close(f);
-    return 1;
 }
 
 char* ttyname(int fd)
