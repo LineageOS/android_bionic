@@ -306,7 +306,6 @@ libc_common_src_files += \
 	arch-arm/bionic/tkill.S \
 	arch-arm/bionic/memcmp.S \
 	arch-arm/bionic/memcmp16.S \
-	arch-arm/bionic/memcpy.S \
 	arch-arm/bionic/memset.S \
 	arch-arm/bionic/setjmp.S \
 	arch-arm/bionic/sigsetjmp.S \
@@ -314,6 +313,12 @@ libc_common_src_files += \
 	arch-arm/bionic/syscall.S \
 	string/memmove.c.arm \
 	unistd/socketcalls.c
+
+ifeq ($(TARGET_USES_OPTIMIZED_MEMCPY_FOR_SCORPION),true)
+libc_common_src_files += arch-arm/bionic/memcpy_8650A.S
+else
+libc_common_src_files += arch-arm/bionic/memcpy.S
+endif
 
 # These files need to be arm so that gdbserver
 # can set breakpoints in them without messing
