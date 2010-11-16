@@ -96,6 +96,8 @@
 
 #define MSM_CAM_IOCTL_SET_FD_ROI   _IOW(MSM_CAM_IOCTL_MAGIC, 35, struct fd_roi_info *)
 
+#define MSM_CAM_IOCTL_GET_CAMERA_INFO   _IOR(MSM_CAM_IOCTL_MAGIC, 36, struct msm_camera_info *)
+
 #define MSM_CAMERA_LED_OFF 0
 #define MSM_CAMERA_LED_LOW 1
 #define MSM_CAMERA_LED_HIGH 2
@@ -103,7 +105,7 @@
 #define MSM_CAMERA_STROBE_FLASH_NONE 0
 #define MSM_CAMERA_STROBE_FLASH_XENON 1
 
-#define MAX_SENSOR_NUM 3
+#define MSM_MAX_CAMERA_SENSORS 5
 #define MAX_SENSOR_NAME 32
 
 #define PP_SNAP 0x01
@@ -476,6 +478,12 @@ enum strobe_flash_ctrl_type {
 struct strobe_flash_ctrl_data {
  enum strobe_flash_ctrl_type type;
  int charge_en;
+};
+
+struct msm_camera_info {
+ int num_cameras;
+ uint8_t has_3d_support[MSM_MAX_CAMERA_SENSORS];
+ uint8_t is_internal_cam[MSM_MAX_CAMERA_SENSORS];
 };
 
 struct flash_ctrl_data {
