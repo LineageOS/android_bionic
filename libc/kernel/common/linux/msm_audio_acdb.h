@@ -23,10 +23,16 @@
 #define AUDIO_SET_AUDPROC_TX_CAL _IOW(AUDIO_IOCTL_MAGIC, (AUDIO_MAX_COMMON_IOCTL_NUM+6), unsigned)
 #define AUDIO_SET_AUDPROC_TX_STREAM_CAL _IOW(AUDIO_IOCTL_MAGIC, (AUDIO_MAX_COMMON_IOCTL_NUM+7), unsigned)
 #define AUDIO_SET_AUDPROC_TX_VOL_CAL _IOW(AUDIO_IOCTL_MAGIC, (AUDIO_MAX_COMMON_IOCTL_NUM+8), unsigned)
+#define AUDIO_SET_SIDETONE_CAL _IOW(AUDIO_IOCTL_MAGIC, (AUDIO_MAX_COMMON_IOCTL_NUM+9), unsigned)
 
 struct cal_block {
  uint32_t cal_size;
  uint32_t cal_offset;
+};
+
+struct sidetone_cal {
+ uint16_t enable;
+ uint16_t gain;
 };
 
 #endif
