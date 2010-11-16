@@ -25,6 +25,8 @@
 #define PMEM_GET_TOTAL_SIZE _IOW(PMEM_IOCTL_MAGIC, 7, unsigned int)
 #define PMEM_CACHE_FLUSH _IOW(PMEM_IOCTL_MAGIC, 8, unsigned int)
 
+#define PMEM_ALLOCATE_ALIGNED   _IOW(PMEM_IOCTL_MAGIC, 15, unsigned int)
+
 struct android_pmem_platform_data
 {
  const char* name;
@@ -43,6 +45,11 @@ struct android_pmem_platform_data
 struct pmem_region {
  unsigned long offset;
  unsigned long len;
+};
+
+struct pmem_allocation {
+ unsigned long size;
+ unsigned int align;
 };
 
 #endif
