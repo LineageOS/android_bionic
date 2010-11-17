@@ -261,6 +261,8 @@ struct venc_ioctl_msg{
 #define VEN_IOCTL_SET_QP_RANGE   _IOW(VEN_IOCTLBASE_ENC, 44, struct venc_ioctl_msg)
 #define VEN_IOCTL_GET_QP_RANGE   _IOR(VEN_IOCTLBASE_ENC, 45, struct venc_ioctl_msg)
 
+#define VEN_IOCTL_GET_NUMBER_INSTANCES   _IOR(VEN_IOCTLBASE_ENC, 46, struct venc_ioctl_msg)
+
 struct venc_switch{
  unsigned char status;
 };
