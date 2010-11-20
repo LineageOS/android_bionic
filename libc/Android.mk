@@ -459,6 +459,10 @@ else # !arm
   endif # x86
 endif # !arm
 
+ifeq ($(BOARD_USE_NASTY_PTHREAD_CREATE_HACK),true)
+  libc_common_cflags += -DNASTY_PTHREAD_CREATE_HACK
+endif
+
 # Define some common includes
 # ========================================================
 libc_common_c_includes := \
