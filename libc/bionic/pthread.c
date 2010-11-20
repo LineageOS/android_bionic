@@ -360,6 +360,13 @@ int pthread_create(pthread_t *thread_out, pthread_attr_t const * attr,
     return 0;
 }
 
+#ifdef NASTY_PTHREAD_CREATE_HACK
+int _debug_pthread_create(void *debug0, void *debug1, pthread_t *thread,
+        const pthread_attr_t *attr, void *(*start_routine) (void *), void *arg)
+{
+    return pthread_create(thread, attr, start_routine, arg);
+}
+#endif
 
 int pthread_attr_init(pthread_attr_t * attr)
 {
