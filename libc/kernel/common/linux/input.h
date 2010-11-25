@@ -15,7 +15,7 @@
 #include <sys/time.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
-#include <asm/types.h>
+#include <linux/types.h>
 
 struct input_event {
  struct timeval time;
@@ -39,6 +39,7 @@ struct input_absinfo {
  __s32 maximum;
  __s32 fuzz;
  __s32 flat;
+ __s32 resolution;
 };
 
 #define EVIOCGVERSION _IOR('E', 0x01, int)  
@@ -80,9 +81,11 @@ struct input_absinfo {
 #define EV_PWR 0x16
 #define EV_FF_STATUS 0x17
 #define EV_MAX 0x1f
+#define EV_CNT (EV_MAX+1)
 
 #define SYN_REPORT 0
 #define SYN_CONFIG 1
+#define SYN_MT_REPORT 2
 
 #define KEY_RESERVED 0
 #define KEY_ESC 1
@@ -200,10 +203,11 @@ struct input_absinfo {
 #define KEY_MUTE 113
 #define KEY_VOLUMEDOWN 114
 #define KEY_VOLUMEUP 115
-#define KEY_POWER 116
+#define KEY_POWER 116  
 #define KEY_KPEQUAL 117
 #define KEY_KPPLUSMINUS 118
 #define KEY_PAUSE 119
+#define KEY_SCALE 120  
 
 #define KEY_KPCOMMA 121
 #define KEY_HANGEUL 122
@@ -214,38 +218,39 @@ struct input_absinfo {
 #define KEY_RIGHTMETA 126
 #define KEY_COMPOSE 127
 
-#define KEY_STOP 128
+#define KEY_STOP 128  
 #define KEY_AGAIN 129
-#define KEY_PROPS 130
-#define KEY_UNDO 131
+#define KEY_PROPS 130  
+#define KEY_UNDO 131  
 #define KEY_FRONT 132
-#define KEY_COPY 133
-#define KEY_OPEN 134
-#define KEY_PASTE 135
-#define KEY_FIND 136
-#define KEY_CUT 137
-#define KEY_HELP 138
-#define KEY_MENU 139
-#define KEY_CALC 140
+#define KEY_COPY 133  
+#define KEY_OPEN 134  
+#define KEY_PASTE 135  
+#define KEY_FIND 136  
+#define KEY_CUT 137  
+#define KEY_HELP 138  
+#define KEY_MENU 139  
+#define KEY_CALC 140  
 #define KEY_SETUP 141
-#define KEY_SLEEP 142
-#define KEY_WAKEUP 143
-#define KEY_FILE 144
+#define KEY_SLEEP 142  
+#define KEY_WAKEUP 143  
+#define KEY_FILE 144  
 #define KEY_SENDFILE 145
 #define KEY_DELETEFILE 146
 #define KEY_XFER 147
 #define KEY_PROG1 148
 #define KEY_PROG2 149
-#define KEY_WWW 150
+#define KEY_WWW 150  
 #define KEY_MSDOS 151
-#define KEY_COFFEE 152
+#define KEY_COFFEE 152  
+#define KEY_SCREENLOCK KEY_COFFEE
 #define KEY_DIRECTION 153
 #define KEY_CYCLEWINDOWS 154
 #define KEY_MAIL 155
-#define KEY_BOOKMARKS 156
+#define KEY_BOOKMARKS 156  
 #define KEY_COMPUTER 157
-#define KEY_BACK 158
-#define KEY_FORWARD 159
+#define KEY_BACK 158  
+#define KEY_FORWARD 159  
 #define KEY_CLOSECD 160
 #define KEY_EJECTCD 161
 #define KEY_EJECTCLOSECD 162
@@ -255,20 +260,20 @@ struct input_absinfo {
 #define KEY_STOPCD 166
 #define KEY_RECORD 167
 #define KEY_REWIND 168
-#define KEY_PHONE 169
+#define KEY_PHONE 169  
 #define KEY_ISO 170
-#define KEY_CONFIG 171
-#define KEY_HOMEPAGE 172
-#define KEY_REFRESH 173
-#define KEY_EXIT 174
+#define KEY_CONFIG 171  
+#define KEY_HOMEPAGE 172  
+#define KEY_REFRESH 173  
+#define KEY_EXIT 174  
 #define KEY_MOVE 175
 #define KEY_EDIT 176
 #define KEY_SCROLLUP 177
 #define KEY_SCROLLDOWN 178
 #define KEY_KPLEFTPAREN 179
 #define KEY_KPRIGHTPAREN 180
-#define KEY_NEW 181
-#define KEY_REDO 182
+#define KEY_NEW 181  
+#define KEY_REDO 182  
 
 #define KEY_F13 183
 #define KEY_F14 184
@@ -287,12 +292,13 @@ struct input_absinfo {
 #define KEY_PAUSECD 201
 #define KEY_PROG3 202
 #define KEY_PROG4 203
+#define KEY_DASHBOARD 204  
 #define KEY_SUSPEND 205
-#define KEY_CLOSE 206
+#define KEY_CLOSE 206  
 #define KEY_PLAY 207
 #define KEY_FASTFORWARD 208
 #define KEY_BASSBOOST 209
-#define KEY_PRINT 210
+#define KEY_PRINT 210  
 #define KEY_HP 211
 #define KEY_CAMERA 212
 #define KEY_SOUND 213
@@ -301,14 +307,41 @@ struct input_absinfo {
 #define KEY_CHAT 216
 #define KEY_SEARCH 217
 #define KEY_CONNECT 218
-#define KEY_FINANCE 219
+#define KEY_FINANCE 219  
 #define KEY_SPORT 220
 #define KEY_SHOP 221
 #define KEY_ALTERASE 222
-#define KEY_CANCEL 223
+#define KEY_CANCEL 223  
 #define KEY_BRIGHTNESSDOWN 224
 #define KEY_BRIGHTNESSUP 225
 #define KEY_MEDIA 226
+
+#define KEY_SWITCHVIDEOMODE 227  
+#define KEY_KBDILLUMTOGGLE 228
+#define KEY_KBDILLUMDOWN 229
+#define KEY_KBDILLUMUP 230
+
+#define KEY_SEND 231  
+#define KEY_REPLY 232  
+#define KEY_FORWARDMAIL 233  
+#define KEY_SAVE 234  
+#define KEY_DOCUMENTS 235
+
+#define KEY_BATTERY 236
+
+#define KEY_BLUETOOTH 237
+#define KEY_WLAN 238
+#define KEY_UWB 239
+
+#define KEY_UNKNOWN 240
+
+#define KEY_VIDEO_NEXT 241  
+#define KEY_VIDEO_PREV 242  
+#define KEY_BRIGHTNESS_CYCLE 243  
+#define KEY_BRIGHTNESS_ZERO 244  
+#define KEY_DISPLAY_OFF 245  
+
+#define KEY_WIMAX 246
 
 #define KEY_STAR 227
 #define KEY_SHARP 228
@@ -319,21 +352,6 @@ struct input_absinfo {
 #define KEY_HEADSETHOOK 233
 #define KEY_0_5 234
 #define KEY_2_5 235
-
-#define KEY_SWITCHVIDEOMODE 236
-#define KEY_KBDILLUMTOGGLE 237
-#define KEY_KBDILLUMDOWN 238
-#define KEY_KBDILLUMUP 239
-
-#define KEY_SEND 231
-#define KEY_REPLY 232
-#define KEY_FORWARDMAIL 233
-#define KEY_SAVE 234
-#define KEY_DOCUMENTS 235
-
-#define KEY_BATTERY 236
-
-#define KEY_UNKNOWN 240
 
 #define BTN_MISC 0x100
 #define BTN_0 0x100
@@ -403,6 +421,7 @@ struct input_absinfo {
 #define BTN_STYLUS2 0x14c
 #define BTN_TOOL_DOUBLETAP 0x14d
 #define BTN_TOOL_TRIPLETAP 0x14e
+#define BTN_TOOL_QUADTAP 0x14f  
 
 #define BTN_WHEEL 0x150
 #define BTN_GEAR_DOWN 0x150
@@ -414,15 +433,15 @@ struct input_absinfo {
 #define KEY_CLEAR 0x163
 #define KEY_POWER2 0x164
 #define KEY_OPTION 0x165
-#define KEY_INFO 0x166
+#define KEY_INFO 0x166  
 #define KEY_TIME 0x167
 #define KEY_VENDOR 0x168
 #define KEY_ARCHIVE 0x169
-#define KEY_PROGRAM 0x16a
+#define KEY_PROGRAM 0x16a  
 #define KEY_CHANNEL 0x16b
 #define KEY_FAVORITES 0x16c
 #define KEY_EPG 0x16d
-#define KEY_PVR 0x16e
+#define KEY_PVR 0x16e  
 #define KEY_MHP 0x16f
 #define KEY_LANGUAGE 0x170
 #define KEY_TITLE 0x171
@@ -432,36 +451,36 @@ struct input_absinfo {
 #define KEY_MODE 0x175
 #define KEY_KEYBOARD 0x176
 #define KEY_SCREEN 0x177
-#define KEY_PC 0x178
-#define KEY_TV 0x179
-#define KEY_TV2 0x17a
-#define KEY_VCR 0x17b
-#define KEY_VCR2 0x17c
-#define KEY_SAT 0x17d
+#define KEY_PC 0x178  
+#define KEY_TV 0x179  
+#define KEY_TV2 0x17a  
+#define KEY_VCR 0x17b  
+#define KEY_VCR2 0x17c  
+#define KEY_SAT 0x17d  
 #define KEY_SAT2 0x17e
-#define KEY_CD 0x17f
-#define KEY_TAPE 0x180
+#define KEY_CD 0x17f  
+#define KEY_TAPE 0x180  
 #define KEY_RADIO 0x181
-#define KEY_TUNER 0x182
+#define KEY_TUNER 0x182  
 #define KEY_PLAYER 0x183
 #define KEY_TEXT 0x184
-#define KEY_DVD 0x185
+#define KEY_DVD 0x185  
 #define KEY_AUX 0x186
 #define KEY_MP3 0x187
 #define KEY_AUDIO 0x188
 #define KEY_VIDEO 0x189
 #define KEY_DIRECTORY 0x18a
 #define KEY_LIST 0x18b
-#define KEY_MEMO 0x18c
+#define KEY_MEMO 0x18c  
 #define KEY_CALENDAR 0x18d
 #define KEY_RED 0x18e
 #define KEY_GREEN 0x18f
 #define KEY_YELLOW 0x190
 #define KEY_BLUE 0x191
-#define KEY_CHANNELUP 0x192
-#define KEY_CHANNELDOWN 0x193
+#define KEY_CHANNELUP 0x192  
+#define KEY_CHANNELDOWN 0x193  
 #define KEY_FIRST 0x194
-#define KEY_LAST 0x195
+#define KEY_LAST 0x195  
 #define KEY_AB 0x196
 #define KEY_NEXT 0x197
 #define KEY_RESTART 0x198
@@ -472,6 +491,32 @@ struct input_absinfo {
 #define KEY_DIGITS 0x19d
 #define KEY_TEEN 0x19e
 #define KEY_TWEN 0x19f
+#define KEY_VIDEOPHONE 0x1a0  
+#define KEY_GAMES 0x1a1  
+#define KEY_ZOOMIN 0x1a2  
+#define KEY_ZOOMOUT 0x1a3  
+#define KEY_ZOOMRESET 0x1a4  
+#define KEY_WORDPROCESSOR 0x1a5  
+#define KEY_EDITOR 0x1a6  
+#define KEY_SPREADSHEET 0x1a7  
+#define KEY_GRAPHICSEDITOR 0x1a8  
+#define KEY_PRESENTATION 0x1a9  
+#define KEY_DATABASE 0x1aa  
+#define KEY_NEWS 0x1ab  
+#define KEY_VOICEMAIL 0x1ac  
+#define KEY_ADDRESSBOOK 0x1ad  
+#define KEY_MESSENGER 0x1ae  
+#define KEY_DISPLAYTOGGLE 0x1af  
+#define KEY_SPELLCHECK 0x1b0  
+#define KEY_LOGOFF 0x1b1  
+
+#define KEY_DOLLAR 0x1b2
+#define KEY_EURO 0x1b3
+
+#define KEY_FRAMEBACK 0x1b4  
+#define KEY_FRAMEFORWARD 0x1b5
+#define KEY_CONTEXT_MENU 0x1b6  
+#define KEY_MEDIA_REPEAT 0x1b7  
 
 #define KEY_DEL_EOL 0x1c0
 #define KEY_DEL_EOS 0x1c1
@@ -508,9 +553,25 @@ struct input_absinfo {
 #define KEY_BRL_DOT6 0x1f6
 #define KEY_BRL_DOT7 0x1f7
 #define KEY_BRL_DOT8 0x1f8
+#define KEY_BRL_DOT9 0x1f9
+#define KEY_BRL_DOT10 0x1fa
+
+#define KEY_NUMERIC_0 0x200  
+#define KEY_NUMERIC_1 0x201  
+#define KEY_NUMERIC_2 0x202
+#define KEY_NUMERIC_3 0x203
+#define KEY_NUMERIC_4 0x204
+#define KEY_NUMERIC_5 0x205
+#define KEY_NUMERIC_6 0x206
+#define KEY_NUMERIC_7 0x207
+#define KEY_NUMERIC_8 0x208
+#define KEY_NUMERIC_9 0x209
+#define KEY_NUMERIC_STAR 0x20a
+#define KEY_NUMERIC_POUND 0x20b
 
 #define KEY_MIN_INTERESTING KEY_MUTE
-#define KEY_MAX 0x1ff
+#define KEY_MAX 0x2ff
+#define KEY_CNT (KEY_MAX+1)
 
 #define REL_X 0x00
 #define REL_Y 0x01
@@ -523,6 +584,7 @@ struct input_absinfo {
 #define REL_WHEEL 0x08
 #define REL_MISC 0x09
 #define REL_MAX 0x0f
+#define REL_CNT (REL_MAX+1)
 
 #define ABS_X 0x00
 #define ABS_Y 0x01
@@ -550,12 +612,33 @@ struct input_absinfo {
 #define ABS_TOOL_WIDTH 0x1c
 #define ABS_VOLUME 0x20
 #define ABS_MISC 0x28
+
+#define ABS_MT_TOUCH_MAJOR 0x30  
+#define ABS_MT_TOUCH_MINOR 0x31  
+#define ABS_MT_WIDTH_MAJOR 0x32  
+#define ABS_MT_WIDTH_MINOR 0x33  
+#define ABS_MT_ORIENTATION 0x34  
+#define ABS_MT_POSITION_X 0x35  
+#define ABS_MT_POSITION_Y 0x36  
+#define ABS_MT_TOOL_TYPE 0x37  
+#define ABS_MT_BLOB_ID 0x38  
+#define ABS_MT_TRACKING_ID 0x39  
+
 #define ABS_MAX 0x3f
+#define ABS_CNT (ABS_MAX+1)
 
 #define SW_LID 0x00  
 #define SW_TABLET_MODE 0x01  
 #define SW_HEADPHONE_INSERT 0x02  
+#define SW_RFKILL_ALL 0x03  
+#define SW_RADIO SW_RFKILL_ALL  
+#define SW_MICROPHONE_INSERT 0x04  
+#define SW_DOCK 0x05  
+#define SW_LINEOUT_INSERT 0x06  
+#define SW_JACK_PHYSICAL_INSERT 0x07  
+#define SW_VIDEOOUT_INSERT 0x08  
 #define SW_MAX 0x0f
+#define SW_CNT (SW_MAX+1)
 
 #define MSC_SERIAL 0x00
 #define MSC_PULSELED 0x01
@@ -563,6 +646,7 @@ struct input_absinfo {
 #define MSC_RAW 0x03
 #define MSC_SCAN 0x04
 #define MSC_MAX 0x07
+#define MSC_CNT (MSC_MAX+1)
 
 #define LED_NUML 0x00
 #define LED_CAPSL 0x01
@@ -576,6 +660,7 @@ struct input_absinfo {
 #define LED_MAIL 0x09
 #define LED_CHARGING 0x0a
 #define LED_MAX 0x0f
+#define LED_CNT (LED_MAX+1)
 
 #define REP_DELAY 0x00
 #define REP_PERIOD 0x01
@@ -585,6 +670,7 @@ struct input_absinfo {
 #define SND_BELL 0x01
 #define SND_TONE 0x02
 #define SND_MAX 0x07
+#define SND_CNT (SND_MAX+1)
 
 #define ID_BUS 0
 #define ID_VENDOR 1
@@ -596,6 +682,7 @@ struct input_absinfo {
 #define BUS_USB 0x03
 #define BUS_HIL 0x04
 #define BUS_BLUETOOTH 0x05
+#define BUS_VIRTUAL 0x06
 
 #define BUS_ISA 0x10
 #define BUS_I8042 0x11
@@ -608,6 +695,10 @@ struct input_absinfo {
 #define BUS_I2C 0x18
 #define BUS_HOST 0x19
 #define BUS_GSC 0x1A
+#define BUS_ATARI 0x1B
+
+#define MT_TOOL_FINGER 0
+#define MT_TOOL_PEN 1
 
 #define FF_STATUS_STOPPED 0x00
 #define FF_STATUS_PLAYING 0x01
@@ -650,7 +741,6 @@ struct ff_condition_effect {
 
  __u16 deadband;
  __s16 center;
-
 };
 
 struct ff_periodic_effect {
@@ -664,7 +754,6 @@ struct ff_periodic_effect {
 
  __u32 custom_len;
  __s16 *custom_data;
-
 };
 
 struct ff_rumble_effect {
@@ -674,11 +763,8 @@ struct ff_rumble_effect {
 
 struct ff_effect {
  __u16 type;
-
  __s16 id;
-
  __u16 direction;
-
  struct ff_trigger trigger;
  struct ff_replay replay;
 
@@ -700,6 +786,9 @@ struct ff_effect {
 #define FF_INERTIA 0x56
 #define FF_RAMP 0x57
 
+#define FF_EFFECT_MIN FF_RUMBLE
+#define FF_EFFECT_MAX FF_RAMP
+
 #define FF_SQUARE 0x58
 #define FF_TRIANGLE 0x59
 #define FF_SINE 0x5a
@@ -707,9 +796,14 @@ struct ff_effect {
 #define FF_SAW_DOWN 0x5c
 #define FF_CUSTOM 0x5d
 
+#define FF_WAVEFORM_MIN FF_SQUARE
+#define FF_WAVEFORM_MAX FF_CUSTOM
+
 #define FF_GAIN 0x60
 #define FF_AUTOCENTER 0x61
 
 #define FF_MAX 0x7f
+#define FF_CNT (FF_MAX+1)
 
 #endif
+
