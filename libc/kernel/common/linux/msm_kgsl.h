@@ -26,10 +26,16 @@
 #define KGSL_FLAGS_RESERVED2 0x00000080
 
 enum kgsl_deviceid {
- KGSL_DEVICE_ANY = 0x00000000,
- KGSL_DEVICE_YAMATO = 0x00000001,
- KGSL_DEVICE_G12 = 0x00000002,
- KGSL_DEVICE_MAX = 0x00000002
+ KGSL_DEVICE_YAMATO = 0x00000000,
+ KGSL_DEVICE_2D0 = 0x00000001,
+ KGSL_DEVICE_2D1 = 0x00000002,
+ KGSL_DEVICE_MAX = 0x00000003
+};
+
+enum kgsl_user_mem_type {
+ KGSL_USER_MEM_TYPE_PMEM = 0x00000000,
+ KGSL_USER_MEM_TYPE_ASHMEM = 0x00000001,
+ KGSL_USER_MEM_TYPE_ADDR = 0x00000002
 };
 
 struct kgsl_devinfo {
@@ -49,10 +55,6 @@ struct kgsl_devmemstore {
  unsigned int sbz;
  volatile unsigned int eoptimestamp;
  unsigned int sbz2;
- volatile unsigned int ts_cmp_enable;
- unsigned int sbz3;
- volatile unsigned int ref_wait_ts;
- unsigned int sbz4;
 };
 
 #define KGSL_DEVICE_MEMSTORE_OFFSET(field)   offsetof(struct kgsl_devmemstore, field)
@@ -69,14 +71,22 @@ enum kgsl_property_type {
  KGSL_PROP_DEVICE_POWER = 0x00000003,
  KGSL_PROP_SHMEM = 0x00000004,
  KGSL_PROP_SHMEM_APERTURES = 0x00000005,
- KGSL_PROP_MMU_ENABLE = 0x00000006,
- KGSL_PROP_INTERRUPT_WAITS = 0x00000007,
+ KGSL_PROP_MMU_ENABLE = 0x00000006
 };
 
 struct kgsl_shadowprop {
  unsigned int gpuaddr;
  unsigned int size;
  unsigned int flags;
+};
+
+struct kgsl_platform_data {
+ unsigned int high_axi_2d;
+ unsigned int high_axi_3d;
+ unsigned int max_grp2d_freq;
+ int (*set_grp2d_async)(void);
+ unsigned int max_grp3d_freq;
+ int (*set_grp3d_async)(void);
 };
 
 #define KGSL_IOC_TYPE 0x09
@@ -105,8 +115,8 @@ struct kgsl_device_waittimestamp {
 
 struct kgsl_ringbuffer_issueibcmds {
  unsigned int drawctxt_id;
- unsigned int ibaddr;
- unsigned int sizedwords;
+ unsigned int ibdesc_addr;
+ unsigned int numibs;
  unsigned int timestamp;
  unsigned int flags;
 };
@@ -140,6 +150,18 @@ struct kgsl_drawctxt_destroy {
 };
 
 #define IOCTL_KGSL_DRAWCTXT_DESTROY   _IOW(KGSL_IOC_TYPE, 0x14, struct kgsl_drawctxt_destroy)
+
+struct kgsl_map_user_mem {
+ int fd;
+ unsigned int gpuaddr;
+ unsigned int len;
+ unsigned int offset;
+ unsigned int hostptr;
+ enum kgsl_user_mem_type memtype;
+ unsigned int reserved;
+};
+
+#define IOCTL_KGSL_MAP_USER_MEM   _IOWR(KGSL_IOC_TYPE, 0x15, struct kgsl_map_user_mem)
 
 struct kgsl_sharedmem_from_pmem {
  int pmem_fd;
@@ -188,7 +210,7 @@ struct kgsl_sharedmem_from_vmalloc {
  unsigned int gpuaddr;
  unsigned int hostptr;
 
- int force_no_low_watermark;
+ unsigned int flags;
 };
 
 #define IOCTL_KGSL_SHAREDMEM_FROM_VMALLOC   _IOWR(KGSL_IOC_TYPE, 0x23, struct kgsl_sharedmem_from_vmalloc)
@@ -202,5 +224,21 @@ struct kgsl_drawctxt_set_bin_base_offset {
 
 #define IOCTL_KGSL_DRAWCTXT_SET_BIN_BASE_OFFSET   _IOW(KGSL_IOC_TYPE, 0x25, struct kgsl_drawctxt_set_bin_base_offset)
 
-#endif
+enum kgsl_cmdwindow_type {
+ KGSL_CMDWINDOW_MIN = 0x00000000,
+ KGSL_CMDWINDOW_2D = 0x00000000,
+ KGSL_CMDWINDOW_3D = 0x00000001,
+ KGSL_CMDWINDOW_MMU = 0x00000002,
+ KGSL_CMDWINDOW_ARBITER = 0x000000FF,
+ KGSL_CMDWINDOW_MAX = 0x000000FF,
+};
 
+struct kgsl_cmdwindow_write {
+ enum kgsl_cmdwindow_type target;
+ unsigned int addr;
+ unsigned int data;
+};
+
+#define IOCTL_KGSL_CMDWINDOW_WRITE   _IOW(KGSL_IOC_TYPE, 0x2e, struct kgsl_cmdwindow_write)
+
+#endif
