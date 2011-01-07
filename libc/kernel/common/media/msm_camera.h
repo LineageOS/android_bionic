@@ -484,6 +484,7 @@ struct msm_camera_info {
  int num_cameras;
  uint8_t has_3d_support[MSM_MAX_CAMERA_SENSORS];
  uint8_t is_internal_cam[MSM_MAX_CAMERA_SENSORS];
+ uint32_t s_mount_angle[MSM_MAX_CAMERA_SENSORS];
 };
 
 struct flash_ctrl_data {
