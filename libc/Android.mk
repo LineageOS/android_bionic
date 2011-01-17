@@ -499,6 +499,35 @@ ifeq ($(TARGET_ARCH),arm)
   ifeq ($(TARGET_HAVE_TEGRA_ERRATA_657451),true)
     libc_common_cflags += -DHAVE_TEGRA_ERRATA_657451
   endif
+  #
+  # Define HAVE_32_BYTE_CACHE_LINE to indicate to C
+  # library it should use to 32-byte version of memcpy, and not
+  # the 64-byte version.
+  #
+  ifeq ($(ARCH_ARM_HAVE_32_BYTE_CACHE_LINES),true)
+    libc_common_cflags += -DHAVE_32_BYTE_CACHE_LINE
+  endif
+  #
+  # Define NEON_UNALIGNED_ACCESS to indicate to C
+  # library it could do unaligned memory access in Neon instructions.
+  #
+  ifeq ($(ARCH_ARM_NEON_SUPPORTS_UNALIGNED_ACCESS),true)
+    libc_common_cflags += -DNEON_UNALIGNED_ACCESS
+    #
+    # Define MEMCPY_ALIGNMENT_DIVIDER to set a size limit to the unaligned
+    # access. Only sizes below this limit uses unaligned access.
+    #
+    ifneq ($(strip $(ARCH_ARM_MEMCPY_ALIGNMENT_DIVIDER)),)
+      libc_common_cflags += -DMEMCPY_ALIGNMENT_DIVIDER=$(strip $(ARCH_ARM_MEMCPY_ALIGNMENT_DIVIDER))
+    endif
+  endif
+  #
+  # Define MEMSET_NEON_DIVIDER to set a size limit for the Neon version
+  # Only sizes below this limit uses the Neon version.
+  #
+  ifneq ($(strip $(ARCH_ARM_MEMSET_NEON_DIVIDER)),)
+    libc_common_cflags += -DMEMSET_NEON_DIVIDER=$(strip $(ARCH_ARM_MEMSET_NEON_DIVIDER))
+  endif
 else # !arm
   ifeq ($(TARGET_ARCH),x86)
     libc_crt_target_cflags := -m32
