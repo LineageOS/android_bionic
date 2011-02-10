@@ -413,6 +413,9 @@ struct v4l2_window {
  __u32 clipcount;
  void __user *bitmap;
  __u8 global_alpha;
+#ifdef OMAP_ENHANCEMENT
+ __u8 zorder;
+#endif
 };
 
 struct v4l2_captureparm {
