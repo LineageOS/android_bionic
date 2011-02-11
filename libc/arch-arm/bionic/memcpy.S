@@ -28,7 +28,7 @@
 
 #include <machine/cpu-features.h>
 
-#if defined(__ARM_NEON__)
+#if defined(__ARM_NEON__) && !defined(NV_AVOID_NEON_MEMCPY)
 
         .text
         .fpu    neon
