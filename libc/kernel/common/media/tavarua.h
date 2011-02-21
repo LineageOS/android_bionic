@@ -16,7 +16,7 @@
 #include <linux/ioctl.h>
 #include <linux/videodev2.h>
 
-#define FM_DEBUG
+#undef FM_DEBUG
 
 #define RDS_BLOCKS_NUM (4)
 #define BYTES_PER_BLOCK (3)
@@ -34,11 +34,27 @@
 #define US_LOW_BAND (87.5)
 #define US_HIGH_BAND (108)
 
+#define MASK_PI (0x0000FFFF)
+#define MASK_PI_MSB (0x0000FF00)
+#define MASK_PI_LSB (0x000000FF)
+#define MASK_PTY (0x0000001F)
+#define MASK_TXREPCOUNT (0x0000000F)
+
 #undef FMDBG
 #ifdef FM_DEBUG
 #define FMDBG(fmt, args...) printk(KERN_INFO "tavarua_radio: " fmt, ##args)
 #else
 #define FMDBG(fmt, args...)
+#endif
+
+#undef FMDERR
+#define FMDERR(fmt, args...) printk(KERN_INFO "tavarua_radio: " fmt, ##args)
+
+#undef FMDBG_I2C
+#ifdef FM_DEBUG_I2C
+#define FMDBG_I2C(fmt, args...) printk(KERN_INFO "fm_i2c: " fmt, ##args)
+#else
+#define FMDBG_I2C(fmt, args...)
 #endif
 
 #define TAVARUA_AUDIO_OUT_ANALOG_OFF (0)
@@ -48,6 +64,8 @@
 
 #define MARIMBA_A0 0x01010013
 #define MARIMBA_2_1 0x02010204
+#define BAHAMA_1_0 0x0302010A
+#define BAHAMA_2_0 0x04020205
 #define WAIT_TIMEOUT 2000
 #define RADIO_INIT_TIME 15
 #define TAVARUA_DELAY 10
@@ -74,7 +92,11 @@ enum v4l2_cid_private_tavarua_t {
  V4L2_CID_PRIVATE_TAVARUA_LP_MODE,
  V4L2_CID_PRIVATE_TAVARUA_ANTENNA,
  V4L2_CID_PRIVATE_TAVARUA_RDSD_BUF,
- V4L2_CID_PRIVATE_TAVARUA_PSALL
+ V4L2_CID_PRIVATE_TAVARUA_PSALL,
+
+ V4L2_CID_PRIVATE_TAVARUA_TX_SETPSREPEATCOUNT,
+ V4L2_CID_PRIVATE_TAVARUA_STOP_RDS_TX_PS_NAME,
+ V4L2_CID_PRIVATE_TAVARUA_STOP_RDS_TX_RT
 };
 
 enum tavarua_buf_t {
@@ -127,8 +149,16 @@ enum register_t {
  RMSSI,
  AUDIOIND = 0x1E,
  XFRCTRL,
+ FM_CTL0 = 0xFF,
  LEAKAGE_CNTRL = 0xFE,
 };
+#define BAHAMA_RBIAS_CTL1 0x07
+#define BAHAMA_FM_MODE_REG 0xFD
+#define BAHAMA_FM_CTL1_REG 0xFE
+#define BAHAMA_FM_CTL0_REG 0xFF
+#define BAHAMA_FM_MODE_NORMAL 0x00
+#define BAHAMA_LDO_DREG_CTL0 0xF0
+#define BAHAMA_LDO_AREG_CTL0 0xF4
 
 #define RDCTRL_STATE_OFFSET 0
 #define RDCTRL_STATE_MASK (3 << RDCTRL_STATE_OFFSET)
@@ -309,7 +339,9 @@ enum tavarua_evt_t {
  TAVARUA_EVT_RDS_AVAIL,
  TAVARUA_EVT_RDS_NOT_AVAIL,
  TAVARUA_EVT_NEW_SRCH_LIST,
- TAVARUA_EVT_NEW_AF_LIST
+ TAVARUA_EVT_NEW_AF_LIST,
+ TAVARUA_EVT_TXRDSDAT,
+ TAVARUA_EVT_TXRDSDONE
 };
 
 enum tavarua_region_t {
@@ -321,4 +353,3 @@ enum tavarua_region_t {
 };
 
 #endif
-
