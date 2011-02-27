@@ -26,7 +26,36 @@
  * SUCH DAMAGE.
  */
 #include <unistd.h>
+#include <stdlib.h>
 #include <sys/reboot.h>
+#include <sys/wait.h>
+
+static void do_preshutdown_cleanup_inner(void)
+{
+    pid_t bg_pid;
+    bg_pid = fork();
+    if (bg_pid < 0)
+        return;
+    if (bg_pid) {
+        int ret_stat, i;
+        if (bg_pid == waitpid(bg_pid, &ret_stat, WNOHANG))
+            return;
+        for (i = 0; i < 100; i++) {
+            usleep(100000);
+            if (bg_pid == waitpid(bg_pid, &ret_stat, WNOHANG))
+                return;
+        }
+    } else {
+        execl("/system/etc/preshutdown", "/system/etc/preshutdown", (char *)NULL);
+        exit(255);
+    }
+}
+
+void do_preshutdown_cleanup(void)
+{
+    do_preshutdown_cleanup_inner();
+    sync();
+}
 
 int reboot (int  mode) 
 {

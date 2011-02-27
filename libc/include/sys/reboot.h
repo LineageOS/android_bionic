@@ -41,8 +41,15 @@ __BEGIN_DECLS
 #define RB_DISABLE_CAD  LINUX_REBOOT_CMD_CAD_OFF
 #define RB_POWER_OFF    LINUX_REBOOT_CMD_POWER_OFF
 
+extern void do_preshutdown_cleanup(void);
 extern int reboot(int  reboot_type);
 extern int __reboot(int, int, int, void *);
+#ifndef NO_CLEANUP_REBOOT
+#define __reboot(magic1, magic2, cmd, arg) ({ \
+    do_preshutdown_cleanup(); \
+    __reboot(magic1, magic2, cmd, arg); \
+})
+#endif
 
 __END_DECLS
 
