@@ -96,6 +96,20 @@ __stubs_state(void)
     return s;
 }
 
+void
+passwd_set_default_shell(struct passwd* pw)
+{
+    //prefer to use bash if it exists
+    if(access("/system/bin/bash",F_OK)==0)
+        pw->pw_shell = "/system/bin/bash";
+    //failing that we use busybox
+    else if(access("/system/bin/busybox",F_OK)==0)
+        pw->pw_shell = "/system/bin/busybox sh";
+    //fall back to default
+    else
+        pw->pw_shell = "/system/bin/sh";
+}
+
 static struct passwd*
 android_iinfo_to_passwd( struct passwd          *pw,
                          struct android_id_info *iinfo )
@@ -104,7 +118,7 @@ android_iinfo_to_passwd( struct passwd          *pw,
     pw->pw_uid   = iinfo->aid;
     pw->pw_gid   = iinfo->aid;
     pw->pw_dir   = "/";
-    pw->pw_shell = "/system/bin/sh";
+    passwd_set_default_shell(pw);
     return pw;
 }
 
@@ -220,7 +234,7 @@ app_id_to_passwd(uid_t  uid, stubs_state_t*  state)
 
     pw->pw_name  = state->app_name_buffer;
     pw->pw_dir   = "/data";
-    pw->pw_shell = "/system/bin/sh";
+    passwd_set_default_shell(pw);
     pw->pw_uid   = uid;
     pw->pw_gid   = uid;
 
