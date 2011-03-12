@@ -91,17 +91,18 @@
 #define VEN_LEVEL_H264_2 0xE 
 #define VEN_LEVEL_H264_2p1 0xF 
 #define VEN_LEVEL_H264_2p2 0x10 
-#define VEN_LEVEL_H264_3 0x11 
-#define VEN_LEVEL_H264_3p1 0x12 
+#define VEN_LEVEL_H264_3 0x11
+#define VEN_LEVEL_H264_3p1 0x12
+#define VEN_LEVEL_H264_4 0x13
 
-#define VEN_LEVEL_H263_10 0x13 
-#define VEN_LEVEL_H263_20 0x14 
-#define VEN_LEVEL_H263_30 0x15 
-#define VEN_LEVEL_H263_40 0x16 
-#define VEN_LEVEL_H263_45 0x17 
-#define VEN_LEVEL_H263_50 0x18 
-#define VEN_LEVEL_H263_60 0x19 
-#define VEN_LEVEL_H263_70 0x1A 
+#define VEN_LEVEL_H263_10 0x14
+#define VEN_LEVEL_H263_20 0x15
+#define VEN_LEVEL_H263_30 0x16
+#define VEN_LEVEL_H263_40 0x17
+#define VEN_LEVEL_H263_45 0x18
+#define VEN_LEVEL_H263_50 0x19
+#define VEN_LEVEL_H263_60 0x1A
+#define VEN_LEVEL_H263_70 0x1B
 
 #define VEN_ENTROPY_MODEL_CAVLC 1
 #define VEN_ENTROPY_MODEL_CABAC 2
@@ -123,17 +124,19 @@
 #define VEN_RC_VBR_VFR 2
 #define VEN_RC_VBR_CFR 3
 #define VEN_RC_CBR_VFR 4
+#define VEN_RC_CBR_CFR 5
 
 #define VEN_FLUSH_INPUT 1
 #define VEN_FLUSH_OUTPUT 2
 #define VEN_FLUSH_ALL 3
 
-#define VEN_INPUTFMT_NV12 1 
-#define VEN_INPUTFMT_NV21 2 
+#define VEN_INPUTFMT_NV12 1
+#define VEN_INPUTFMT_NV21 2
+#define VEN_INPUTFMT_NV12_16M2KA 3
 
-#define VEN_ROTATION_0 1 
-#define VEN_ROTATION_90 2 
-#define VEN_ROTATION_180 3 
+#define VEN_ROTATION_0 1
+#define VEN_ROTATION_90 2
+#define VEN_ROTATION_180 3
 #define VEN_ROTATION_270 4 
 
 #define VEN_TIMEOUT_INFINITE 0xffffffff
@@ -147,8 +150,8 @@
 #define VEN_IOCTLBASE_ENC 0x850
 
 struct venc_ioctl_msg{
- void *inputparam;
- void *outputparam;
+ void __user *in;
+ void __user *out;
 };
 
 #define VEN_IOCTL_SET_INTF_VERSION   _IOW(VEN_IOCTLBASE_NENC, 0, struct venc_ioctl_msg)
@@ -275,7 +278,7 @@ struct venc_allocatorproperty{
 
 struct venc_bufferpayload{
  unsigned char *pbuffer;
- unsigned long nsize;
+ size_t sz;
  int fd;
  unsigned int offset;
  unsigned int maped_size;
@@ -284,7 +287,7 @@ struct venc_bufferpayload{
 
 struct venc_buffer{
  unsigned char *ptrbuffer;
- unsigned long size;
+ unsigned long sz;
  unsigned long len;
  unsigned long offset;
  long long timestamp;
@@ -399,4 +402,3 @@ struct venc_msg{
  unsigned long msgdata_size;
 };
 #endif
-
