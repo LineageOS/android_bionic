@@ -141,6 +141,9 @@ memcpy:
         strcsb      ip, [r0], #1
         strcsb      lr, [r0], #1
 
+.ifdef NEEDS_ARM_ERRATA_754319_754320_ASM
+        VMOV s0,s0                           @ NOP for ARM Errata
+.endif
         ldmfd       sp!, {r0, lr}
         bx          lr
         .fnend
