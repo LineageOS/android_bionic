@@ -2,6 +2,8 @@
  * Copyright (C) 2008 The Android Open Source Project
  * All rights reserved.
  *
+ * Copyright (c) 2009-2011, Code Aurora Forum. All rights reserved.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -35,6 +37,90 @@
 
     .align
 	
+
+#if defined(SCORPION_NEON_OPTIMIZATION)
+	.code 32
+	.align 8
+	.global memset
+	.type memset, %function
+
+	.global bzero
+	.type bzero, %function
+
+bzero:
+	mov             r2, r1
+	mov             r1, #0
+memset:
+	push            {r0}
+
+	cmp             r2, #6
+	bgt             .Lmemset_gt6
+	cmp             r2, #0
+	beq             .Lmemset_smallcopy_done
+.Lmemset_smallcopy_loop:
+	strb            r1, [r0], #1
+	subs            r2, r2, #1
+	bne             .Lmemset_smallcopy_loop
+.Lmemset_smallcopy_done:
+	pop             {r0}
+	bx              lr
+
+.Lmemset_gt6:
+	vdup.8		q0, r1
+	vmov		r1, s0
+
+	/*
+	 * Decide where to route for the maximum copy sizes.
+	 */
+	cmp             r2, #4
+	blt             .Lmemset_lt4
+	cmp             r2, #16
+	blt             .Lmemset_lt16
+	vmov            q1, q0
+	cmp             r2, #128
+	blt             .Lmemset_32
+.Lmemset_128:
+	mov             r12, r2, lsr #7
+.Lmemset_128_loop:
+	vst1.32         {q0, q1}, [r0]!
+	vst1.32         {q0, q1}, [r0]!
+	vst1.32         {q0, q1}, [r0]!
+	vst1.32         {q0, q1}, [r0]!
+	subs            r12, r12, #1
+	bne             .Lmemset_128_loop
+	ands            r2, r2, #0x7f
+	beq             .Lmemset_end
+.Lmemset_32:
+	movs             r12, r2, lsr #5
+	beq              .Lmemset_lt32
+.Lmemset_32_loop:
+	subs            r12, r12, #1
+	vst1.32         {q0, q1}, [r0]!
+	bne             .Lmemset_32_loop
+	ands            r2, r2, #0x1f
+	beq             .Lmemset_end
+.Lmemset_lt32:
+	cmp             r2, #16
+	blt             .Lmemset_lt16
+	vst1.64         {q0}, [r0]!
+	subs            r2, r2, #16
+	beq             .Lmemset_end
+.Lmemset_lt16:
+	movs            r12, r2, lsl #29
+	strcs           r1, [r0], #4
+	strcs           r1, [r0], #4
+	strmi           r1, [r0], #4
+.Lmemset_lt4:
+	movs            r2, r2, lsl #31
+	strcsh          r1, [r0], #2
+	strmib          r1, [r0]
+.Lmemset_end:
+	pop             {r0}
+	bx		lr
+
+	.end
+#else   /* !SCORPION_NEON_OPTIMIZATION */
+
 		/*
 		 * Optimized memset() for ARM.
          *
@@ -115,3 +201,4 @@ memset:
         bx          lr
         .fnend
     
+#endif  /* SCORPION_NEON_OPTIMIZATION */
