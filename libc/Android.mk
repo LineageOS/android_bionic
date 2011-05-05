@@ -370,10 +370,19 @@ libc_common_src_files += \
 	arch-arm/bionic/strcpy.S \
 	arch-arm/bionic/strcmp.S \
 	arch-arm/bionic/syscall.S \
-	string/memmove.c.arm \
-	string/bcopy.c \
 	string/strncmp.c \
 	unistd/socketcalls.c
+
+# Check if we want a neonized version of memmove instead of the
+# current ARM version
+ifeq ($(TARGET_USE_SCORPION_BIONIC_OPTIMIZATION),true)
+libc_common_src_files += \
+	arch-arm/bionic/memmove.S
+else # Non-Scorpion-based ARM
+libc_common_src_files += \
+	string/bcopy.c \
+	string/memmove.c.arm
+endif # !TARGET_USE_SCORPION_BIONIC_OPTIMIZATION
 
 # These files need to be arm so that gdbserver
 # can set breakpoints in them without messing
@@ -480,6 +489,14 @@ ifeq ($(TARGET_ARCH),arm)
   endif
   ifeq ($(ARCH_ARM_USE_NON_NEON_MEMCPY),true)
     libc_common_cflags += -DARCH_ARM_USE_NON_NEON_MEMCPY
+  endif
+  # Add in defines to activate SCORPION_NEON_OPTIMIZATION
+  ifeq ($(TARGET_USE_SCORPION_BIONIC_OPTIMIZATION),true)
+    libc_common_cflags += -DSCORPION_NEON_OPTIMIZATION
+    ifeq ($(TARGET_USE_SCORPION_PLD_SET),true)
+      libc_common_cflags += -DPLDOFFS=$(TARGET_SCORPION_BIONIC_PLDOFFS)
+      libc_common_cflags += -DPLDSIZE=$(TARGET_SCORPION_BIONIC_PLDSIZE)
+    endif
   endif
 else # !arm
   ifeq ($(TARGET_ARCH),x86)
