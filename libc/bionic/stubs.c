@@ -341,7 +341,7 @@ getgrnam(const char *name)
 
 struct netent* getnetbyname(const char *name)
 {
-    fprintf(stderr, "FIX ME! implement getgrnam() %s:%d\n", __FILE__, __LINE__);
+    fprintf(stderr, "FIX ME! implement getnetbyname() %s:%d\n", __FILE__, __LINE__);
     return NULL;
 }
 
@@ -373,15 +373,46 @@ struct netent *getnetbyaddr(uint32_t net, int type)
     return NULL;
 }
 
+// Android doesn't have /etc/protocols.  Use this minimal list.
+struct protoent protocols[] = {
+    {"ip",      {"IP", NULL},       0},
+    {"icmp",    {"ICMP", NULL},     1},
+    {"tcp",     {"TCP", NULL},      6},
+    {"udp",     {"UDP", NULL},      17},
+    {NULL,      {NULL},             0}
+};
+
 struct protoent *getprotobyname(const char *name)
 {
-    fprintf(stderr, "FIX ME! implement %s() %s:%d\n", __FUNCTION__, __FILE__, __LINE__);
+    int i = 0;
+
+    while (name && protocols[i].p_name != 0)
+    {
+        if (strcmp(protocols[i].p_name, name) == 0)
+        {
+            return &protocols[i];
+        }
+
+        i++;
+    }
+
     return NULL;
 }
 
 struct protoent *getprotobynumber(int proto)
 {
-    fprintf(stderr, "FIX ME! implement %s() %s:%d\n", __FUNCTION__, __FILE__, __LINE__);
+    int i = 0;
+
+    while (protocols[i].p_name != 0)
+    {
+        if (protocols[i].p_proto == proto)
+        {
+            return &protocols[i];
+        }
+
+        i++;
+    }
+
     return NULL;
 }
 

@@ -95,6 +95,7 @@ struct tc_prio_qopt
 {
  int bands;
  __u8 priomap[TC_PRIO_MAX+1];
+ __u8 enable_flow;
 };
 
 struct tc_multiq_qopt {
