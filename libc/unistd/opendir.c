@@ -238,6 +238,7 @@ int scandir(const char *dir, struct dirent ***namelist,
             de_list = (struct dirent **) 
                     malloc(sizeof(struct dirent *)*de_list_size);
             if (de_list == NULL) {
+                closedir(d);
                 return -1;
             }
         }
@@ -248,7 +249,12 @@ int scandir(const char *dir, struct dirent ***namelist,
             de_list_new = (struct dirent **) 
                     realloc(de_list, sizeof(struct dirent *)*de_list_size);
             if (de_list_new == NULL) {
+                int i = 0;
+                for (;i < n_elem; i++) {
+                    free(de_list[i]);
+                }
                 free(de_list);
+                closedir(d);
                 return -1;
             }
             de_list = de_list_new;
