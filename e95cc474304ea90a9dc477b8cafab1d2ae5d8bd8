@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAGX///zk\u003d",
+        "filename": "libc/Android.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 510,
+      "author": {
+        "id": 1140
+      },
+      "writtenOn": "2011-06-11T21:31:21Z",
+      "side": 1,
+      "message": "ifeq ($(ARCH_ARM_HAVE_NEON),true)\n    libc_common_cflags +\u003d -D__ARM_NEON__\nendif",
+      "revId": "e95cc474304ea90a9dc477b8cafab1d2ae5d8bd8",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
