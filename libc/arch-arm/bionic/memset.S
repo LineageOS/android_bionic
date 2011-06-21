@@ -29,7 +29,7 @@
  */
 #include <machine/cpu-features.h>
 
-#if defined(SCORPION_NEON_OPTIMIZATION)
+#if defined(SCORPION_NEON_OPTIMIZATION) || defined(CORTEX_CACHE_LINE_32)
 	.code 32
 	.align 8
 	.global memset
@@ -110,7 +110,7 @@ memset:
 	bx		lr
 
 	.end
-#else   /* !SCORPION_NEON_OPTIMIZATION */
+#else   /* !(SCORPION_NEON_OPTIMIZATION || CORTEX_CACHE_LINE_32) */
 	.text
 
     .global memset
@@ -201,4 +201,4 @@ memset:
         bx          lr
         .fnend
     
-#endif  /* SCORPION_NEON_OPTIMIZATION */
+#endif  /* SCORPION_NEON_OPTIMIZATION || CORTEX_CACHE_LINE_32 */
