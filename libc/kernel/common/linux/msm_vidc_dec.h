@@ -454,7 +454,6 @@ struct vdec_output_frameinfo {
  void *client_data;
  void *input_frame_clientdata;
  struct vdec_framesize framesize;
-enum vdec_interlaced_format interlaced_format;
 };
 
 union vdec_msgdata {
