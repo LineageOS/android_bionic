@@ -74,7 +74,8 @@ struct prop_msg
 };
 
 #define PROP_MSG_SETPROP 1
-    
+#define PROP_MSG_SETPROP_SYNC 2
+
 /*
 ** Rules:
 **
