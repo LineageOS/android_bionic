@@ -335,6 +335,8 @@ struct input_absinfo {
 
 #define KEY_UNKNOWN 240
 
+#define KEY_3D 249
+
 #define BTN_MISC 0x100
 #define BTN_0 0x100
 #define BTN_1 0x101
