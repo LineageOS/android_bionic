@@ -4542,8 +4542,22 @@ void dlmalloc_stats() {
 size_t dlmalloc_usable_size(void* mem) {
   if (mem != 0) {
     mchunkptr p = mem2chunk(mem);
-    if (cinuse(p))
-      return chunksize(p) - overhead_for(p);
+#if FOOTERS
+    mstate fm = get_mstate_for(p);
+    if (!ok_magic(fm)) {
+      USAGE_ERROR_ACTION(fm, p);
+      return 0;
+    }
+#else /* FOOTERS */
+#define fm gm
+#endif /* FOOTERS */
+    if (!PREACTION(fm)) {
+      size_t usable_size = 0;
+      if (cinuse(p))
+        usable_size = chunksize(p) - overhead_for(p);
+      POSTACTION(fm);
+      return usable_size;
+    }
   }
   return 0;
 }
