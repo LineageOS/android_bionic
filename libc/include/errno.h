@@ -45,6 +45,7 @@ __BEGIN_DECLS
 extern int    __set_errno(int  error);
 
 /* internal function returning the address of the thread-specific errno */
+__attribute__((const))
 extern volatile int*   __errno(void);
 
 /* a macro expanding to the errno l-value */
