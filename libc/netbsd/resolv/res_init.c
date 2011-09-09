@@ -224,6 +224,12 @@ __res_vinit(res_state statp, int preinit) {
         int found_prop;
 	char dnsProperty[PROP_VALUE_MAX];
 #endif
+        // Move the conditional check before pre-init,
+        //     otherwise res_ndestroy will never be executed
+        //     and memory leaks if res_ninit is invoked more
+        //     than once.
+        if ((statp->options & RES_INIT) != 0U)
+                res_ndestroy(statp);
 
 	if (!preinit) {
 		statp->retrans = RES_TIMEOUT;
@@ -231,9 +237,6 @@ __res_vinit(res_state statp, int preinit) {
 		statp->options = RES_DEFAULT;
 		statp->id = res_randomid();
 	}
-
-	if ((statp->options & RES_INIT) != 0U)
-		res_ndestroy(statp);
 
 	memset(u, 0, sizeof(u));
 #ifdef USELOOPBACK

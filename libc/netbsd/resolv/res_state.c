@@ -53,6 +53,7 @@ static _res_thread*
 _res_thread_alloc(void)
 {
     _res_thread*  rt = malloc(sizeof(*rt));
+    memset(rt, 0, sizeof(*rt)); // initialize the allocated memory chunk
 
     if (rt) {
         rt->_h_errno = 0;
