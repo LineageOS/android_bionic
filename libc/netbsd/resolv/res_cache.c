@@ -26,11 +26,35 @@
  * SUCH DAMAGE.
  */
 
+/* $NetBSD: ns_name.c,v 1.3 2004/11/07 02:19:49 christos Exp $ */
+
+/*
+ * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
+ * Copyright (c) 1996,1999 by Internet Software Consortium.
+ *
+ * Permission to use, copy, modify, and distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND ISC DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL ISC BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+ * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+
+/* Copyright (C) 2009 Motorola, Inc. */
+
 #include "resolv_cache.h"
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include "pthread.h"
+
+#define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
+#include <sys/_system_properties.h>
 
 /* This code implements a small and *simple* DNS resolver cache.
  *
@@ -989,6 +1013,7 @@ typedef struct Entry {
     int              answerlen;
     time_t           when;   /* time_t when entry was added to table */
     int              id;     /* for debugging purpose */
+    time_t           ttl;   /* time_t ttl of DNS response */
 } Entry;
 
 
@@ -1073,7 +1098,8 @@ entry_alloc( const Entry*  init, const void*  answer, int  answerlen )
     memcpy( (char*)e->answer, answer, e->answerlen );
 
     e->when  = _time_now();
-
+    e->ttl = CONFIG_SECONDS;
+    XLOG( "ttl(0x%X)", e->ttl);
     return e;
 }
 
@@ -1150,7 +1176,12 @@ _resolv_cache_create( void )
 
     cache = calloc(sizeof(*cache), 1);
     if (cache) {
-        cache->generation = ~0U;
+        struct prop_info *pi = __system_property_find("net.change");
+        if (pi == NULL) {
+            cache->generation = ~0U;
+        } else {
+            cache->generation = pi->serial;
+        }
         pthread_mutex_init( &cache->lock, NULL );
         cache->mru_list.mru_prev = cache->mru_list.mru_next = &cache->mru_list;
         XLOG("%s: cache created\n", __FUNCTION__);
@@ -1280,6 +1311,126 @@ _cache_remove_oldest( Cache*  cache )
 }
 
 
+/*
+ * ns_name_skip(ptrptr, eom)
+ *	Advance *ptrptr to skip over the compressed name it points at.
+ * return:
+ *	0 on success, -1 (with errno set) on failure.
+ */
+#define NS_TYPE_ELT			0x40 /* EDNS0 extended label type */
+#define DNS_LABELTYPE_BITSTRING		0x41
+#define NS_CMPRSFLGS	0xc0	/* Flag bits indicating name compression. */
+
+static int
+labellen(const uint8_t *lp)
+{
+	int bitlen;
+	uint8_t l = *lp;
+
+	if ((l & NS_CMPRSFLGS) == NS_CMPRSFLGS) {
+		/* should be avoided by the caller */
+		return(-1);
+	}
+
+	if ((l & NS_CMPRSFLGS) == NS_TYPE_ELT) {
+		if (l == DNS_LABELTYPE_BITSTRING) {
+			if ((bitlen = *(lp + 1)) == 0)
+				bitlen = 256;
+			return((bitlen + 7 ) / 8 + 1);
+		}
+		return(-1);	/* unknwon ELT */
+	}
+	return(l);
+}
+
+static int
+ns_name_skip(const uint8_t **ptrptr, const uint8_t *eom)
+{
+	const uint8_t *cp;
+	u_int n;
+	int l;
+
+	cp = *ptrptr;
+	while (cp < eom && (n = *cp++) != 0) {
+		/* Check for indirection. */
+		switch (n & NS_CMPRSFLGS) {
+		case 0:			/* normal case, n == len */
+			cp += n;
+			continue;
+		case NS_TYPE_ELT: /* EDNS0 extended label */
+			if ((l = labellen(cp - 1)) < 0) {
+				return(-1);
+			}
+			cp += l;
+			continue;
+		case NS_CMPRSFLGS:	/* indirection */
+			cp++;
+			break;
+		default:		/* illegal type */
+			return (-1);
+		}
+		break;
+	}
+	if (cp > eom) {
+		return (-1);
+	}
+	*ptrptr = cp;
+	return (0);
+}
+
+# define GETSHORT(f,p) f = *p++;  \
+                       f <<= 8; \
+                       f |= *p++;
+
+# define GETLONG(f,p) f = *p++ ;  \
+                       f <<= 8;  \
+                       f |= *p++ ; \
+                       f <<= 8;  \
+                       f |= *p++ ; \
+                       f <<= 8;  \
+                       f |= *p++ ;
+
+static long find_ttl(const char *buf, int buflen, const char * ans, int anssiz)
+{
+    uint8_t* p = ans;   // pointer to the query
+    int i, ancount = 0, qtype = 0, qclass = 0, rdlen = 0;
+    long ttl = -1;
+
+    XLOG( "%s: buf(0x%X)", __FUNCTION__, buflen);
+    XLOG_BYTES(buf, buflen);
+    XLOG_QUERY(buf, buflen);
+    XLOG( "%s: answer(0x%X)", __FUNCTION__, anssiz);
+    XLOG_BYTES(ans, anssiz);
+
+    ancount = (p[6] << 8) | p[7];
+
+    XLOG( "%s:ancount:0x%x",  __FUNCTION__, ancount);
+    p = ans + DNS_HEADER_SIZE;
+    if (-1 == ns_name_skip(&p, ans + anssiz))
+        return -1;
+
+    GETSHORT(qtype, p);                    // QTYPE
+    GETSHORT(qclass, p);                   // CLASS
+    if (qclass != 0x0001)
+        return -1;       // we expext IN CLASS
+
+    for (; ancount > 0 ; ancount--) {
+        if (-1 == ns_name_skip(&p, ans + anssiz))
+            return -1;
+        GETSHORT(qtype, p);                // TYPE
+        GETSHORT(qclass, p);               // CLASS
+        if (qclass != 0x0001) {            // CLASS is not IN
+            p += 4;
+            GETSHORT(rdlen, p);
+            p += rdlen;
+            continue;
+        }
+        GETLONG(ttl, p);                    // TTL
+        return ttl;
+    }
+    return -1;
+}
+
 ResolvCacheStatus
 _resolv_cache_lookup( struct resolv_cache*  cache,
                       const void*           query,
@@ -1322,7 +1473,8 @@ _resolv_cache_lookup( struct resolv_cache*  cache,
     now = _time_now();
 
     /* remove stale entries here */
-    if ( (unsigned)(now - e->when) >= CONFIG_SECONDS ) {
+    XLOG( "ttl(0x%lX)", e->ttl);
+    if ( (now - e->when) >= e->ttl ) {
         XLOG( " NOT IN CACHE (STALE ENTRY %p DISCARDED)", *lookup );
         _cache_remove_p(cache, lookup);
         goto Exit;
@@ -1336,6 +1488,7 @@ _resolv_cache_lookup( struct resolv_cache*  cache,
         goto Exit;
     }
 
+    XLOG( "FOUND IN CACHE entry=%p, ttl=%ld", e, e->ttl );
     memcpy( answer, e->answer, e->answerlen );
 
     /* bump up this entry to the top of the MRU list */
@@ -1344,7 +1497,6 @@ _resolv_cache_lookup( struct resolv_cache*  cache,
         entry_mru_add( e, &cache->mru_list );
     }
 
-    XLOG( "FOUND IN CACHE entry=%p", e );
     result = RESOLV_CACHE_FOUND;
 
 Exit:
@@ -1363,6 +1515,7 @@ _resolv_cache_add( struct resolv_cache*  cache,
     Entry    key[1];
     Entry*   e;
     Entry**  lookup;
+    long     ttl;
 
     /* don't assume that the query has already been cached
      */
@@ -1371,14 +1524,19 @@ _resolv_cache_add( struct resolv_cache*  cache,
         return;
     }
 
-    pthread_mutex_lock( &cache->lock );
 
     XLOG( "%s: query:", __FUNCTION__ );
     XLOG_QUERY(query,querylen);
 #if DEBUG_DATA
+    XLOG( "query:");
+    XLOG_BYTES(query,querylen);
     XLOG( "answer:");
     XLOG_BYTES(answer,answerlen);
 #endif
+    ttl =  find_ttl(query,querylen,answer,answerlen);
+    XLOG( "%s:ttl:0x%x,=%d",  __FUNCTION__, ttl, ttl);
+
+    pthread_mutex_lock( &cache->lock );
 
     lookup = _cache_lookup_p(cache, key);
     e      = *lookup;
@@ -1403,6 +1561,8 @@ _resolv_cache_add( struct resolv_cache*  cache,
 
     e = entry_alloc( key, answer, answerlen );
     if (e != NULL) {
+        if (0 < ttl) e->ttl = ttl;
+
         _cache_add_p(cache, lookup, e);
     }
 #if DEBUG
