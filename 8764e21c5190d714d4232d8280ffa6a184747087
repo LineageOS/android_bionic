@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAH3//+Fw\u003d",
+        "filename": "libc/netbsd/resolv/res_state.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1063
+      },
+      "writtenOn": "2011-09-10T16:40:12Z",
+      "side": 1,
+      "message": "Given that there\u0027s a if (rt) check below, the memset should be inside that block.",
+      "revId": "8764e21c5190d714d4232d8280ffa6a184747087",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
