@@ -467,6 +467,9 @@ DEFAULT_MMAP_THRESHOLD       default: 256K
 
 #ifdef ANDROID
 #define USE_BUILTIN_FFS 1
+#ifdef __arm__
+#include <machine/cpu-features.h>
+#endif
 #endif  /* ANDROID */
 
 #ifndef WIN32
@@ -2399,7 +2402,18 @@ static size_t traverse_and_check(mstate m);
 
 #else /* GNUC */
 #if  USE_BUILTIN_FFS
+#if defined(__arm__) && __ARM_ARCH__ >= 7
+#define compute_bit2idx(X, I) \
+{ \
+  unsigned int J; \
+  __asm__ ("rbit %0, %1\n" \
+           "clz %0, %0" \
+           : "=r" (J) : "r" (X)); \
+  I = (bindex_t) J; \
+}
+#else
 #define compute_bit2idx(X, I) I = ffs(X)-1
+#endif
 
 #else /* USE_BUILTIN_FFS */
 #define compute_bit2idx(X, I)\
