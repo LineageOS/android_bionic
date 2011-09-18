@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "AAAAH3//9gI\u003d",
+        "filename": "libc/netbsd/resolv/res_cache.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1016,
+      "author": {
+        "id": 1353
+      },
+      "writtenOn": "2011-09-18T01:40:47Z",
+      "side": 1,
+      "message": "Why is ttl used as time_t here and not as long?",
+      "revId": "8764e21c5190d714d4232d8280ffa6a184747087",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAH3//9gM\u003d",
+        "filename": "libc/netbsd/resolv/res_cache.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1392,
+      "author": {
+        "id": 1353
+      },
+      "writtenOn": "2011-09-18T01:40:47Z",
+      "side": 1,
+      "message": "GETSHORT and GETLONG should include a range check",
+      "revId": "8764e21c5190d714d4232d8280ffa6a184747087",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAH3//+Fw\u003d",
         "filename": "libc/netbsd/resolv/res_state.c",
         "patchSetId": 2
@@ -13,6 +47,23 @@
       "writtenOn": "2011-09-10T16:40:12Z",
       "side": 1,
       "message": "Given that there\u0027s a if (rt) check below, the memset should be inside that block.",
+      "revId": "8764e21c5190d714d4232d8280ffa6a184747087",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAH3//9gA\u003d",
+        "filename": "libc/netbsd/resolv/res_state.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1353
+      },
+      "writtenOn": "2011-09-18T01:40:47Z",
+      "side": 1,
+      "message": "Given that h_errno, _serial, _pi and _rstatic are also initialized below I would just memset rt-\u003e_nres below to 0 (and move -\u003e_serial \u003d 0 to an else block for rt-\u003e_pi!\u003dNULL).\n\n... just looked at 2b1199e8 which Steve merged today - it uses calloc anyway \u003d\u003e problem solved :)",
       "revId": "8764e21c5190d714d4232d8280ffa6a184747087",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
