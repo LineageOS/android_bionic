@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAH3//9fA\u003d",
+        "filename": "libc/bionic/dlmalloc.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 2413,
+      "author": {
+        "id": 107
+      },
+      "writtenOn": "2011-09-18T07:30:31Z",
+      "side": 1,
+      "message": "Please remove the space here.",
+      "revId": "e97c48d5cc47b69accde77b633f0a174a9269545",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAH3//9e8\u003d",
+        "filename": "libc/bionic/dlmalloc.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 2414,
+      "author": {
+        "id": 107
+      },
+      "writtenOn": "2011-09-18T07:30:31Z",
+      "side": 1,
+      "message": "and here.",
+      "revId": "e97c48d5cc47b69accde77b633f0a174a9269545",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
