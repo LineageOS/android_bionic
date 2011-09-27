@@ -149,7 +149,7 @@ memcpy:
         .fnend
 
 
-#else   /* __ARM_ARCH__ < 7 */
+#else   /* !__ARM_NEON__ */
 
 
 	.text
@@ -510,4 +510,4 @@ copy_last_3_and_return:
         .fnend
 
 
-#endif    /* __ARM_ARCH__ < 7 */
+#endif    /* !__ARM_NEON__ */

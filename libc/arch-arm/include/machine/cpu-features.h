@@ -56,7 +56,7 @@
 
 #  elif defined __ARM_ARCH_6__   || defined __ARM_ARCH_6J__ || \
       defined __ARM_ARCH_6K__  || defined __ARM_ARCH_6Z__ || \
-      defined __ARM_ARCH_6KZ__ || defined __ARM_ARCH_6T2__
+      defined __ARM_ARCH_6ZK__ || defined __ARM_ARCH_6T2__
 #
 #    define __ARM_ARCH__ 6
 #
@@ -162,11 +162,11 @@
 #  define __ARM_HAVE_DMB
 #endif
 
-/* define __ARM_HAVE_LDREXD for ARMv7 architecture
- * (also present in ARMv6K, but not implemented in ARMv7-M, neither of which
- * we care about)
+/* define __ARM_HAVE_LDREXD for ARMv6K and ARMv7 architecture
+ * (not implemented in ARMv7-M)
  */
-#if __ARM_ARCH__ >= 7
+#if defined __ARM_ARCH_6K__ || defined __ARM_ARCH_6ZK__ || \
+    (__ARM_ARCH__ >= 7 && !defined __ARM_ARCH_7M__)
 #  define __ARM_HAVE_LDREXD
 #endif
 
