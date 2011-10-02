@@ -220,6 +220,8 @@ typedef struct {
 
 #include <sys/cdefs.h>
 
+#include <sys/cdefs_hidden_push.h>
+
 __BEGIN_DECLS
 int	nsdispatch(void *, const ns_dtab [], const char *,
 			const char *, const ns_src [], ...);
@@ -233,5 +235,7 @@ int		 _nsyylex(void);
 #endif /* _NS_PRIVATE */
 
 __END_DECLS
+
+#include <sys/cdefs_hidden_pop.h>
 
 #endif /* !_NSSWITCH_H */

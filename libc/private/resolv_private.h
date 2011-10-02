@@ -57,6 +57,8 @@
 #include <resolv.h>
 #include "resolv_static.h"
 
+#include <sys/cdefs_hidden_push.h>
+
 /*
  * Revision information.  This is the release date in YYYYMMDD format.
  * It can change every day so the right thing to do with it is use it
@@ -314,7 +316,6 @@ void		fp_query(const u_char *, FILE *);
 const char *	hostalias(const char *);
 void		p_query(const u_char *);
 void		res_close(void);
-int		res_init(void);
 int		res_opt(int, u_char *, int, int);
 int		res_isourserver(const struct sockaddr_in *);
 int		res_mkquery(int, const char *, int, int, const u_char *, int, const u_char *, u_char *, int);
@@ -495,5 +496,7 @@ int res_get_dns_changed();
 u_int  res_randomid(void);
 
 __END_DECLS
+
+#include <sys/cdefs_hidden_pop.h>
 
 #endif /* !_RESOLV_PRIVATE_H_ */

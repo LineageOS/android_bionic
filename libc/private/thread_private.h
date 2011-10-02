@@ -7,6 +7,8 @@
 
 #include <pthread.h>
 
+#include <sys/cdefs_hidden_push.h>
+
 /*
  * This file defines the thread library interface to libc.  Thread
  * libraries must implement the functions described here for proper
@@ -158,5 +160,7 @@ void	_thread_atexit_unlock(void);
 					if (__isthreaded)		\
 						_thread_atexit_unlock();\
 				} while (0)
+
+#include <sys/cdefs_hidden_pop.h>
 
 #endif /* _THREAD_PRIVATE_H_ */

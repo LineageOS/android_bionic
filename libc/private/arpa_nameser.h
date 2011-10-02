@@ -58,6 +58,8 @@
 #include <sys/types.h>
 #include <sys/cdefs.h>
 
+#include <sys/cdefs_hidden_push.h>
+
 /*
  * Revision information.  This is the release date in YYYYMMDD format.
  * It can change every day so the right thing to do with it is use it
@@ -573,5 +575,7 @@ __END_DECLS
 #else
 #define  XLOG(...)   do {} while (0)
 #endif
+
+#include <sys/cdefs_hidden_pop.h>
 
 #endif /* !_ARPA_NAMESER_H_ */

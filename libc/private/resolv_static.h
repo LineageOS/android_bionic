@@ -3,6 +3,8 @@
 
 #include <netdb.h>
 
+#include <sys/cdefs_hidden_push.h>
+
 /* this structure contains all the variables that were declared
  * 'static' in the original NetBSD resolver code.
  *
@@ -28,5 +30,7 @@ typedef struct res_static {
 } *res_static;
 
 extern res_static __res_get_static(void);
+
+#include <sys/cdefs_hidden_pop.h>
 
 #endif /* _RESOLV_STATIC_H */

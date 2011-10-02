@@ -35,6 +35,8 @@
 #include "wcio.h"
 #include "fileext.h"
 
+#include <sys/cdefs_hidden_push.h>
+
 #ifndef DEFFILEMODE
 #define DEFFILEMODE  (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)
 #endif
@@ -89,3 +91,5 @@ extern int __sdidinit;
 	free((char *)(fp)->_lb._base); \
 	(fp)->_lb._base = NULL; \
 }
+
+#include <sys/cdefs_hidden_pop.h>

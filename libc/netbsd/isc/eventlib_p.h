@@ -44,6 +44,7 @@
 #include <isc/list.h>
 #include <isc/memcluster.h>
 
+#include <sys/cdefs_hidden_push.h>
 
 #define	EV_MASK_ALL	(EV_READ | EV_WRITE | EV_EXCEPT)
 #define EV_ERR(e)		return (errno = (e), -1)
@@ -229,5 +230,7 @@ evWait *evFreeWait(evContext_p *ctx, evWait *old);
 
 /* Global options */
 int		__evOptMonoTime;
+
+#include <sys/cdefs_hidden_pop.h>
 
 #endif /*_EVENTLIB_P_H*/

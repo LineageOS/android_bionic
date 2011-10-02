@@ -65,6 +65,15 @@ extern void _resolv_flush_cache_for_default_iface();
 /* flush the cache associated with a certain interface */
 extern void _resolv_flush_cache_for_iface(const char* ifname);
 
+/* In 4.3BSD, res_init() function reads the config files (resolv.conf)
+ * to get the default domain name, search order and name server address(es).
+ * However, in bionic, resolv.conf is already ignored, so it is a no-op for
+ * actual functionality.
+ *
+ * Place in public header only for binary compatibility.
+ */
+extern int  res_init(void);
+
 __END_DECLS
 
 #endif /* _RESOLV_H_ */

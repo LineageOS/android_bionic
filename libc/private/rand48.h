@@ -18,6 +18,9 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include <sys/cdefs.h>
+
+#include <sys/cdefs_hidden_push.h>
 
 void		__dorand48(unsigned short[3]);
 
@@ -28,5 +31,7 @@ void		__dorand48(unsigned short[3]);
 #define	RAND48_MULT_1	(0xdeec)
 #define	RAND48_MULT_2	(0x0005)
 #define	RAND48_ADD	(0x000b)
+
+#include <sys/cdefs_hidden_pop.h>
 
 #endif /* _RAND48_H_ */

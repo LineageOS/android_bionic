@@ -83,6 +83,8 @@ __BEGIN_DECLS
 /* set the Thread Local Storage, must contain at least BIONIC_TLS_SLOTS pointers */
 extern void __init_tls(void**  tls, void*  thread_info);
 
+#include <sys/cdefs_hidden_push.h>
+
 /* syscall only, do not call directly */
 extern int __set_tls(void *ptr);
 
@@ -140,6 +142,8 @@ extern void*  __get_tls( void );
 
 /* return the stack base and size, used by our malloc debugger */
 extern void*  __get_stack_base(int  *p_stack_size);
+
+#include <sys/cdefs_hidden_pop.h>
 
 __END_DECLS
 

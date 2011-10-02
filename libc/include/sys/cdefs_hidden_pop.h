@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (C) 2011 The Android Open Source Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,30 +25,17 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#ifndef _ANDROID_BIONIC_LOGD_H
-#define _ANDROID_BIONIC_LOGD_H
 
-#include <stdarg.h>
+/* Ignore GCC visibility if debug build */
+#if !defined(DEBUG) || defined(NDEBUG)
 
-#include <sys/cdefs_hidden_push.h>
+#if !defined(__LIBC_HIDDEN_PUSH_DEFINED)
+#error "Unbalanced pair of GCC visibility push/pop"
+#endif
 
-enum  {
-    ANDROID_LOG_UNKNOWN = 0,
-    ANDROID_LOG_DEFAULT,    /* only for SetMinPriority() */
+#define __LIBC_HIDDEN_POP_DEFINED
+#undef __LIBC_HIDDEN_PUSH_DEFINED
 
-    ANDROID_LOG_VERBOSE,
-    ANDROID_LOG_DEBUG,
-    ANDROID_LOG_INFO,
-    ANDROID_LOG_WARN,
-    ANDROID_LOG_ERROR,
-    ANDROID_LOG_FATAL,
+#pragma GCC visibility pop
 
-    ANDROID_LOG_SILENT,     /* only for SetMinPriority(); must be last */
-};
-
-int __libc_android_log_print(int prio, const char *tag, const char *fmt, ...);
-int __libc_android_log_vprint(int prio, const char *tag, const char *fmt, va_list ap);
-
-#include <sys/cdefs_hidden_pop.h>
-
-#endif /* _ANDROID_BIONIC_LOGD_H */
+#endif

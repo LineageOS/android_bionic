@@ -31,6 +31,8 @@
 #include <sys/time.h>
 #include <stdio.h>
 
+#include <sys/cdefs_hidden_push.h>
+
 #ifndef __P
 # define __EVENTLIB_P_DEFINED
 # ifdef __STDC__
@@ -200,5 +202,7 @@ int evDefer __P((evContext, evWaitFunc, void *));
 #ifdef __EVENTLIB_P_DEFINED
 # undef __P
 #endif
+
+#include <sys/cdefs_hidden_pop.h>
 
 #endif /*_EVENTLIB_H*/
