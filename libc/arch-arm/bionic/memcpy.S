@@ -274,7 +274,7 @@ memcpy:
         .align 4
 
 /* a prefetch distance of 4 cache-lines works best experimentally */
-#define CACHE_LINE_SIZE     32
+#define CACHE_LINE_SIZE     64
 #define PREFETCH_DISTANCE   (CACHE_LINE_SIZE*4)
 
 memcpy:
@@ -377,6 +377,9 @@ memcpy:
         strcsb      ip, [r0], #1
         strcsb      lr, [r0], #1
 
+.ifdef NEEDS_ARM_ERRATA_754319_754320_ASM
+        VMOV s0,s0                           @ NOP for ARM Errata
+.endif
         ldmfd       sp!, {r0, lr}
         bx          lr
         .fnend
