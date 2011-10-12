@@ -35,8 +35,6 @@
  *
  ***************************************************************************/
 
-#include <machine/cpu-features.h>
-
 #if defined(SCORPION_NEON_OPTIMIZATION)
 	/*
 	 * These can be overridden in:
@@ -63,9 +61,9 @@
 	.type bcopy, %function
 
 bcopy:
-	mov		r12, r0
-	mov		r0, r1
-	mov		r1, r12
+	mov             r12, r0
+	mov             r0, r1
+	mov             r1, r12
 memmove:
 	push            {r0}
 
@@ -110,7 +108,7 @@ memmove:
 	/* The window size is in r3. */
 	sub             r3, r1, r0
 	/* #############################################################
-	 * Front to Back copy 
+	 * Front to Back copy
 	 */
 	/*
 	 * Note that we can't just route based on the size in r2.  If that's

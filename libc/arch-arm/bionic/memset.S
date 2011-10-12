@@ -27,8 +27,6 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include <machine/cpu-features.h>
-
 #if defined(SCORPION_NEON_OPTIMIZATION) || defined(CORTEX_CACHE_LINE_32)
 	.code 32
 	.align 8
@@ -40,7 +38,7 @@
 
 bzero:
 	mov             r2, r1
-	mov             r1, #0	
+	mov             r1, #0
 memset:
 	push            {r0}
 
