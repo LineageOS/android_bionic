@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAJ3///nI\u003d",
+        "filename": "libc/arch-arm/bionic/memmove.S",
+        "patchSetId": 1
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 107
+      },
+      "writtenOn": "2011-10-12T06:12:45Z",
+      "side": 1,
+      "message": "Please remove space...",
+      "revId": "e93640a19939123268a0a6f0e4f19e0c8cde9e7a",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAJ3///nE\u003d",
+        "filename": "libc/arch-arm/bionic/memset.S",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 107
+      },
+      "writtenOn": "2011-10-12T06:12:45Z",
+      "side": 1,
+      "message": "Please remove tab...",
+      "revId": "e93640a19939123268a0a6f0e4f19e0c8cde9e7a",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
