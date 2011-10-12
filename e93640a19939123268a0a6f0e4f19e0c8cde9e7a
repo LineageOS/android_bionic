@@ -2,6 +2,57 @@
   "comments": [
     {
       "key": {
+        "uuid": "AAAAJ3///mY\u003d",
+        "filename": "libc/arch-arm/bionic/memmove.S",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1039
+      },
+      "writtenOn": "2011-10-12T09:36:19Z",
+      "side": 1,
+      "message": "this include is not required, no __ARM__ stuff",
+      "revId": "e93640a19939123268a0a6f0e4f19e0c8cde9e7a",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAJ3///mM\u003d",
+        "filename": "libc/arch-arm/bionic/memmove.S",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1039
+      },
+      "writtenOn": "2011-10-12T09:36:19Z",
+      "side": 1,
+      "message": "these code \"align\" values are confusing... could somebody confirm them ? align 4 and align 3 later too",
+      "revId": "e93640a19939123268a0a6f0e4f19e0c8cde9e7a",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAJ3///mU\u003d",
+        "filename": "libc/arch-arm/bionic/memmove.S",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1039
+      },
+      "writtenOn": "2011-10-12T09:36:19Z",
+      "side": 1,
+      "message": "all tabs or all spaces.... a choice must be taken (caf is not our default upstream for bionic, we should make it clean)",
+      "revId": "e93640a19939123268a0a6f0e4f19e0c8cde9e7a",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAJ3///nI\u003d",
         "filename": "libc/arch-arm/bionic/memmove.S",
         "patchSetId": 1
@@ -13,6 +64,23 @@
       "writtenOn": "2011-10-12T06:12:45Z",
       "side": 1,
       "message": "Please remove space...",
+      "revId": "e93640a19939123268a0a6f0e4f19e0c8cde9e7a",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAJ3///mQ\u003d",
+        "filename": "libc/arch-arm/bionic/memset.S",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1039
+      },
+      "writtenOn": "2011-10-12T09:36:19Z",
+      "side": 1,
+      "message": "This one is not required neither",
       "revId": "e93640a19939123268a0a6f0e4f19e0c8cde9e7a",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
