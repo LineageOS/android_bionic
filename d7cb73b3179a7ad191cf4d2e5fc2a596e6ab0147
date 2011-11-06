@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "AAAALH///+A\u003d",
+        "filename": "libc/bionic/stubs.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1039
+      },
+      "writtenOn": "2011-11-06T06:54:02Z",
+      "side": 1,
+      "message": "oh, but this can be an optional way to override default shell... but i still think it should not be changed for normal apps, to stay in sync with normal android versions",
+      "parentUuid": "AAAALH///+Y\u003d",
+      "revId": "d7cb73b3179a7ad191cf4d2e5fc2a596e6ab0147",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAALH///+I\u003d",
         "filename": "libc/bionic/stubs.c",
         "patchSetId": 1
