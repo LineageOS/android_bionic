@@ -10,27 +10,13 @@ LOCAL_SRC_FILES:= \
 	dlfcn.c \
 	debugger.c
 
-ifneq ($(TARGET_USES_2G_VM_SPLIT),true)
-# This is aligned to 4K page boundary so that both GNU ld and gold work.  Gold
-# actually produces a correct binary with starting address 0xB0000100 but the
-# extra objcopy step to rename symbols causes the resulting binary to be misaligned
-# and unloadable.  Increasing the alignment adds an extra 3840 bytes in padding
-# but switching to gold saves about 1M of space.
-LINKER_TEXT_BASE := 0xB0001000
-else
-LINKER_TEXT_BASE := 0x70001000
+ifeq ($(TARGET_USES_2G_VM_SPLIT),true)
 LOCAL_CFLAGS += -DVM_SPLIT_2G
 endif
 
-# The maximum size set aside for the linker, from
-# LINKER_TEXT_BASE rounded down to a megabyte.
-LINKER_AREA_SIZE := 0x01000000
+LOCAL_LDFLAGS := -shared
 
-LOCAL_LDFLAGS := -Wl,-Ttext,$(LINKER_TEXT_BASE)
-
-LOCAL_CFLAGS += -DPRELINK
-LOCAL_CFLAGS += -DLINKER_TEXT_BASE=$(LINKER_TEXT_BASE)
-LOCAL_CFLAGS += -DLINKER_AREA_SIZE=$(LINKER_AREA_SIZE)
+LOCAL_CFLAGS += -fno-stack-protector
 
 # Set LINKER_DEBUG to either 1 or 0
 #
