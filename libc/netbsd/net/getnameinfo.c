@@ -45,6 +45,7 @@
  *   beware on merge.
  */
 
+#include <pthread.h>
 #include <sys/cdefs.h>
 #if defined(LIBC_SCCS) && !defined(lint)
 __RCSID("$NetBSD: getnameinfo.c,v 1.43 2006/02/17 15:58:26 ginsbach Exp $");
@@ -74,6 +75,7 @@ __RCSID("$NetBSD: getnameinfo.c,v 1.43 2006/02/17 15:58:26 ginsbach Exp $");
 #endif
 #include <stddef.h>
 #include <string.h>
+#include "dnsproxyd_lock.h"
 
 static const struct afd {
 	int		a_af;
@@ -160,18 +162,27 @@ android_gethostbyaddr_proxy(struct hostent* hp, const void *addr, socklen_t addr
 		return -1;
 	}
 	// create socket
+	// Lock here to prevent android_getaddrinfo_proxy from trying to
+	// write to the same socket at the same time.
+	pthread_mutex_lock(&dnsproxyd_lock);
 	sock = socket(AF_UNIX, SOCK_STREAM, 0);
 	if (sock < 0) {
+		pthread_mutex_unlock(&dnsproxyd_lock);
 		return -1;
 	}
 
-	setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
+	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one)) < 0) {
+		pthread_mutex_unlock(&dnsproxyd_lock);
+		return -1;
+	}
+
 	memset(&proxy_addr, 0, sizeof(proxy_addr));
 	proxy_addr.sun_family = AF_UNIX;
 	strlcpy(proxy_addr.sun_path, "/dev/socket/dnsproxyd",
 			sizeof(proxy_addr.sun_path));
-	if (TEMP_FAILURE_RETRY(connect(sock, (const struct sockaddr*) (void*) &proxy_addr,
-							sizeof(proxy_addr))) != 0) {
+	if (connect(sock, (const struct sockaddr*) (void*) &proxy_addr,
+				sizeof(proxy_addr)) != 0) {
+		pthread_mutex_unlock(&dnsproxyd_lock);
 		close(sock);
 		return -1;
 	}
@@ -214,6 +225,7 @@ android_gethostbyaddr_proxy(struct hostent* hp, const void *addr, socklen_t addr
 	result = name_len;
 
  exit:
+	pthread_mutex_unlock(&dnsproxyd_lock);
 	if (proxy != NULL) {
 		fclose(proxy);
 	}
