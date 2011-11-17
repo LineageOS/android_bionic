@@ -173,7 +173,6 @@ RESET_STATE:
     return rt;
 }
 
-__LIBC_HIDDEN__
 struct __res_state _nres;
 
 #if 0
