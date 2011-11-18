@@ -501,6 +501,9 @@ ifeq ($(TARGET_ARCH),arm)
   ifeq ($(TARGET_HAVE_TEGRA_ERRATA_657451),true)
     libc_common_cflags += -DHAVE_TEGRA_ERRATA_657451
   endif
+  ifeq ($(TARGET_CORTEX_CACHE_LINE_32),true)
+    libc_common_cflags += -DCORTEX_CACHE_LINE_32
+  endif
 else # !arm
   ifeq ($(TARGET_ARCH),x86)
     libc_crt_target_cflags :=
