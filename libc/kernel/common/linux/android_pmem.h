@@ -12,6 +12,15 @@
 #ifndef _ANDROID_PMEM_H_
 #define _ANDROID_PMEM_H_
 
+#include <linux/fs.h>
+
+#define PMEM_KERNEL_TEST_MAGIC 0xc0
+#define PMEM_KERNEL_TEST_NOMINAL_TEST_IOCTL _IO(PMEM_KERNEL_TEST_MAGIC, 1)
+#define PMEM_KERNEL_TEST_ADVERSARIAL_TEST_IOCTL _IO(PMEM_KERNEL_TEST_MAGIC, 2)
+#define PMEM_KERNEL_TEST_HUGE_ALLOCATION_TEST_IOCTL _IO(PMEM_KERNEL_TEST_MAGIC, 3)
+#define PMEM_KERNEL_TEST_FREE_UNALLOCATED_TEST_IOCTL _IO(PMEM_KERNEL_TEST_MAGIC, 4)
+#define PMEM_KERNEL_TEST_LARGE_REGION_NUMBER_TEST_IOCTL _IO(PMEM_KERNEL_TEST_MAGIC, 5)
+
 #define PMEM_IOCTL_MAGIC 'p'
 #define PMEM_GET_PHYS _IOW(PMEM_IOCTL_MAGIC, 1, unsigned int)
 #define PMEM_MAP _IOW(PMEM_IOCTL_MAGIC, 2, unsigned int)
@@ -23,27 +32,34 @@
 #define PMEM_CONNECT _IOW(PMEM_IOCTL_MAGIC, 6, unsigned int)
 
 #define PMEM_GET_TOTAL_SIZE _IOW(PMEM_IOCTL_MAGIC, 7, unsigned int)
+
 #define PMEM_CACHE_FLUSH _IOW(PMEM_IOCTL_MAGIC, 8, unsigned int)
 
-struct android_pmem_platform_data
-{
- const char* name;
+#define PMEM_CLEAN_INV_CACHES _IOW(PMEM_IOCTL_MAGIC, 11, unsigned int)
+#define PMEM_CLEAN_CACHES _IOW(PMEM_IOCTL_MAGIC, 12, unsigned int)
+#define PMEM_INV_CACHES _IOW(PMEM_IOCTL_MAGIC, 13, unsigned int)
 
- unsigned long start;
-
- unsigned long size;
-
- unsigned no_allocator;
-
- unsigned cached;
-
- unsigned buffered;
-};
-
+#define PMEM_GET_FREE_SPACE _IOW(PMEM_IOCTL_MAGIC, 14, unsigned int)
+#define PMEM_ALLOCATE_ALIGNED _IOW(PMEM_IOCTL_MAGIC, 15, unsigned int)
 struct pmem_region {
  unsigned long offset;
  unsigned long len;
 };
 
-#endif
+struct pmem_addr {
+ unsigned long vaddr;
+ unsigned long offset;
+ unsigned long length;
+};
 
+struct pmem_freespace {
+ unsigned long total;
+ unsigned long largest;
+};
+
+struct pmem_allocation {
+ unsigned long size;
+ unsigned int align;
+};
+
+#endif

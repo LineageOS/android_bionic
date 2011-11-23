@@ -368,6 +368,8 @@ libc_common_src_files += \
 	string/strncmp.c \
 	unistd/socketcalls.c
 
+
+
 # These files need to be arm so that gdbserver
 # can set breakpoints in them without messing
 # up any thumb code.
@@ -414,6 +416,7 @@ libc_common_src_files += \
 	string/strcpy.c \
 	bionic/pthread-atfork.c \
 	bionic/pthread-rwlocks.c \
+	string/strcpy.c \
 	bionic/pthread-timers.c \
 	bionic/ptrace.c
 
@@ -455,6 +458,7 @@ libc_common_src_files += \
 	string/strcpy.c \
 	bionic/pthread-atfork.c \
 	bionic/pthread-rwlocks.c \
+	string/strcpy.c \
 	bionic/pthread-timers.c \
 	bionic/ptrace.c \
 	unistd/socketcalls.c
@@ -535,6 +539,9 @@ libc_crt_target_cflags += -I$(LOCAL_PATH)/private
 
 ifeq ($(TARGET_ARCH),arm)
 libc_crt_target_cflags += -DCRT_LEGACY_WORKAROUND
+endif
+ifeq ($(BOARD_USE_NASTY_PTHREAD_CREATE_HACK),true)
+  libc_common_cflags += -DNASTY_PTHREAD_CREATE_HACK
 endif
 
 # Define some common includes
@@ -620,6 +627,13 @@ LOCAL_SRC_FILES := $(libc_common_src_files)
 LOCAL_CFLAGS := $(libc_common_cflags)
 ifeq ($(TARGET_ARCH),arm)
 LOCAL_CFLAGS += -DCRT_LEGACY_WORKAROUND
+endif
+ifdef NEEDS_ARM_ERRATA_754319_754320
+asm_flags := \
+	--defsym NEEDS_ARM_ERRATA_754319_754320_ASM=1
+
+LOCAL_CFLAGS+= \
+	$(foreach f,$(asm_flags),-Wa,"$(f)")
 endif
 LOCAL_C_INCLUDES := $(libc_common_c_includes)
 LOCAL_MODULE := libc_common

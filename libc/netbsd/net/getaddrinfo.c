@@ -77,6 +77,7 @@
  *	  friends.
  */
 
+#include <pthread.h>
 #include <fcntl.h>
 #include <sys/cdefs.h>
 #include <sys/types.h>
@@ -103,6 +104,7 @@
 #include <syslog.h>
 #include <stdarg.h>
 #include "nsswitch.h"
+#include "dnsproxyd_lock.h"
 
 #ifdef ANDROID_CHANGES
 #include <sys/system_properties.h>
@@ -442,19 +444,27 @@ android_getaddrinfo_proxy(
 		return -1;
 	}
 
+	// Lock here to prevent android_gethostbyaddr_proxy from trying to
+	// write to the same socket at the same time.
+	pthread_mutex_lock(&dnsproxyd_lock);
 	sock = socket(AF_UNIX, SOCK_STREAM, 0);
 	if (sock < 0) {
+		pthread_mutex_unlock(&dnsproxyd_lock);
 		return -1;
 	}
 
-	setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
+	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one)) < 0) {
+		pthread_mutex_unlock(&dnsproxyd_lock);
+		return -1;
+	}
+
 	memset(&proxy_addr, 0, sizeof(proxy_addr));
 	proxy_addr.sun_family = AF_UNIX;
 	strlcpy(proxy_addr.sun_path, "/dev/socket/dnsproxyd",
 		sizeof(proxy_addr.sun_path));
-	if (TEMP_FAILURE_RETRY(connect(sock,
-				       (const struct sockaddr*) &proxy_addr,
-				       sizeof(proxy_addr))) != 0) {
+	if (connect(sock, (const struct sockaddr*) &proxy_addr,
+				sizeof(proxy_addr)) != 0) {
+		pthread_mutex_unlock(&dnsproxyd_lock);
 		close(sock);
 		return -1;
 	}
@@ -566,6 +576,7 @@ android_getaddrinfo_proxy(
 		freeaddrinfo(ai);
 	}
 exit:
+	pthread_mutex_unlock(&dnsproxyd_lock);
 	if (proxy != NULL) {
 		fclose(proxy);
 	}

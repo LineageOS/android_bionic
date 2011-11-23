@@ -13,19 +13,20 @@
 #include <sys/types.h>
 
 #define SHA1_DIGEST_LENGTH		20
-#define SHA1_DIGEST_STRING_LENGTH	41
+#define SHA1_BLOCK_SIZE 		64
 
 typedef struct {
-	uint32_t state[5];
-	uint32_t count[2];
-	u_char buffer[64];
+    uint64_t count;
+    uint32_t state[SHA1_DIGEST_LENGTH / 4];
+    uint8_t buffer[SHA1_BLOCK_SIZE];
 } SHA1_CTX;
 
 __BEGIN_DECLS
-void	SHA1Transform(uint32_t[5], const u_char[64]);
+void	SHA1Transform(uint32_t[SHA1_DIGEST_LENGTH/4],
+	              const uint8_t[SHA1_BLOCK_SIZE]);
 void	SHA1Init(SHA1_CTX *);
-void	SHA1Update(SHA1_CTX *, const u_char *, u_int);
-void	SHA1Final(u_char[SHA1_DIGEST_LENGTH], SHA1_CTX *);
+void	SHA1Update(SHA1_CTX *, const uint8_t *, unsigned int);
+void	SHA1Final(uint8_t[SHA1_DIGEST_LENGTH], SHA1_CTX *);
 __END_DECLS
 
 #endif /* _SYS_SHA1_H_ */
