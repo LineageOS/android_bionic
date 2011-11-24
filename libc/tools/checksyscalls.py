@@ -87,7 +87,11 @@ def process_nr_line(line,dict):
     m = re_arm_nr_line.match(line)
     if m:
         #print "%s = %s" % (m.group(1), m.group(2))
-        dict["ARM_"+m.group(1)] = int(m.group(2)) + 0x0f0000
+        try:
+            dict["ARM_"+m.group(1)] = int(m.group(2)) + 0x0f0000
+        except:
+            print "EXCEPTION: %s = %s" % (m.group(1), m.group(2))
+            pass
         return
 
     m = re_x86_line.match(line)
@@ -121,7 +125,7 @@ if linux_root[-1] == '/':
 if len(linux_root) > 8 and linux_root[-8:] == '/include':
     linux_root = linux_root[:-8]
 
-arm_unistd = linux_root + "/include/asm-arm/unistd.h"
+arm_unistd = linux_root + "/arch/arm/include/asm/unistd.h"
 if not os.path.exists(arm_unistd):
     print "WEIRD: could not locate the ARM unistd.h header file"
     print "tried searching in '%s'" % arm_unistd
@@ -132,17 +136,17 @@ if not os.path.exists(arm_unistd):
 # with two distinct unistd_32.h and unistd_64.h definition files.
 # take care of this here
 #
-x86_unistd = linux_root + "/include/asm-i386/unistd_32.h"
+x86_unistd = linux_root + "/arch/x86/include/asm/unistd_32.h"
 if not os.path.exists(x86_unistd):
     x86_unistd1 = x86_unistd
-    x86_unistd = linux_root + "/include/asm-x86/unistd.h"
+    x86_unistd = linux_root + "/arch/x86/include/asm/unistd.h"
     if not os.path.exists(x86_unistd):
         print "WEIRD: could not locate the i386/x86 unistd.h header file"
         print "tried searching in '%s' and '%s'" % (x86_unistd1, x86_unistd)
         print "maybe using a different set of kernel headers might help"
         sys.exit(1)
 
-process_header( linux_root+"/include/asm-arm/unistd.h", arm_dict )
+process_header( linux_root+"/arch/arm/include/asm/unistd.h", arm_dict )
 process_header( x86_unistd, x86_dict )
 
 # now perform the comparison
