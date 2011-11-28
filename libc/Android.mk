@@ -140,6 +140,7 @@ libc_common_src_files := \
 	stdio/vsscanf.c \
 	stdio/wbuf.c \
 	stdio/wsetup.c \
+	stdlib/ulcmp.c \
 	stdlib/_rand48.c \
 	stdlib/assert.c \
 	stdlib/atexit.c \
@@ -507,9 +508,6 @@ ifeq ($(TARGET_ARCH),arm)
   #
   ifeq ($(ARCH_ARM_HAVE_TLS_REGISTER),true)
     libc_common_cflags += -DHAVE_ARM_TLS_REGISTER
-  endif
-  ifeq ($(TARGET_HAVE_TEGRA_ERRATA_657451),true)
-    libc_common_cflags += -DHAVE_TEGRA_ERRATA_657451
   endif
 else # !arm
   ifeq ($(TARGET_ARCH),x86)
