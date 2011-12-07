@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1995 - 2001 Kungliga Tekniska Högskolan
+ * Copyright (c) 1995 - 2001 Kungliga Tekniska H?gskolan
  * (Royal Institute of Technology, Stockholm, Sweden).
  * All rights reserved.
  * 
@@ -43,7 +43,7 @@ struct md5 {
   union {
     unsigned char save[64];
     u_int32_t save32[16];
-  }
+  };
 };
 
 typedef struct md5 MD5_CTX;
