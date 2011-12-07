@@ -404,7 +404,10 @@ res_nsend(res_state statp,
 	 */
 	if (EXT(statp).nscount != 0) {
 		int needclose = 0;
-		struct sockaddr_storage peer;
+		union {
+			struct sockaddr_storage storage;
+			struct sockaddr generic;
+		} peer;
 		socklen_t peerlen;
 
 		if (EXT(statp).nscount != statp->nscount)
@@ -420,13 +423,13 @@ res_nsend(res_state statp,
 
 				if (EXT(statp).nssocks[ns] == -1)
 					continue;
-				peerlen = sizeof(peer);
+				peerlen = sizeof(peer.storage);
 				if (getpeername(EXT(statp).nssocks[ns],
-				    (struct sockaddr *)(void *)&peer, &peerlen) < 0) {
+				    &peer.generic, &peerlen) < 0) {
 					needclose++;
 					break;
 				}
-				if (!sock_eq((struct sockaddr *)(void *)&peer,
+				if (!sock_eq(&peer.generic,
 				    get_nsaddr(statp, (size_t)ns))) {
 					needclose++;
 					break;
@@ -742,12 +745,15 @@ send_vc(res_state statp,
 
 	/* Are we still talking to whom we want to talk to? */
 	if (statp->_vcsock >= 0 && (statp->_flags & RES_F_VC) != 0) {
-		struct sockaddr_storage peer;
-		socklen_t size = sizeof peer;
+		union {
+			struct sockaddr_storage storage;
+			struct sockaddr generic;
+		} peer;
+		socklen_t size = sizeof peer.storage;
 
 		if (getpeername(statp->_vcsock,
-				(struct sockaddr *)(void *)&peer, &size) < 0 ||
-		    !sock_eq((struct sockaddr *)(void *)&peer, nsap)) {
+				&peer.generic, &size) < 0 ||
+		    !sock_eq(&peer.generic, nsap)) {
 			res_nclose(statp);
 			statp->_flags &= ~RES_F_VC;
 		}
@@ -1026,7 +1032,10 @@ send_dg(res_state statp,
 	int nsaplen;
 	struct timespec now, timeout, finish;
 	fd_set dsmask;
-	struct sockaddr_storage from;
+	union {
+		struct sockaddr_storage storage;
+		struct sockaddr generic;
+	} from;
 	socklen_t fromlen;
 	int resplen, seconds, n, s;
 
@@ -1118,9 +1127,9 @@ retry:
 		return (0);
 	}
 	errno = 0;
-	fromlen = sizeof(from);
+	fromlen = sizeof(from.storage);
 	resplen = recvfrom(s, (char*)ans, (size_t)anssiz,0,
-			   (struct sockaddr *)(void *)&from, &fromlen);
+			   &from.generic, &fromlen);
 	if (resplen <= 0) {
 		Perror(statp, stderr, "recvfrom", errno);
 		res_nclose(statp);
@@ -1151,7 +1160,7 @@ retry:
 		goto retry;
 	}
 	if (!(statp->options & RES_INSECURE1) &&
-	    !res_ourserver_p(statp, (struct sockaddr *)(void *)&from)) {
+	    !res_ourserver_p(statp, &from.generic)) {
 		/*
 		 * response from wrong server? ignore it.
 		 * XXX - potential security hazard could
