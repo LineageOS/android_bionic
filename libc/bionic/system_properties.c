@@ -158,7 +158,10 @@ int __system_property_get(const char *name, char *value)
 static int send_prop_msg(prop_msg *msg)
 {
     struct pollfd pollfds[1];
-    struct sockaddr_un addr;
+    union {
+        struct sockaddr_un addr;
+        struct sockaddr addr_g;
+    } addr;
     socklen_t alen;
     size_t namelen;
     int s;
@@ -172,11 +175,11 @@ static int send_prop_msg(prop_msg *msg)
 
     memset(&addr, 0, sizeof(addr));
     namelen = strlen(property_service_socket);
-    strlcpy(addr.sun_path, property_service_socket, sizeof addr.sun_path);
-    addr.sun_family = AF_LOCAL;
+    strlcpy(addr.addr.sun_path, property_service_socket, sizeof addr.addr.sun_path);
+    addr.addr.sun_family = AF_LOCAL;
     alen = namelen + offsetof(struct sockaddr_un, sun_path) + 1;
 
-    if(TEMP_FAILURE_RETRY(connect(s, (struct sockaddr *) &addr, alen) < 0)) {
+    if(TEMP_FAILURE_RETRY(connect(s, &addr.addr_g, alen) < 0)) {
         close(s);
         return result;
     }

@@ -139,7 +139,10 @@ android_gethostbyaddr_proxy(struct hostent* hp, const void *addr, socklen_t addr
 
 	int sock;
 	const int one = 1;
-	struct sockaddr_un proxy_addr;
+	union {
+		struct sockaddr_un un;
+		struct sockaddr generic;
+	} proxy_addr;
 	const char* cache_mode = getenv("ANDROID_DNS_MODE");
 	FILE* proxy = NULL;
 	int result = -1;
@@ -167,11 +170,11 @@ android_gethostbyaddr_proxy(struct hostent* hp, const void *addr, socklen_t addr
 
 	setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
 	memset(&proxy_addr, 0, sizeof(proxy_addr));
-	proxy_addr.sun_family = AF_UNIX;
-	strlcpy(proxy_addr.sun_path, "/dev/socket/dnsproxyd",
-			sizeof(proxy_addr.sun_path));
-	if (TEMP_FAILURE_RETRY(connect(sock, (const struct sockaddr*) (void*) &proxy_addr,
-							sizeof(proxy_addr))) != 0) {
+	proxy_addr.un.sun_family = AF_UNIX;
+	strlcpy(proxy_addr.un.sun_path, "/dev/socket/dnsproxyd",
+			sizeof(proxy_addr.un.sun_path));
+	if (TEMP_FAILURE_RETRY(connect(sock, &proxy_addr.generic,
+							sizeof(proxy_addr.un))) != 0) {
 		close(sock);
 		return -1;
 	}
