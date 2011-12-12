@@ -40,7 +40,7 @@ __BEGIN_DECLS
 
 struct res_state;
 
-extern struct __res_state *__res_state(void);
+extern struct __res_state *__res_state(void) __attribute__((const));
 #define _res (*__res_state())
 
 /* Base-64 functions - because some code expects it there */

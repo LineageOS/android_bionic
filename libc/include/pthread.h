@@ -146,6 +146,7 @@ void pthread_exit(void * retval);
 int pthread_join(pthread_t thid, void ** ret_val);
 int pthread_detach(pthread_t  thid);
 
+__attribute__((const))
 pthread_t pthread_self(void);
 int pthread_equal(pthread_t one, pthread_t two);
 
