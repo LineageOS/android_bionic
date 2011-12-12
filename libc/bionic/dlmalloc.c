@@ -465,6 +465,12 @@ DEFAULT_MMAP_THRESHOLD       default: 256K
 
 */
 
+#ifdef ANDROID
+#ifdef __arm__
+#include <machine/cpu-features.h>
+#endif
+#endif  /* ANDROID */
+
 #ifndef WIN32
 #ifdef _WIN32
 #define WIN32 1
@@ -2415,6 +2421,22 @@ static size_t traverse_and_check(mstate m);
     I =  (bindex_t)((K << 1) + ((S >> (K + (TREEBIN_SHIFT-1)) & 1)));\
   }\
 }
+#elif defined(__GNUC__) && defined(__ARM_ARCH__) && __ARM_ARCH__ >= 7
+#define compute_tree_index(S, I)\
+{\
+  size_t X = S >> TREEBIN_SHIFT;\
+  if (X == 0)\
+    I = 0;\
+  else if (X > 0xFFFF)\
+    I = NTREEBINS-1;\
+  else {\
+    unsigned int K;\
+    __asm__ ("rbit %0, %1\n"\
+             "clz %0, %0"\
+             : "=r" (K) : "r" (X));\
+    I = (bindex_t)((K << 1) + ((S >> (K + (TREEBIN_SHIFT-1)) & 1)));\
+  }\
+}
 #else /* GNUC */
 #define compute_tree_index(S, I)\
 {\
@@ -2475,6 +2497,17 @@ static size_t traverse_and_check(mstate m);
 }
 
 #else /* GNUC */
+#if defined(__ARM_ARCH__) && __ARM_ARCH__ >= 7
+#define compute_bit2idx(X, I) \
+{ \
+  unsigned int J; \
+  __asm__ ("rbit %0, %1\n" \
+           "clz %0, %0" \
+           : "=r" (J) : "r" (X)); \
+  I = (bindex_t) J; \
+}
+
+#else /* ARM_ARCH */
 #if  USE_BUILTIN_FFS
 #define compute_bit2idx(X, I) I = ffs(X)-1
 
@@ -2490,6 +2523,7 @@ static size_t traverse_and_check(mstate m);
   N += K = Y >> (1-0) &  1;  Y >>= K;\
   I = (bindex_t)(N + Y);\
 }
+#endif /* ARM_ARCH */
 #endif /* USE_BUILTIN_FFS */
 #endif /* GNUC */
 
