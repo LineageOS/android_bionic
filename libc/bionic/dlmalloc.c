@@ -1169,6 +1169,11 @@ void* mspace_realloc(mspace msp, void* mem, size_t newsize);
   but like mspace_free, the default is to abort the program.
 */
 void* mspace_merge_objects(mspace msp, void* mema, void* memb);
+
+#ifdef __arm__
+#include <machine/cpu-features.h>
+#endif
+
 #endif
 
 /*
@@ -2434,6 +2439,16 @@ static size_t traverse_and_check(mstate m);
 }
 
 #else /* GNUC */
+#if defined(__ARM_ARCH__) && _ARM_ARCH__ >= 7
+#define compute_bit2idx(X, I) \
+{ \
+ unsigned int J; \
+ __asm__ ("rbit %0, %1\n" \
+          "clz %0, %0" \
+          : "=r" (J) : "r" (X)); \
+ I = (bindex_t) J; \
+}
+#else /* ARM_ARCH */
 #if  USE_BUILTIN_FFS
 #define compute_bit2idx(X, I) I = ffs(X)-1
 
