@@ -147,7 +147,7 @@ memcpy:
 END(memcpy)
 
 
-#else   /* __ARM_ARCH__ < 7 */
+#else   /* !__ARM_NEON__ */
 
 
 		/*
@@ -501,4 +501,4 @@ copy_last_3_and_return:
 END(memcpy)
 
 
-#endif    /* __ARM_ARCH__ < 7 */
+#endif    /* !__ARM_NEON__ */
