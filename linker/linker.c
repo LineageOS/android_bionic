@@ -659,8 +659,11 @@ static int open_library(const char *name)
 }
 
 /* temporary space for holding the first page of the shared lib
- * which contains the elf header (with the pht). */
-static unsigned char __header[PAGE_SIZE];
+ * which contains the elf header (with the pht).
+ * It is 32-bit aligned for ELF manipulation efficiency.
+ */
+static unsigned char __header[PAGE_SIZE]
+                     __attribute__((aligned(4)));
 
 typedef struct {
     long mmap_addr;
@@ -694,6 +697,22 @@ is_prelinked(int fd, const char *name)
     return (unsigned long)info.mmap_addr;
 }
 
+#if _BYTE_ORDER == _LITTLE_ENDIAN
+#define ELFMAG_U32 \
+    ((uint32_t)((ELFMAG0 << (EI_MAG0 * 8)) | \
+                (ELFMAG1 << (EI_MAG1 * 8)) | \
+                (ELFMAG2 << (EI_MAG2 * 8)) | \
+                (ELFMAG3 << (EI_MAG3 * 8))))
+#elif _BYTE_ORDER == _BIG_ENDIAN
+#define ELFMAG_U32 \
+    ((uint32_t)((ELFMAG0 << (EI_MAG3 * 8)) | \
+                (ELFMAG1 << (EI_MAG2 * 8)) | \
+                (ELFMAG2 << (EI_MAG1 * 8)) | \
+                (ELFMAG3 << (EI_MAG0 * 8)))
+#else
+#error "Unknown target byte order!"
+#endif
+
 /* verify_elf_object
  *      Verifies if the object @ base is a valid ELF object
  *
@@ -707,11 +726,10 @@ static int
 verify_elf_object(void *base, const char *name)
 {
     Elf32_Ehdr *hdr = (Elf32_Ehdr *) base;
+    uint32_t *magic32 = (uint32_t *) &hdr->e_ident;
 
-    if (hdr->e_ident[EI_MAG0] != ELFMAG0) return -1;
-    if (hdr->e_ident[EI_MAG1] != ELFMAG1) return -1;
-    if (hdr->e_ident[EI_MAG2] != ELFMAG2) return -1;
-    if (hdr->e_ident[EI_MAG3] != ELFMAG3) return -1;
+    if (*magic32 != ELFMAG_U32)
+        return -1;
 
     /* TODO: Should we verify anything else in the header? */
 #ifdef ANDROID_ARM_LINKER
