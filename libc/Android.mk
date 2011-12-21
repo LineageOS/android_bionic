@@ -140,6 +140,7 @@ libc_common_src_files := \
 	stdio/vsscanf.c \
 	stdio/wbuf.c \
 	stdio/wsetup.c \
+	stdlib/ulcmp.c \
 	stdlib/_rand48.c \
 	stdlib/assert.c \
 	stdlib/atexit.c \
