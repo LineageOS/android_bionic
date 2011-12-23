@@ -16,6 +16,24 @@
       "revId": "9cc174f2f2de5df52b064e76e5af7f768d5b766f",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAOX///Mk\u003d",
+        "filename": "libc/tools/zoneinfo/generate",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 320
+      },
+      "writtenOn": "2011-12-23T03:22:09Z",
+      "side": 1,
+      "message": "This obviously isn\u0027t related to the alignment problem. The openjdk JVM failed to find the ZoneCompactor class without including the directory in the classpath. I thought the current directory is usually automatically included in the classpath. It may be a problem unique to the openjdk JVM, but adding this should not negatively impact other JVMs.",
+      "parentUuid": "AAAAOX///NI\u003d",
+      "revId": "9cc174f2f2de5df52b064e76e5af7f768d5b766f",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }
