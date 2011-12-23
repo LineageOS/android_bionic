@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAOX///NI\u003d",
+        "filename": "libc/tools/zoneinfo/generate",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1482
+      },
+      "writtenOn": "2011-12-23T01:27:34Z",
+      "side": 1,
+      "message": "Is this required for such purpose?",
+      "revId": "9cc174f2f2de5df52b064e76e5af7f768d5b766f",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
