@@ -38,6 +38,9 @@
 #define PAGE_SIZE 4096
 #define PAGE_MASK 4095
 
+#define likely(expr)   __builtin_expect (expr, 1)
+#define unlikely(expr) __builtin_expect (expr, 0)
+
 void debugger_init();
 const char *addr_to_name(unsigned addr);
 
@@ -112,6 +115,14 @@ struct soinfo
     unsigned nchain;
     unsigned *bucket;
     unsigned *chain;
+
+    /* GNU-style hash table infos */
+    unsigned gnu_nbucket;
+    unsigned gnu_shift;
+    unsigned gnu_bitmask_words;
+    unsigned *gnu_bitmask;
+    unsigned *gnu_bucket;
+    unsigned *gnu_chain;
 
     unsigned *plt_got;
 

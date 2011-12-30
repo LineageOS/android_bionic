@@ -85,6 +85,7 @@ typedef __s64 Elf64_Sxword;
 #define DT_DEBUG 21
 #define DT_TEXTREL 22
 #define DT_JMPREL 23
+#define DT_GNU_HASH 0x6ffffef5
 #define DT_LOPROC 0x70000000
 #define DT_HIPROC 0x7fffffff
 
@@ -244,6 +245,7 @@ typedef struct elf64_phdr {
 #define SHT_SHLIB 10
 #define SHT_DYNSYM 11
 #define SHT_NUM 12
+#define SHT_GNU_HASH 0x6ffffff6
 #define SHT_LOPROC 0x70000000
 #define SHT_HIPROC 0x7fffffff
 #define SHT_LOUSER 0x80000000

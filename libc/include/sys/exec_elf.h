@@ -251,6 +251,7 @@ typedef struct {
 #define SHT_SHLIB	10		/* reserved - purpose unknown */
 #define SHT_DYNSYM	11		/* dynamic symbol table section */
 #define SHT_NUM		12		/* number of section types */
+#define SHT_GNU_HASH	0x6ffffff6	/* GNU-style symbol hash table section  */
 #define SHT_LOPROC	0x70000000	/* reserved range for processor */
 #define SHT_HIPROC	0x7fffffff	/*  specific section header types */
 #define SHT_LOUSER	0x80000000	/* reserved range for application */
@@ -458,6 +459,7 @@ typedef struct {
 #define DT_JMPREL	23		/* add. of PLT's relocation entries */
 #define DT_BIND_NOW	24		/* Bind now regardless of env setting */
 #define DT_NUM		25		/* Number used. */
+#define DT_GNU_HASH	0x6ffffef5	/* address of gnu-style symbol hash table */
 #define DT_LOPROC	0x70000000	/* reserved range for processor */
 #define DT_HIPROC	0x7fffffff	/*  specific dynamic array tags */
 	
