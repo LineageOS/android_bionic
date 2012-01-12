@@ -389,53 +389,7 @@ dl_iterate_phdr(int (*cb)(struct dl_phdr_info *info, size_t size, void *data),
 }
 #endif
 
-static Elf32_Sym *_gnu_hash_lookup(soinfo *si, unsigned gnu_hash, const char *name)
-{
-    Elf32_Sym *s;
-    Elf32_Sym *symtab = si->symtab;
-    const char *strtab = si->strtab;
-    int elfclass = 32;
-    Elf32_Word bitmask_word = si->gnu_bitmask[(gnu_hash / elfclass)
-                                              & (si->gnu_bitmask_words - 1)];
-    unsigned hashbit1 = gnu_hash & (elfclass - 1);
-    unsigned hashbit2 = ((gnu_hash >> si->gnu_shift)
-                         & (elfclass - 1));
-    Elf32_Word bucket;
-    Elf32_Word index;
-    /* Bloom Filter */
-    if (likely(((bitmask_word >> hashbit1) &
-                (bitmask_word >> hashbit2) & 1) == 0)) {
-        return NULL;
-    }
-    TRACE_TYPE(LOOKUP, "%5d SEARCH %s in %s@0x%08x %08x %d\n", pid,
-               name, si->name, si->base, gnu_hash, gnu_hash % si->gnu_nbucket);
-    bucket = si->gnu_bucket[gnu_hash % si->gnu_nbucket];
-    if (likely(bucket != 0)) {
-        Elf32_Word *hasharr = &si->gnu_chain[bucket];
-        do {
-            if (((*hasharr ^ gnu_hash) >> 1) == 0) {
-                index = hasharr - si->gnu_chain;
-                s = symtab + index;
-                if (strcmp(strtab + s->st_name, name)) continue;
-
-                switch(ELF32_ST_BIND(s->st_info)) {
-                case STB_GLOBAL:
-                case STB_WEAK:
-                    /* no section == undefined */
-                    if (s->st_shndx == 0) continue;
-
-                    TRACE_TYPE(LOOKUP, "%5d FOUND %s in %s (%08x) %d\n", pid,
-                               name, si->name, s->st_value, s->st_size);
-                    return s;
-                }
-            }
-        } while ((*hasharr++ & 1) == 0);
-    }
-
-    return NULL;
-}
-
-static Elf32_Sym *_elf_hash_lookup(soinfo *si, unsigned hash, const char *name)
+static Elf32_Sym *_elf_lookup(soinfo *si, unsigned hash, const char *name)
 {
     Elf32_Sym *s;
     Elf32_Sym *symtab = si->symtab;
@@ -466,28 +420,6 @@ static Elf32_Sym *_elf_hash_lookup(soinfo *si, unsigned hash, const char *name)
     return NULL;
 }
 
-static Elf32_Sym *_symbol_lookup(soinfo *si, unsigned hash, unsigned gnu_hash, const char *name)
-{
-  Elf32_Sym *sym;
-  if ( si->gnu_bitmask != NULL ){
-      sym = _gnu_hash_lookup(si, gnu_hash, name);
-  } else {
-      sym = _elf_hash_lookup(si, hash, name);
-  }
-  return sym;
-}
-
-
-static unsigned gnuhash(const char *_name)
-{
-    const unsigned char *name = (const unsigned char *) _name;
-    unsigned h = 5381;
-    while (*name){
-        h = (h << 5) + h + *name++;
-    }
-    return h & 0xffffffff;
-}
-
 static unsigned elfhash(const char *_name)
 {
     const unsigned char *name = (const unsigned char *) _name;
@@ -513,7 +445,6 @@ static Elf32_Sym *
 _do_lookup(soinfo *si, const char *name, unsigned *base)
 {
     unsigned elf_hash = elfhash(name);
-    unsigned gnu_hash = gnuhash(name);
     Elf32_Sym *s;
     unsigned *d;
     soinfo *lsi = si;
@@ -528,14 +459,14 @@ _do_lookup(soinfo *si, const char *name, unsigned *base)
      * dynamic linking.  Some systems return the first definition found
      * and some the first non-weak definition.   This is system dependent.
      * Here we return the first definition found for simplicity.  */
-    s = _symbol_lookup(si, elf_hash, gnu_hash, name);
+    s = _elf_lookup(si, elf_hash, name);
     if(s != NULL)
         goto done;
 
     /* Next, look for it in the preloads list */
     for(i = 0; preloads[i] != NULL; i++) {
         lsi = preloads[i];
-        s = _symbol_lookup(lsi, elf_hash, gnu_hash, name);
+        s = _elf_lookup(lsi, elf_hash, name);
         if(s != NULL)
             goto done;
     }
@@ -551,7 +482,7 @@ _do_lookup(soinfo *si, const char *name, unsigned *base)
 
             DEBUG("%5d %s: looking up %s in %s\n",
                   pid, si->name, name, lsi->name);
-            s = _symbol_lookup(lsi, elf_hash, gnu_hash, name);
+            s = _elf_lookup(lsi, elf_hash, name);
             if ((s != NULL) && (s->st_shndx != SHN_UNDEF))
                 goto done;
         }
@@ -566,7 +497,7 @@ _do_lookup(soinfo *si, const char *name, unsigned *base)
         lsi = somain;
         DEBUG("%5d %s: looking up %s in executable %s\n",
               pid, si->name, name, lsi->name);
-        s = _symbol_lookup(lsi, elf_hash, gnu_hash, name);
+        s = _elf_lookup(lsi, elf_hash, name);
     }
 #endif
 
@@ -587,7 +518,7 @@ done:
  */
 Elf32_Sym *lookup_in_library(soinfo *si, const char *name)
 {
-    return _symbol_lookup(si, elfhash(name), gnuhash(name), name);
+    return _elf_lookup(si, elfhash(name), name);
 }
 
 /* This is used by dl_sym().  It performs a global symbol lookup.
@@ -595,7 +526,6 @@ Elf32_Sym *lookup_in_library(soinfo *si, const char *name)
 Elf32_Sym *lookup(const char *name, soinfo **found, soinfo *start)
 {
     unsigned elf_hash = elfhash(name);
-    unsigned gnu_hash = gnuhash(name);
     Elf32_Sym *s = NULL;
     soinfo *si;
 
@@ -607,7 +537,7 @@ Elf32_Sym *lookup(const char *name, soinfo **found, soinfo *start)
     {
         if(si->flags & FLAG_ERROR)
             continue;
-        s = _symbol_lookup(si, elf_hash, gnu_hash, name);
+        s = _elf_lookup(si, elf_hash, name);
         if (s != NULL) {
             *found = si;
             break;
@@ -1896,19 +1826,6 @@ static int link_image(soinfo *si, unsigned wr_offset)
             si->nchain = ((unsigned *) (si->base + *d))[1];
             si->bucket = (unsigned *) (si->base + *d + 8);
             si->chain = (unsigned *) (si->base + *d + 8 + si->nbucket * 4);
-            break;
-        case DT_GNU_HASH:
-            {
-                unsigned symbias;
-                si->gnu_nbucket = ((unsigned *) (si->base + *d))[0];
-                symbias  = ((unsigned *) (si->base + *d))[1];
-                si->gnu_bitmask_words = ((unsigned *) (si->base + *d))[2];
-                si->gnu_shift = ((unsigned *) (si->base + *d))[3];
-                si->gnu_bitmask =  (unsigned *) (si->base + *d + 16);
-                si->gnu_bucket = (unsigned *) (si->base + *d + 16 +
-                                               4 * si->gnu_bitmask_words);
-                si->gnu_chain = (si->gnu_bucket + si->gnu_nbucket - symbias);
-            }
             break;
         case DT_STRTAB:
             si->strtab = (const char *) (si->base + *d);
