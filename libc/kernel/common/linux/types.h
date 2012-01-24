@@ -27,6 +27,8 @@ typedef __u64 __bitwise __le64;
 typedef __u64 __bitwise __be64;
 #endif
 
+typedef __u32 uint32_t;
+
 struct ustat {
  __kernel_daddr_t f_tfree;
  __kernel_ino_t f_tinode;
