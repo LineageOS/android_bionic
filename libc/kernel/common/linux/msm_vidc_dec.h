@@ -45,6 +45,8 @@
 
 #define VDEC_S_BUSY (VDEC_S_BASE + 13)
 
+#define VDEC_S_INPUT_BITSTREAM_ERR (VDEC_S_BASE + 14)
+
 #define VDEC_INTF_VER 1
 #define VDEC_MSG_BASE 0x0000000
 
@@ -63,6 +65,8 @@
 #define VDEC_EVT_RESOURCES_LOST (VDEC_MSG_BASE + 12)
 #define VDEC_MSG_EVT_CONFIG_CHANGED (VDEC_MSG_BASE + 13)
 #define VDEC_MSG_EVT_HW_ERROR (VDEC_MSG_BASE + 14)
+#define VDEC_MSG_EVT_INFO_CONFIG_CHANGED (VDEC_MSG_BASE + 15)
+#define VDEC_MSG_EVT_INFO_FIELD_DROPPED (VDEC_MSG_BASE + 16)
 
 #define VDEC_BUFFERFLAG_EOS 0x00000001
 #define VDEC_BUFFERFLAG_DECODEONLY 0x00000004
@@ -72,10 +76,12 @@
 #define VDEC_BUFFERFLAG_EXTRADATA 0x00000040
 #define VDEC_BUFFERFLAG_CODECCONFIG 0x00000080
 
-#define VDEC_EXTRADATA_QP 0x00000001
-#define VDEC_EXTRADATA_SEI 0x00000002
-#define VDEC_EXTRADATA_VUI 0x00000004
-#define VDEC_EXTRADATA_MB_ERROR_MAP 0x00000008
+#define VDEC_EXTRADATA_NONE 0x001
+#define VDEC_EXTRADATA_QP 0x004
+#define VDEC_EXTRADATA_MB_ERROR_MAP 0x008
+#define VDEC_EXTRADATA_SEI 0x010
+#define VDEC_EXTRADATA_VUI 0x020
+#define VDEC_EXTRADATA_VC1 0x040
 
 #define VDEC_CMDBASE 0x800
 #define VDEC_CMD_SET_INTF_VERSION (VDEC_CMDBASE)
@@ -83,8 +89,8 @@
 #define VDEC_IOCTL_MAGIC 'v'
 
 struct vdec_ioctl_msg {
- void *inputparam;
- void *outputparam;
+ void __user *in;
+ void __user *out;
 };
 
 #define VDEC_IOCTL_GET_PROFILE_LEVEL_SUPPORTED   _IOWR(VDEC_IOCTL_MAGIC, 0, struct vdec_ioctl_msg)
@@ -134,12 +140,31 @@ struct vdec_ioctl_msg {
 
 #define VDEC_IOCTL_GET_NUMBER_INSTANCES   _IOR(VDEC_IOCTL_MAGIC, 27, struct vdec_ioctl_msg)
 
+#define VDEC_IOCTL_SET_PICTURE_ORDER   _IOW(VDEC_IOCTL_MAGIC, 28, struct vdec_ioctl_msg)
+
+#define VDEC_IOCTL_SET_FRAME_RATE   _IOW(VDEC_IOCTL_MAGIC, 29, struct vdec_ioctl_msg)
+
+#define VDEC_IOCTL_SET_H264_MV_BUFFER   _IOW(VDEC_IOCTL_MAGIC, 30, struct vdec_ioctl_msg)
+#define VDEC_IOCTL_FREE_H264_MV_BUFFER   _IOW(VDEC_IOCTL_MAGIC, 31, struct vdec_ioctl_msg)
+
+#define VDEC_IOCTL_GET_MV_BUFFER_SIZE   _IOR(VDEC_IOCTL_MAGIC, 32, struct vdec_ioctl_msg)
+
+#define VDEC_IOCTL_SET_IDR_ONLY_DECODING   _IO(VDEC_IOCTL_MAGIC, 33)
+
+#define VDEC_IOCTL_SET_CONT_ON_RECONFIG   _IO(VDEC_IOCTL_MAGIC, 34)
+
+#define VDEC_IOCTL_SET_DISABLE_DMX   _IOW(VDEC_IOCTL_MAGIC, 35, struct vdec_ioctl_msg)
+#define VDEC_IOCTL_GET_DISABLE_DMX   _IOR(VDEC_IOCTL_MAGIC, 36, struct vdec_ioctl_msg)
+
+#define VDEC_IOCTL_GET_DISABLE_DMX_SUPPORT   _IOR(VDEC_IOCTL_MAGIC, 37, struct vdec_ioctl_msg)
+
 enum vdec_picture {
  PICTURE_TYPE_I,
  PICTURE_TYPE_P,
  PICTURE_TYPE_B,
  PICTURE_TYPE_BI,
  PICTURE_TYPE_SKIP,
+ PICTURE_TYPE_IDR,
  PICTURE_TYPE_UNKNOWN
 };
 
@@ -153,17 +178,17 @@ struct vdec_allocatorproperty {
  uint32_t mincount;
  uint32_t maxcount;
  uint32_t actualcount;
- uint32_t buffer_size;
+ size_t buffer_size;
  uint32_t alignment;
  uint32_t buf_poolid;
 };
 
 struct vdec_bufferpayload {
- uint8_t *bufferaddr;
- uint32_t buffer_len;
+ void __user *bufferaddr;
+ size_t buffer_len;
  int pmem_fd;
- uint32_t offset;
- uint32_t mmaped_size;
+ size_t offset;
+ size_t mmaped_size;
 };
 
 struct vdec_setbuffer_cmd {
@@ -210,7 +235,6 @@ enum vdec_mpeg2_profile {
 };
 
 enum vdec_mpeg2_level {
-
  VDEC_MPEG2LevelLL = 0x1,
  VDEC_MPEG2LevelML = 0x2,
  VDEC_MPEG2LevelH14 = 0x4,
@@ -396,6 +420,11 @@ enum vdec_output_fromat {
  VDEC_YUV_FORMAT_TILE_4x2 = 0x2
 };
 
+enum vdec_output_order {
+ VDEC_ORDER_DISPLAY = 0x1,
+ VDEC_ORDER_DECODE = 0x2
+};
+
 struct vdec_picsize {
  uint32_t frame_width;
  uint32_t frame_height;
@@ -404,26 +433,28 @@ struct vdec_picsize {
 };
 
 struct vdec_seqheader {
- uint8_t *ptr_seqheader;
- uint32_t seq_header_len;
+ void __user *ptr_seqheader;
+ size_t seq_header_len;
  int pmem_fd;
- uint32_t pmem_offset;
+ size_t pmem_offset;
 };
 
 struct vdec_mberror {
- uint8_t *ptr_errormap;
- uint32_t err_mapsize;
+ void __user *ptr_errormap;
+ size_t err_mapsize;
 };
 
 struct vdec_input_frameinfo {
- uint8_t *bufferaddr;
- uint32_t offset;
- uint32_t datalen;
+ void __user *bufferaddr;
+ size_t offset;
+ size_t datalen;
  uint32_t flags;
  int64_t timestamp;
  void *client_data;
  int pmem_fd;
- uint32_t pmem_offset;
+ size_t pmem_offset;
+ void __user *desc_addr;
+ uint32_t desc_size;
 };
 
 struct vdec_framesize {
@@ -434,15 +465,16 @@ struct vdec_framesize {
 };
 
 struct vdec_output_frameinfo {
- uint8_t *phy_addr;
- uint8_t *bufferaddr;
- uint32_t offset;
- uint32_t len;
+ void __user *bufferaddr;
+ size_t offset;
+ size_t len;
  uint32_t flags;
  int64_t time_stamp;
+ enum vdec_picture pic_type;
  void *client_data;
  void *input_frame_clientdata;
  struct vdec_framesize framesize;
+ enum vdec_interlaced_format interlaced_format;
 };
 
 union vdec_msgdata {
@@ -454,7 +486,27 @@ struct vdec_msginfo {
  uint32_t status_code;
  uint32_t msgcode;
  union vdec_msgdata msgdata;
- uint32_t msgdatasize;
+ size_t msgdatasize;
 };
+
+struct vdec_framerate {
+ unsigned long fps_denominator;
+ unsigned long fps_numerator;
+};
+
+struct vdec_h264_mv{
+ size_t size;
+ int count;
+ int pmem_fd;
+ int offset;
+};
+
+struct vdec_mv_buff_size{
+ int width;
+ int height;
+ int size;
+ int alignment;
+};
+
 #endif
 

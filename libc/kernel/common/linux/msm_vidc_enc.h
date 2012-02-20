@@ -11,11 +11,9 @@
  ****************************************************************************/
 #ifndef _MSM_VIDC_ENC_H_
 #define _MSM_VIDC_ENC_H_
-
 #include <linux/types.h>
 #include <linux/ioctl.h>
 
-#define VEN_S_BASE 0x00000000
 #define VEN_S_SUCCESS (VEN_S_BASE) 
 #define VEN_S_EFAIL (VEN_S_BASE+1) 
 #define VEN_S_EFATAL (VEN_S_BASE+2) 
@@ -93,15 +91,17 @@
 #define VEN_LEVEL_H264_2p2 0x10 
 #define VEN_LEVEL_H264_3 0x11 
 #define VEN_LEVEL_H264_3p1 0x12 
+#define VEN_LEVEL_H264_3p2 0x13 
+#define VEN_LEVEL_H264_4 0x14 
 
-#define VEN_LEVEL_H263_10 0x13 
-#define VEN_LEVEL_H263_20 0x14 
-#define VEN_LEVEL_H263_30 0x15 
-#define VEN_LEVEL_H263_40 0x16 
-#define VEN_LEVEL_H263_45 0x17 
-#define VEN_LEVEL_H263_50 0x18 
-#define VEN_LEVEL_H263_60 0x19 
-#define VEN_LEVEL_H263_70 0x1A 
+#define VEN_LEVEL_H263_10 0x15 
+#define VEN_LEVEL_H263_20 0x16 
+#define VEN_LEVEL_H263_30 0x17 
+#define VEN_LEVEL_H263_40 0x18 
+#define VEN_LEVEL_H263_45 0x19 
+#define VEN_LEVEL_H263_50 0x1A 
+#define VEN_LEVEL_H263_60 0x1B 
+#define VEN_LEVEL_H263_70 0x1C 
 
 #define VEN_ENTROPY_MODEL_CAVLC 1
 #define VEN_ENTROPY_MODEL_CABAC 2
@@ -123,6 +123,7 @@
 #define VEN_RC_VBR_VFR 2
 #define VEN_RC_VBR_CFR 3
 #define VEN_RC_CBR_VFR 4
+#define VEN_RC_CBR_CFR 5
 
 #define VEN_FLUSH_INPUT 1
 #define VEN_FLUSH_OUTPUT 2
@@ -130,6 +131,7 @@
 
 #define VEN_INPUTFMT_NV12 1 
 #define VEN_INPUTFMT_NV21 2 
+#define VEN_INPUTFMT_NV12_16M2KA 3 
 
 #define VEN_ROTATION_0 1 
 #define VEN_ROTATION_90 2 
@@ -147,8 +149,8 @@
 #define VEN_IOCTLBASE_ENC 0x850
 
 struct venc_ioctl_msg{
- void *inputparam;
- void *outputparam;
+ void __user *in;
+ void __user *out;
 };
 
 #define VEN_IOCTL_SET_INTF_VERSION   _IOW(VEN_IOCTLBASE_NENC, 0, struct venc_ioctl_msg)
@@ -189,6 +191,11 @@ struct venc_ioctl_msg{
 
 #define VEN_IOCTL_CMD_STOP _IO(VEN_IOCTLBASE_NENC, 19)
 
+#define VEN_IOCTL_SET_RECON_BUFFER   _IOW(VEN_IOCTLBASE_NENC, 20, struct venc_ioctl_msg)
+#define VEN_IOCTL_FREE_RECON_BUFFER   _IOW(VEN_IOCTLBASE_NENC, 21, struct venc_ioctl_msg)
+
+#define VEN_IOCTL_GET_RECON_BUFFER_SIZE   _IOW(VEN_IOCTLBASE_NENC, 22, struct venc_ioctl_msg)
+
 #define VEN_IOCTL_SET_BASE_CFG   _IOW(VEN_IOCTLBASE_ENC, 1, struct venc_ioctl_msg)
 #define VEN_IOCTL_GET_BASE_CFG   _IOR(VEN_IOCTLBASE_ENC, 2, struct venc_ioctl_msg)
 
@@ -199,7 +206,6 @@ struct venc_ioctl_msg{
 #define VEN_IOCTL_GET_CODEC_PROFILE   _IOR(VEN_IOCTLBASE_ENC, 6, struct venc_ioctl_msg)
 
 #define VEN_IOCTL_SET_PROFILE_LEVEL   _IOW(VEN_IOCTLBASE_ENC, 7, struct venc_ioctl_msg)
-
 #define VEN_IOCTL_GET_PROFILE_LEVEL   _IOR(VEN_IOCTLBASE_ENC, 8, struct venc_ioctl_msg)
 
 #define VEN_IOCTL_SET_SHORT_HDR   _IOW(VEN_IOCTLBASE_ENC, 9, struct venc_ioctl_msg)
@@ -259,6 +265,9 @@ struct venc_ioctl_msg{
 #define VEN_IOCTL_SET_QP_RANGE   _IOW(VEN_IOCTLBASE_ENC, 44, struct venc_ioctl_msg)
 #define VEN_IOCTL_GET_QP_RANGE   _IOR(VEN_IOCTLBASE_ENC, 45, struct venc_ioctl_msg)
 
+#define VEN_IOCTL_GET_NUMBER_INSTANCES   _IOR(VEN_IOCTLBASE_ENC, 46, struct venc_ioctl_msg)
+#define VEN_IOCTL_SET_METABUFFER_MODE   _IOW(VEN_IOCTLBASE_ENC, 47, struct venc_ioctl_msg)
+
 struct venc_switch{
  unsigned char status;
 };
@@ -275,7 +284,7 @@ struct venc_allocatorproperty{
 
 struct venc_bufferpayload{
  unsigned char *pbuffer;
- unsigned long nsize;
+ size_t sz;
  int fd;
  unsigned int offset;
  unsigned int maped_size;
@@ -284,7 +293,7 @@ struct venc_bufferpayload{
 
 struct venc_buffer{
  unsigned char *ptrbuffer;
- unsigned long size;
+ unsigned long sz;
  unsigned long len;
  unsigned long offset;
  long long timestamp;
@@ -307,6 +316,7 @@ struct venc_basecfg{
 struct venc_profile{
  unsigned long profile;
 };
+
 struct ven_profilelevel{
  unsigned long level;
 };
@@ -320,9 +330,12 @@ struct venc_qprange{
  unsigned long maxqp;
  unsigned long minqp;
 };
+
 struct venc_intraperiod{
  unsigned long num_pframes;
+ unsigned long num_bframes;
 };
+
 struct venc_seqheader{
  unsigned char *hdrbufptr;
  unsigned long bufsize;
@@ -371,6 +384,7 @@ struct venc_ratectrlcfg{
 struct venc_voptimingcfg{
  unsigned long voptime_resolution;
 };
+
 struct venc_framerate{
  unsigned long fps_denominator;
  unsigned long fps_numerator;
@@ -398,5 +412,20 @@ struct venc_msg{
  struct venc_buffer buf;
  unsigned long msgdata_size;
 };
+
+struct venc_recon_addr{
+ unsigned char *pbuffer;
+ unsigned long buffer_size;
+ unsigned long pmem_fd;
+ unsigned long offset;
+};
+
+struct venc_recon_buff_size{
+ int width;
+ int height;
+ int size;
+ int alignment;
+};
+
 #endif
 
