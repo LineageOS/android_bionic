@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAQX//+Io\u003d",
+        "filename": "libc/Android.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 129
+      },
+      "writtenOn": "2012-02-21T21:04:03Z",
+      "side": 1,
+      "message": "Is the condition correct?",
+      "revId": "fd1d68fcad8bec32bd744edd42289080f811de1c",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
