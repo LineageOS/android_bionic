@@ -16,6 +16,24 @@
       "revId": "fd1d68fcad8bec32bd744edd42289080f811de1c",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAQX//+IY\u003d",
+        "filename": "libc/Android.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 2024
+      },
+      "writtenOn": "2012-02-22T15:01:44Z",
+      "side": 1,
+      "message": "hmm.\nlook really strange,\nalso i am not able to find strlen.c.arm... (strlen.c is found through )\n\nso seems the failback is string/strlen.c\n\n\nit looks the same is in the ics branch....\n\nanyway testing now with condition true",
+      "parentUuid": "AAAAQX//+Io\u003d",
+      "revId": "fd1d68fcad8bec32bd744edd42289080f811de1c",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }
