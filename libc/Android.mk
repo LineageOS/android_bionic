@@ -371,7 +371,7 @@ libc_common_src_files += \
 	arch-arm/bionic/syscall.S \
 	string/strncmp.c \
 	unistd/socketcalls.c
-ifeq ($(ARCH_ARM_HAVE_ARMV7A),false)
+ifeq ($(ARCH_ARM_HAVE_ARMV7A),true)
 libc_common_src_files += arch-arm/bionic/strlen-armv7.S
 else
 libc_common_src_files += arch-arm/bionic/strlen.c.arm
