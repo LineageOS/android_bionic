@@ -2341,6 +2341,22 @@ static size_t traverse_and_check(mstate m);
     I =  (bindex_t)((K << 1) + ((S >> (K + (TREEBIN_SHIFT-1)) & 1)));\
   }\
 }
+#elif defined(__GNUC__) && defined(__ARM_ARCH__) && __ARM_ARCH__ >= 7
+#define compute_tree_index(S, I)\
+{\
+  size_t X = S >> TREEBIN_SHIFT;\
+  if (X == 0)\
+    I = 0;\
+  else if (X > 0xFFFF)\
+    I = NTREEBINS-1;\
+  else {\
+    unsigned int K;\
+    __asm__ ("rbit %0, %1\n"\
+             "clz %0, %0"\
+             : "=r" (K) : "r" (X));\
+    I = (bindex_t)((K << 1) + ((S >> (K + (TREEBIN_SHIFT-1)) & 1)));\
+  }\
+}
 #else /* GNUC */
 #define compute_tree_index(S, I)\
 {\
