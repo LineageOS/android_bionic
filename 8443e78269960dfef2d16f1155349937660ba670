@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAARH///BQ\u003d",
+        "filename": "libc/arch-arm/bionic/memcmp.S",
+        "patchSetId": 3
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1579
+      },
+      "writtenOn": "2012-03-13T19:19:48Z",
+      "side": 1,
+      "message": "remove these whitespace errors too",
+      "revId": "8443e78269960dfef2d16f1155349937660ba670",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
