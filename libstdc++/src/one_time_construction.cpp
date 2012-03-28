@@ -13,21 +13,30 @@
 #include <bionic_futex.h>
 #include <bionic_atomic_inline.h>
 
+// For arm-eabi, guard variable use the LSB of 32 bit.
+// For others, guard variable use the first byte of guard variable
+// to check guard variable is initialized or not.
+// both pending and waiting are mapped to byte.
+const static uint32_t ready = 0x1;
+const static uint32_t pending = 0x100;
+const static uint32_t waiting = 0x10000;
+
 extern "C" int __cxa_guard_acquire(int volatile * gv)
 {
-    // 0 -> 2, return 1
-    // 2 -> 6, wait and return 0
-    // 6 untouched, wait and return 0
-    // 1 untouched, return 0
+    // 0 -> pending, return 1
+    // pending -> waiting, wait and return 0
+    // waiting: untouched, wait and return 0
+    // ready: untouched, return 0
+
 retry:
-    if (__atomic_cmpxchg(0, 0x2, gv) == 0) {
+    if (__atomic_cmpxchg(0, pending, gv) == 0) {
         ANDROID_MEMBAR_FULL();
         return 1;
     }
-    __atomic_cmpxchg(0x2, 0x6, gv); // Indicate there is a waiter
-    __futex_wait(gv, 0x6, NULL);
+    __atomic_cmpxchg(pending, waiting, gv); // Indicate there is a waiter
+    __futex_wait(gv, waiting, NULL);
 
-    if(*gv != 1) // __cxa_guard_abort was called, let every thread try since there is no return code for this condition
+    if(*gv != ready) // __cxa_guard_abort was called, let every thread try since there is no return code for this condition
         goto retry;
 
     ANDROID_MEMBAR_FULL();
@@ -36,14 +45,15 @@ retry:
 
 extern "C" void __cxa_guard_release(int volatile * gv)
 {
-    // 2 -> 1
-    // 6 -> 1, and wake
+    // pending -> ready
+    // waiting -> ready, and wake
+
     ANDROID_MEMBAR_FULL();
-    if (__atomic_cmpxchg(0x2, 0x1, gv) == 0) {
+    if (__atomic_cmpxchg(pending, ready, gv) == 0) {
         return;
     }
 
-    *gv = 0x1;
+    *gv = ready;
     __futex_wake(gv, 0x7fffffff);
 }
 
