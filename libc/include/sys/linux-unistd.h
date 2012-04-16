@@ -200,6 +200,7 @@ int              delete_module (const char*, unsigned int);
 int              klogctl (int, char *, int);
 int              sysinfo (struct sysinfo *);
 int              personality (unsigned long);
+int              unshare (int);
 int              futex (void *, int, int, void *, void *, int);
 int              epoll_create (int size);
 int              epoll_ctl (int epfd, int op, int fd, struct epoll_event *event);
