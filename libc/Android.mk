@@ -550,6 +550,7 @@ ifeq ($(TARGET_ARCH),arm)
       libc_common_cflags += -DPLDOFFS=$(TARGET_KRAIT_BIONIC_PLDOFFS)
       libc_common_cflags += -DPLDTHRESH=$(TARGET_KRAIT_BIONIC_PLDTHRESH)
       libc_common_cflags += -DPLDSIZE=$(TARGET_KRAIT_BIONIC_PLDSIZE)
+      libc_common_cflags += -DBBTHRESH=$(TARGET_KRAIT_BIONIC_BBTHRESH)
     endif
   endif
   ifeq ($(TARGET_CORTEX_CACHE_LINE_32),true)
