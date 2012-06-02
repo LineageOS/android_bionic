@@ -313,6 +313,15 @@ static void free_info(soinfo *si)
     freelist = si;
 }
 
+#ifndef LINKER_TEXT_BASE
+#error "linker's makefile must define LINKER_TEXT_BASE"
+#endif
+#ifndef LINKER_AREA_SIZE
+#error "linker's makefile must define LINKER_AREA_SIZE"
+#endif
+#define LINKER_BASE ((LINKER_TEXT_BASE) & 0xfff00000)
+#define LINKER_TOP  (LINKER_BASE + (LINKER_AREA_SIZE))
+
 const char *addr_to_name(unsigned addr)
 {
     soinfo *si;
@@ -321,6 +330,10 @@ const char *addr_to_name(unsigned addr)
         if((addr >= si->base) && (addr < (si->base + si->size))) {
             return si->name;
         }
+    }
+
+    if((addr >= LINKER_BASE) && (addr < LINKER_TOP)){
+        return "linker";
     }
 
     return "";
@@ -341,10 +354,12 @@ _Unwind_Ptr dl_unwind_find_exidx(_Unwind_Ptr pc, int *pcount)
     soinfo *si;
     unsigned addr = (unsigned)pc;
 
-    for (si = solist; si != 0; si = si->next){
-        if ((addr >= si->base) && (addr < (si->base + si->size))) {
-            *pcount = si->ARM_exidx_count;
-            return (_Unwind_Ptr)(si->base + (unsigned long)si->ARM_exidx);
+    if ((addr < LINKER_BASE) || (addr >= LINKER_TOP)) {
+        for (si = solist; si != 0; si = si->next){
+            if ((addr >= si->base) && (addr < (si->base + si->size))) {
+                *pcount = si->ARM_exidx_count;
+                return (_Unwind_Ptr)(si->base + (unsigned long)si->ARM_exidx);
+            }
         }
     }
    *pcount = 0;
@@ -405,33 +420,6 @@ static Elf32_Sym *_elf_lookup(soinfo *si, unsigned hash, const char *name)
     return NULL;
 }
 
-/*
- * Essentially the same method as _elf_lookup() above, but only
- * searches for LOCAL symbols
- */
-static Elf32_Sym *_elf_lookup_local(soinfo *si, unsigned hash, const char *name)
-{
-    Elf32_Sym *symtab = si->symtab;
-    const char *strtab = si->strtab;
-    unsigned n = hash % si->nbucket;;
-
-    TRACE_TYPE(LOOKUP, "%5d LOCAL SEARCH %s in %s@0x%08x %08x %d\n", pid,
-               name, si->name, si->base, hash, hash % si->nbucket);
-    for(n = si->bucket[hash % si->nbucket]; n != 0; n = si->chain[n]){
-        Elf32_Sym *s = symtab + n;
-        if (strcmp(strtab + s->st_name, name)) continue;
-        if (ELF32_ST_BIND(s->st_info) != STB_LOCAL) continue;
-        /* no section == undefined */
-        if(s->st_shndx == 0) continue;
-
-        TRACE_TYPE(LOOKUP, "%5d FOUND LOCAL %s in %s (%08x) %d\n", pid,
-                   name, si->name, s->st_value, s->st_size);
-        return s;
-    }
-
-    return NULL;
-}
-
 static unsigned elfhash(const char *_name)
 {
     const unsigned char *name = (const unsigned char *) _name;
@@ -462,17 +450,7 @@ _do_lookup(soinfo *si, const char *name, unsigned *base)
     soinfo *lsi = si;
     int i;
 
-    /* If we are trying to find a symbol for the linker itself, look
-     * for LOCAL symbols first. Avoid using LOCAL symbols for other
-     * shared libraries until we have a better understanding of what
-     * might break by doing so. */
-    if (si->flags & FLAG_LINKER) {
-        s = _elf_lookup_local(si, elf_hash, name);
-        if(s != NULL)
-            goto done;
-    }
-
-    /* Look for symbols in the local scope (the object who is
+    /* Look for symbols in the local scope first (the object who is
      * searching). This happens with C++ templates on i386 for some
      * reason.
      *
@@ -481,7 +459,6 @@ _do_lookup(soinfo *si, const char *name, unsigned *base)
      * dynamic linking.  Some systems return the first definition found
      * and some the first non-weak definition.   This is system dependent.
      * Here we return the first definition found for simplicity.  */
-
     s = _elf_lookup(si, elf_hash, name);
     if(s != NULL)
         goto done;
@@ -1771,10 +1748,10 @@ static int link_image(soinfo *si, unsigned wr_offset)
     DEBUG("%5d si->base = 0x%08x si->flags = 0x%08x\n", pid,
           si->base, si->flags);
 
-    if (si->flags & (FLAG_EXE | FLAG_LINKER)) {
+    if (si->flags & FLAG_EXE) {
         /* Locate the needed program segments (DYNAMIC/ARM_EXIDX) for
-         * linkage info if this is the executable or the linker itself. 
-         * If this was a dynamic lib, that would have been done at load time.
+         * linkage info if this is the executable. If this was a
+         * dynamic lib, that would have been done at load time.
          *
          * TODO: It's unfortunate that small pieces of this are
          * repeated from the load_library routine. Refactor this just
@@ -1793,17 +1770,16 @@ static int link_image(soinfo *si, unsigned wr_offset)
             if (phdr->p_type == PT_LOAD) {
                 /* For the executable, we use the si->size field only in
                    dl_unwind_find_exidx(), so the meaning of si->size
-                   is not the size of the executable; it is the distance
-                   between the load location of the executable and the last
-                   address of the loadable part of the executable.
-                   We use the range [si->base, si->base + si->size) to
-                   determine whether a PC value falls within the executable
-                   section. Of course, if a value is between si->base and
-                   (si->base + phdr->p_vaddr), it's not in the executable
-                   section, but a) we shouldn't be asking for such a value
-                   anyway, and b) if we have to provide an EXIDX for such a
-                   value, then the executable's EXIDX is probably the better
-                   choice.
+                   is not the size of the executable; it is the last
+                   virtual address of the loadable part of the executable;
+                   since si->base == 0 for an executable, we use the
+                   range [0, si->size) to determine whether a PC value
+                   falls within the executable section.  Of course, if
+                   a value is below phdr->p_vaddr, it's not in the
+                   executable section, but a) we shouldn't be asking for
+                   such a value anyway, and b) if we have to provide
+                   an EXIDX for such a value, then the executable's
+                   EXIDX is probably the better choice.
                 */
                 DEBUG_DUMP_PHDR(phdr, "PT_LOAD", pid);
                 if (phdr->p_vaddr + phdr->p_memsz > si->size)
@@ -1813,20 +1789,12 @@ static int link_image(soinfo *si, unsigned wr_offset)
                 if (!(phdr->p_flags & PF_W)) {
                     unsigned _end;
 
-                    if (si->base + phdr->p_vaddr < si->wrprotect_start)
-                        si->wrprotect_start = si->base + phdr->p_vaddr;
-                    _end = (((si->base + phdr->p_vaddr + phdr->p_memsz + PAGE_SIZE - 1) &
+                    if (phdr->p_vaddr < si->wrprotect_start)
+                        si->wrprotect_start = phdr->p_vaddr;
+                    _end = (((phdr->p_vaddr + phdr->p_memsz + PAGE_SIZE - 1) &
                              (~PAGE_MASK)));
                     if (_end > si->wrprotect_end)
                         si->wrprotect_end = _end;
-                    /* Make the section writable just in case we'll have to
-                     * write to it during relocation (i.e. text segment).
-                     * However, we will remember what range of addresses
-                     * should be write protected.
-                     */
-                    mprotect((void *) (si->base + phdr->p_vaddr),
-                             phdr->p_memsz,
-                             PFLAGS_TO_PROT(phdr->p_flags) | PROT_WRITE);
                 }
             } else if (phdr->p_type == PT_DYNAMIC) {
                 if (si->dynamic != (unsigned *)-1) {
@@ -2136,12 +2104,7 @@ int main(int argc, char **argv)
 
 static void * __tls_area[ANDROID_TLS_SLOTS];
 
-/*
- * This code is called after the linker has linked itself and
- * fixed it's own GOT. It is safe to make references to externs
- * and other non-local data at this point.
- */
-static unsigned __linker_init_post_relocation(unsigned **elfdata)
+unsigned __linker_init(unsigned **elfdata)
 {
     static soinfo linker_soinfo;
 
@@ -2249,18 +2212,7 @@ static unsigned __linker_init_post_relocation(unsigned **elfdata)
         vecs += 2;
     }
 
-    /* Compute the value of si->base. We can't rely on the fact that
-     * the first entry is the PHDR because this will not be true
-     * for certain executables (e.g. some in the NDK unit test suite)
-     */
-    int nn;
     si->base = 0;
-    for ( nn = 0; nn < si->phnum; nn++ ) {
-        if (si->phdr[nn].p_type == PT_PHDR) {
-            si->base = (Elf32_Addr) si->phdr - si->phdr[nn].p_vaddr;
-            break;
-        }
-    }
     si->dynamic = (unsigned *)-1;
     si->wrprotect_start = 0xffffffff;
     si->wrprotect_end = 0;
@@ -2328,70 +2280,4 @@ static unsigned __linker_init_post_relocation(unsigned **elfdata)
     TRACE("[ %5d Ready to execute '%s' @ 0x%08x ]\n", pid, si->name,
           si->entry);
     return si->entry;
-}
-
-/*
- * Find the value of AT_BASE passed to us by the kernel. This is the load
- * location of the linker.
- */
-static unsigned find_linker_base(unsigned **elfdata) {
-    int argc = (int) *elfdata;
-    char **argv = (char**) (elfdata + 1);
-    unsigned *vecs = (unsigned*) (argv + argc + 1);
-    while (vecs[0] != 0) {
-        vecs++;
-    }
-
-    /* The end of the environment block is marked by two NULL pointers */
-    vecs++;
-
-    while(vecs[0]) {
-        if (vecs[0] == AT_BASE) {
-            return vecs[1];
-        }
-        vecs += 2;
-    }
-
-    return 0; // should never happen
-}
-
-/*
- * This is the entry point for the linker, called from begin.S. This
- * method is responsible for fixing the linker's own relocations, and
- * then calling __linker_init_post_relocation().
- *
- * Because this method is called before the linker has fixed it's own
- * relocations, any attempt to reference an extern variable, extern
- * function, or other GOT reference will generate a segfault.
- */
-unsigned __linker_init(unsigned **elfdata) {
-    unsigned linker_addr = find_linker_base(elfdata);
-    Elf32_Ehdr *elf_hdr = (Elf32_Ehdr *) linker_addr;
-    Elf32_Phdr *phdr =
-        (Elf32_Phdr *)((unsigned char *) linker_addr + elf_hdr->e_phoff);
-
-    soinfo linker_so;
-    memset(&linker_so, 0, sizeof(soinfo));
-
-    linker_so.base = linker_addr;
-    linker_so.dynamic = (unsigned *) -1;
-    linker_so.phdr = phdr;
-    linker_so.phnum = elf_hdr->e_phnum;
-    linker_so.flags |= FLAG_LINKER;
-    linker_so.wrprotect_start = 0xffffffff;
-    linker_so.wrprotect_end = 0;
-
-    if (link_image(&linker_so, 0)) {
-        // It would be nice to print an error message, but if the linker
-        // can't link itself, there's no guarantee that we'll be able to
-        // call write() (because it involves a GOT reference).
-        //
-        // This situation should never occur unless the linker itself
-        // is corrupt.
-        exit(-1);
-    }
-
-    // We have successfully fixed our own relocations. It's safe to run
-    // the main part of the linker now.
-    return __linker_init_post_relocation(elfdata);
 }
