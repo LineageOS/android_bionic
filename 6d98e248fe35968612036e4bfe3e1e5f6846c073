@@ -1,0 +1,8 @@
+Change-Id: I6d98e248fe35968612036e4bfe3e1e5f6846c073
+Code-Review+2: Steve Kondik <shade@chemlab.org>
+Verified+1: Steve Kondik <shade@chemlab.org>
+Submitted-by: Steve Kondik <shade@chemlab.org>
+Submitted-at: Sat, 02 Jun 2012 16:49:51 +0400
+Reviewed-on: http://review.cyanogenmod.com/16974
+Project: CyanogenMod/android_bionic
+Branch: refs/heads/ics
