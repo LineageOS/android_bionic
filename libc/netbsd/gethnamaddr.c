@@ -653,14 +653,14 @@ gethostbyaddr(const void *addr,
 	assert(addr != NULL);
 
 	if (af == AF_INET6 && len == IN6ADDRSZ &&
-	    (IN6_IS_ADDR_LINKLOCAL((const struct in6_addr *)(const void *)uaddr) ||
-	     IN6_IS_ADDR_SITELOCAL((const struct in6_addr *)(const void *)uaddr))) {
+	    (IN6_IS_ADDR_LINKLOCAL((const struct in6_addr *)addr) ||
+	     IN6_IS_ADDR_SITELOCAL((const struct in6_addr *)addr))) {
 		h_errno = HOST_NOT_FOUND;
 		return NULL;
 	}
 	if (af == AF_INET6 && len == IN6ADDRSZ &&
-	    (IN6_IS_ADDR_V4MAPPED((const struct in6_addr *)(const void *)uaddr) ||
-	     IN6_IS_ADDR_V4COMPAT((const struct in6_addr *)(const void *)uaddr))) {
+	    (IN6_IS_ADDR_V4MAPPED((const struct in6_addr *)addr) ||
+	     IN6_IS_ADDR_V4COMPAT((const struct in6_addr *)addr))) {
 		/* Unmap. */
 		addr += IN6ADDRSZ - INADDRSZ;
 		uaddr += IN6ADDRSZ - INADDRSZ;
