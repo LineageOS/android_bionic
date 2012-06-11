@@ -1,0 +1,9 @@
+Change-Id: Ie16d95e60ac89e7b6940b60991515f0e80647e03
+Code-Review+2: Ricardo Cerqueira <cyanogenmod@cerqueira.org>
+Verified+1: Ricardo Cerqueira <cyanogenmod@cerqueira.org>
+Code-Review+1: Bernhard Rosenkraenzer <Bernhard.Rosenkranzer@linaro.org>
+Submitted-by: Ricardo Cerqueira <cyanogenmod@cerqueira.org>
+Submitted-at: Mon, 11 Jun 2012 18:33:40 +0400
+Reviewed-on: http://review.cyanogenmod.com/17356
+Project: CyanogenMod/android_bionic
+Branch: refs/heads/ics
