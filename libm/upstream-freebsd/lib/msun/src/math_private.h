@@ -723,6 +723,16 @@ irintl(long double x)
 #define	__ieee754_remainderf remainderf
 #define	__ieee754_scalbf scalbf
 
+#if defined(KRAIT_NEON_OPTIMIZATION) || defined(QCOM_NEON_OPTIMIZATION)
+int	__kernel_rem_pio2(double*,double*,int,int,int) __attribute__((pcs("aapcs-vfp")));
+double	__full_ieee754_pow(double,double);
+#ifndef INLINE_REM_PIO2
+int	__ieee754_rem_pio2(double,double*) __attribute__((pcs("aapcs-vfp")));
+#endif
+double	__kernel_sin(double,double,int) __attribute__((pcs("aapcs-vfp")));
+double	__kernel_cos(double,double) __attribute__((pcs("aapcs-vfp")));
+double	__kernel_tan(double,double,int) __attribute__((pcs("aapcs-vfp")));
+#else
 /* fdlibm kernel function */
 int	__kernel_rem_pio2(double*,double*,int,int,int);
 
@@ -733,6 +743,8 @@ int	__ieee754_rem_pio2(double,double*);
 double	__kernel_sin(double,double,int);
 double	__kernel_cos(double,double);
 double	__kernel_tan(double,double,int);
+#endif
+
 double	__ldexp_exp(double,int);
 #ifdef _COMPLEX_H
 double complex __ldexp_cexp(double complex,int);
