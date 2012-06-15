@@ -112,6 +112,7 @@
     XX(__aeabi_i2f)          \
     XX(__aeabi_l2d)          \
     XX(__aeabi_l2f)          \
+    XX(__aeabi_llsl)         \
     XX(__aeabi_lmul)         \
     XX(__aeabi_ui2d)         \
     XX(__aeabi_ui2f)         \
@@ -120,7 +121,7 @@
     XX(__cmpdf2)             \
     XX(__divdf3)             \
     XX(__divsf3)             \
-    XX(__eqdf2)             \
+    XX(__eqdf2)              \
     XX(__extendsfdf2)        \
     XX(__fixdfsi)            \
     XX(__fixsfsi)            \
