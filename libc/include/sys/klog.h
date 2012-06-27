@@ -42,7 +42,7 @@ __BEGIN_DECLS
 #define KLOG_ENABLE     7
 #define KLOG_SETLEVEL   8
 #define KLOG_UNREADSIZE 9
-#define KLOG_WRITE      10
+#define KLOG_SIZE      10
 
 extern int klogctl(int, char *, int);
 
