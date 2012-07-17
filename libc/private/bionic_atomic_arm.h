@@ -45,10 +45,10 @@
             "\n" \
             "adr r3, 6f\n" \
             "bx  r3\n" \
-            ".thumb" \
+            ".thumb\n" \
         "6:\n"
 
-#  define __ATOMIC_CLOBBERS   "r3"  /* list of clobbered registers */
+#  define __ATOMIC_CLOBBERS   "r3",  /* list of clobbered registers */
 
 /* Warn the user that ARM mode should really be preferred! */
 #  warning Rebuilding this source file in ARM mode is highly recommended for performance!!
