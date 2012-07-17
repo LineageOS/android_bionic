@@ -31,7 +31,7 @@
 #include <machine/cpu-features.h>
 #include <machine/asm.h>
 
-#if defined(__ARM_NEON__)
+#if defined(__ARM_NEON__) && !defined(ARCH_ARM_USE_NON_NEON_MEMCPY)
 #if defined(KRAIT_NEON_OPTIMIZATION)
 	/*
 	 * These can be overridden in:
@@ -534,7 +534,7 @@ ENTRY(memcpy)
 END(memcpy)
 #endif  /* CORTEX_CACHE_LINE_32 */
 #endif  /* !SCORPION_NEON_OPTIMIZATION */
-#else   /* __ARM_ARCH__ < 7 */
+#else   /* __ARM_NEON__ && !ARCH_ARM_USE_NON_NEON_MEMCPY */
 
 
 		/*
@@ -888,4 +888,4 @@ copy_last_3_and_return:
 END(memcpy)
 
 
-#endif    /* __ARM_ARCH__ < 7 */
+#endif    /* __ARM_NEON__ && !ARCH_ARM_USE_NON_NEON_MEMCPY */
