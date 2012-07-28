@@ -50,7 +50,7 @@
 #endif
 	.thumb
 
-#if defined(__ARM_NEON__)
+#if defined(__ARM_NEON__) && !defined(ARCH_ARM_USE_NON_NEON_MEMCPY)
 @ ---------------------------------------------------------------------------
 	.thumb_func
 	.p2align 4,,15
