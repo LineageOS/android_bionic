@@ -135,6 +135,9 @@ __bionic_memory_barrier(void)
  *
  * LDREX/STREX are only available starting from ARMv6
  */
+
+#ifndef(ARM_ARCH_V6)
+
 #ifdef __ARM_HAVE_LDREX_STREX
 __ATOMIC_INLINE__ int
 __bionic_cmpxchg(int32_t old_value, int32_t new_value, volatile int32_t* ptr)
@@ -175,6 +178,7 @@ __bionic_cmpxchg(int32_t old_value, int32_t new_value, volatile int32_t* ptr)
     return __kernel_cmpxchg(old_value, new_value, ptr);
 }
 #endif /* !__ARM_HAVE_LDREX_STREX */
+#endif /* ARM_ARCH_V6 */
 
 /* Swap operation, without any explicit barriers.
  * There are again two similar cases to consider:
