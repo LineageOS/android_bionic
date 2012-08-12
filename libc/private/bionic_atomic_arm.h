@@ -135,6 +135,8 @@ __bionic_memory_barrier(void)
  *
  * LDREX/STREX are only available starting from ARMv6
  */
+
+#if defined(ARM_ARCH_V6)
 #ifdef __ARM_HAVE_LDREX_STREX
 __ATOMIC_INLINE__ int
 __bionic_cmpxchg(int32_t old_value, int32_t new_value, volatile int32_t* ptr)
