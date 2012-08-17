@@ -49,4 +49,3 @@ struct sync_fence_info_data {
 #define SYNC_IOC_MERGE _IOWR(SYNC_IOC_MAGIC, 1, struct sync_merge_data)
 #define SYNC_IOC_FENCE_INFO _IOWR(SYNC_IOC_MAGIC, 2,  struct sync_fence_info_data)
 #endif
-
