@@ -13,10 +13,6 @@
 static char rcsid[] = "$FreeBSD: src/lib/msun/src/e_pow.c,v 1.11 2005/02/04 18:26:06 das Exp $";
 #endif
 
-#if defined(KRAIT_NEON_OPTIMIZATION) || defined(SPARROW_NEON_OPTIMIZATION)
-double pow_neon(double x, double y);
-#endif
-
 /* __ieee754_pow(x,y) return x**y
  *
  *		      n
@@ -65,6 +61,14 @@ double pow_neon(double x, double y);
 #include "math.h"
 #include "math_private.h"
 
+#if defined(KRAIT_NEON_OPTIMIZATION) || defined(SPARROW_NEON_OPTIMIZATION)
+#if defined(KRAIT_NO_AAPCS_VFP_MODE)
+double pow_neon(double x, double y);
+#else
+double pow_neon(double x, double y, int32_t lx, int32_t hx) __attribute__((pcs("aapcs-vfp")));
+#endif
+#endif
+
 static const double
 bp[] = {1.0, 1.5,},
 dp_h[] = { 0.0, 5.84962487220764160156e-01,}, /* 0x3FE2B803, 0x40000000 */
@@ -112,12 +116,32 @@ __ieee754_pow(double x, double y)
 	ix = hx&0x7fffffff;  iy = hy&0x7fffffff;
 
     /* y==zero: x**0 = 1 */
-	if((iy|ly)==0) return one; 	
 
-    /* +-NaN return x+y */
-	if(ix > 0x7ff00000 || ((ix==0x7ff00000)&&(lx!=0)) ||
-	   iy > 0x7ff00000 || ((iy==0x7ff00000)&&(ly!=0))) 
-		return x+y;	
+    if (ly == 0) {
+        if (hy == ly) {
+            /* y==0.0, x**0 = 1 */
+            return one;
+        }
+        else if (iy > 0x7ff00000) {
+            /* y is NaN, return x+y (NaN) */
+            return x+y;
+        }
+    }
+    else if (iy >= 0x7ff00000) {
+        /* y is NaN, return x+y (NaN) */
+        return x+y;
+    }
+
+    if (lx == 0) {
+        if (ix > 0x7ff00000) {
+            /* x is NaN, return x+y (NaN) */
+            return x+y;
+        }
+    }
+    else if (ix >= 0x7ff00000) {
+        /* x is NaN, return x+y (NaN) */
+        return x+y;
+    }
 
     /* determine if y is an odd int when x < 0
      * yisint = 0	... y is not an integer
@@ -207,7 +231,11 @@ __ieee754_pow(double x, double y)
 	    t2 = v-(t1-u);
 #if defined(KRAIT_NEON_OPTIMIZATION) || defined(SPARROW_NEON_OPTIMIZATION)
 	} else if (ix <= 0x40100000 && iy <= 0x40100000 && hy > 0 && hx > 0) {
+#if defined(KRAIT_NO_AAPCS_VFP_MODE)
 		return pow_neon(x,y);
+#else
+		return pow_neon(x,y,lx,hx);
+#endif
 #endif
 	} else {
 	    double ss,s2,s_h,s_l,t_h,t_l;
