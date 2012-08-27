@@ -179,6 +179,12 @@ libm_common_src_files += \
 
 libm_common_src_files += fake_long_double.c
 
+  ifeq ($(TARGET_CPU_VARIANT),krait)
+    libm_common_src_files += \
+	  arm/e_pow.S
+    libm_common_cflags += -DKRAIT_NEON_OPTIMIZATION -fno-if-conversion
+  endif
+
 # TODO: on Android, "long double" is "double".
 #    upstream-freebsd/lib/msun/src/e_acosl.c \
 #    upstream-freebsd/lib/msun/src/e_asinl.c \
