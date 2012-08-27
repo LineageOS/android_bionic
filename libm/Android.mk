@@ -165,7 +165,7 @@ ifeq ($(TARGET_ARCH),arm)
   ifeq ($(TARGET_USE_KRAIT_BIONIC_OPTIMIZATION),true)
     libm_common_src_files += \
 	  arm/e_pow.S
-    libm_common_cflags += -DKRAIT_NEON_OPTIMIZATION
+    libm_common_cflags += -DKRAIT_NEON_OPTIMIZATION -fno-if-conversion
   endif
 
   libm_common_includes = $(LOCAL_PATH)/arm
