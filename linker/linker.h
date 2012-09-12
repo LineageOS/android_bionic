@@ -169,7 +169,6 @@ struct soinfo
     int has_text_relocations;
 };
 
-
 extern soinfo libdl_info;
 
 
