@@ -500,6 +500,7 @@ register const int      doextend;
 
             if (lseek(fid, off, SEEK_SET) < 0) {
                 XLOG(( "tzload: could not seek to %d in '%s'\n", off, DATAFILE ));
+                close(fid);
                 return -1;
             }
         }
