@@ -1,0 +1,12 @@
+Change-Id: I79911e416e4edb4ec47c71e0e89da92cb72415b9
+Code-Review+2: Danny Baumann <dannybaumann@web.de>
+Verified+1: Danny Baumann <dannybaumann@web.de>
+Code-Review+1: Jim Huang <jserv@0xlab.org>
+Code-Review+1: Yanuar Harry <ai.the.smarties.physics@gmail.com>
+Code-Review+1: Yuliyan Lesev <jlesev@gmail.com>
+Code-Review+1: Andriy Podanenko <podarokua@gmail.com>
+Submitted-by: Danny Baumann <dannybaumann@web.de>
+Submitted-at: Tue, 18 Sep 2012 02:37:14 -0400
+Reviewed-on: http://review.cyanogenmod.com/13778
+Project: CyanogenMod/android_bionic
+Branch: refs/heads/gingerbread
