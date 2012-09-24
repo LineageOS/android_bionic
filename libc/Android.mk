@@ -458,15 +458,18 @@ endif # !arm
 # Define some common cflags
 # ========================================================
 libc_common_cflags := \
-    -DWITH_ERRLIST \
-    -DANDROID_CHANGES \
-    -D_LIBC=1 \
-    -DFLOATING_POINT \
-    -DINET6 \
-    -I$(LOCAL_PATH)/private \
-    -DPOSIX_MISTAKE \
-    -DLOG_ON_HEAP_ERROR \
-    -std=gnu99
+		-DWITH_ERRLIST			\
+		-DANDROID_CHANGES		\
+		-DUSE_LOCKS 			\
+		-DREALLOC_ZERO_BYTES_FREES 	\
+		-D_LIBC=1 			\
+		-DSOFTFLOAT                     \
+		-DFLOATING_POINT		\
+		-DINET6 \
+		-I$(LOCAL_PATH)/private \
+		-DUSE_DL_PREFIX \
+		-DPOSIX_MISTAKE \
+                -DLOG_ON_HEAP_ERROR \
 
 ifeq ($(BOARD_USES_QCOM_HARDWARE),true)
 libc_common_cflags += -DQCOM_HARDWARE
