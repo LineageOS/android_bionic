@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAY3///QY\u003d",
+        "filename": "libc/include/sys/klog.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 431
+      },
+      "writtenOn": "2012-10-09T02:45:56Z",
+      "side": 1,
+      "message": "Personally I\u0027d maintain the column-like look the stuff over these ones has. Just a nitpick :)",
+      "revId": "079b2a514a003070e8b58ae9b4244516df6ed22d",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
