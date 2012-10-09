@@ -16,6 +16,24 @@
       "revId": "079b2a514a003070e8b58ae9b4244516df6ed22d",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAY3///IM\u003d",
+        "filename": "libc/include/sys/klog.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 2793
+      },
+      "writtenOn": "2012-10-09T19:38:02Z",
+      "side": 1,
+      "message": "Probably best to keep it as-is considering that this is exactly as it was merged to AOSP.",
+      "parentUuid": "AAAAY3///QY\u003d",
+      "revId": "079b2a514a003070e8b58ae9b4244516df6ed22d",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }
