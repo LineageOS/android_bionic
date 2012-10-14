@@ -554,6 +554,10 @@ endif
 #
 libc_crt_target_cflags += -I$(LOCAL_PATH)/private
 
+ifeq ($(BOARD_USE_NASTY_PTHREAD_CREATE_HACK),true)
+  libc_common_cflags += -DNASTY_PTHREAD_CREATE_HACK
+endif
+
 ifeq ($(TARGET_ARCH),arm)
 libc_crt_target_cflags += -DCRT_LEGACY_WORKAROUND
 endif
