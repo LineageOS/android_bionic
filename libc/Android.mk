@@ -412,6 +412,18 @@ ifneq (, $(filter true,$(TARGET_USE_KRAIT_BIONIC_OPTIMIZATION) $(TARGET_USE_SPAR
  endif # !TARGET_USE_KRAIT_BIONIC_OPTIMIZATION
 endif # !TARGET_USE_SCORPION_BIONIC_OPTIMIZATION
 
+# If the kernel supports kernel user helpers for gettimeofday, use
+# that instead.
+ifeq ($(KERNEL_HAS_GETTIMEOFDAY_HELPER),true)
+  libc_common_src_files := $(filter-out arch-arm/syscalls/gettimeofday.S,$(libc_common_src_files))
+  libc_common_src_files := $(filter-out arch-arm/syscalls/clock_gettime.S,$(libc_common_src_files))
+  libc_common_src_files += \
+	arch-arm/bionic/gettimeofday.c \
+	arch-arm/bionic/gettimeofday_syscall.S \
+	arch-arm/bionic/clock_gettime.c \
+	arch-arm/bionic/clock_gettime_syscall.S
+endif # KERNEL_HAS_GETTIMEOFDAY_HELPER
+
 # These files need to be arm so that gdbserver
 # can set breakpoints in them without messing
 # up any thumb code.
