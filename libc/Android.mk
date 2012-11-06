@@ -437,10 +437,11 @@ libc_common_src_files += \
 	arch-x86/string/strncmp_wrapper.S \
 	arch-x86/string/strlen_wrapper.S \
 	string/strcpy.c \
+	bionic/memmove_words.c \
 	bionic/pthread-atfork.c \
 	bionic/pthread-rwlocks.c \
 	bionic/pthread-timers.c \
-	bionic/ptrace.c
+	bionic/ptrace.c 
 
 libc_static_common_src_files += \
         bionic/pthread.c \
