@@ -18,6 +18,34 @@ ifneq ($(BUILD_TINY_ANDROID), true)
 
 LOCAL_PATH := $(call my-dir)
 
+# -----------------------------------------------------------------------------
+# Benchmarks.
+# -----------------------------------------------------------------------------
+
+benchmark_c_flags = \
+    -O2 \
+    -Wall -Wextra \
+    -Werror \
+
+benchmark_src_files = \
+    benchmark_main.cpp \
+    string_benchmark.cpp \
+
+# Build benchmarks for the device (with bionic's .so). Run with:
+#   adb shell bionic-benchmarks
+include $(CLEAR_VARS)
+LOCAL_MODULE := bionic-benchmarks
+LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
+LOCAL_CFLAGS += $(benchmark_c_flags)
+LOCAL_C_INCLUDES += external/stlport/stlport bionic/ bionic/libstdc++/include
+LOCAL_SHARED_LIBRARIES += libstlport
+LOCAL_SRC_FILES := $(benchmark_src_files)
+include $(BUILD_EXECUTABLE)
+
+# -----------------------------------------------------------------------------
+# Unit tests.
+# -----------------------------------------------------------------------------
+
 test_src_files = \
     getcwd_test.cpp \
     pthread_test.cpp \
@@ -29,7 +57,7 @@ test_dynamic_ldflags = -Wl,--export-dynamic -Wl,-u,DlSymTestFunction
 test_dynamic_src_files = \
     dlopen_test.cpp \
 
-# Build for the device (with bionic's .so). Run with:
+# Build tests for the device (with bionic's .so). Run with:
 #   adb shell /data/nativetest/bionic-unit-tests/bionic-unit-tests
 include $(CLEAR_VARS)
 LOCAL_MODULE := bionic-unit-tests
@@ -39,7 +67,7 @@ LOCAL_SHARED_LIBRARIES += libdl
 LOCAL_SRC_FILES := $(test_src_files) $(test_dynamic_src_files)
 include $(BUILD_NATIVE_TEST)
 
-# Build for the device (with bionic's .a). Run with:
+# Build tests for the device (with bionic's .a). Run with:
 #   adb shell /data/nativetest/bionic-unit-tests-static/bionic-unit-tests-static
 include $(CLEAR_VARS)
 LOCAL_MODULE := bionic-unit-tests-static
