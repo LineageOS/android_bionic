@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAa3//92M\u003d",
+        "filename": "libc/Android.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 440,
+      "author": {
+        "id": 32
+      },
+      "writtenOn": "2012-11-10T10:34:50Z",
+      "side": 1,
+      "message": "Use tabs here and follow the local style.",
+      "revId": "3d55b10f57625719066d95fa71f9f02c7a20a345",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
