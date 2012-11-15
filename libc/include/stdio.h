@@ -482,7 +482,7 @@ __END_DECLS
 
 #if defined(__BIONIC_FORTIFY_INLINE)
 
-__BIONIC_FORTIFY_INLINE
+__BIONIC_FORTIFY_INLINE_WITHOUT_ALWAYS
 __attribute__((__format__ (printf, 3, 0)))
 __attribute__((__nonnull__ (3)))
 int vsnprintf(char *dest, size_t size, const char *format, __va_list ap)
