@@ -75,7 +75,7 @@ echo "Compacting $latest_version..."
 javac -d . \
     $bionic_zoneinfo_tools_dir/ZoneCompactor.java \
     $bionic_zoneinfo_tools_dir/ZoneInfo.java
-java -classpath . ZoneCompactor setup data
+java ZoneCompactor setup data
 
 echo "Updating bionic to $latest_version..."
 mv zoneinfo.dat zoneinfo.idx $bionic_zoneinfo_dir
