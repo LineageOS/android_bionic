@@ -367,19 +367,11 @@ __get_nproc_conf(void)
     const char*  p;
     int          count = 0;
 
-#ifdef QCOM_HARDWARE
-    if (line_parser_init(parser, "/sys/devices/system/cpu/present") < 0)
-#else
     if (line_parser_init(parser, "/proc/cpuinfo") < 0)
-#endif
         return 1;
 
     while ((p = line_parser_gets(parser))) {
-#ifdef QCOM_HARDWARE
-        if ( sscanf(p, "0-%d", &count) == 1 )
-#else
         if ( !memcmp(p, "processor", 9) )
-#endif
             count += 1;
     }
     return (count < 1) ? 1 : count;
@@ -393,19 +385,11 @@ __get_nproc_onln(void)
     const char*  p;
     int          count = 0;
 
-#ifdef QCOM_HARDWARE
-    if (line_parser_init(parser, "/sys/devices/system/cpu/present") < 0)
-#else
     if (line_parser_init(parser, "/proc/stat") < 0)
-#endif
         return 1;
 
     while ((p = line_parser_gets(parser))) {
-#ifdef QCOM_HARDWARE
-        if ( sscanf(p, "0-%d", &count) == 1 )
-#else
         if ( !memcmp(p, "cpu", 3) && isdigit(p[3]) )
-#endif
             count += 1;
     }
     return (count < 1) ? 1 : count;
