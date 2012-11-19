@@ -34,13 +34,33 @@
 #include <elf.h>
 #include <sys/exec_elf.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include <link.h>
+
 #undef PAGE_MASK
 #undef PAGE_SIZE
 #define PAGE_SIZE 4096
-#define PAGE_MASK 4095
+#define PAGE_MASK (PAGE_SIZE-1)
+
+/* Convenience macros to make page address/offset computations more explicit */
+
+/* Returns the address of the page starting at address 'x' */
+#define PAGE_START(x)  ((x) & ~PAGE_MASK)
+
+/* Returns the offset of address 'x' in its memory page, i.e. this is the
+ * same than 'x' - PAGE_START(x) */
+#define PAGE_OFFSET(x) ((x) & PAGE_MASK)
+
+/* Returns the address of the next page after address 'x', unless 'x' is
+ * itself at the start of a page. Equivalent to:
+ *
+ *  (x == PAGE_START(x)) ? x : PAGE_START(x)+PAGE_SIZE
+ */
+#define PAGE_END(x)    PAGE_START((x) + (PAGE_SIZE-1))
 
 void debugger_init();
-const char *addr_to_name(unsigned addr);
 
 /* magic shared structures that GDB knows about */
 
@@ -52,16 +72,6 @@ struct link_map
     struct link_map * l_next;
     struct link_map * l_prev;
 };
-
-/* needed for dl_iterate_phdr to be passed to the callbacks provided */
-struct dl_phdr_info
-{
-    Elf32_Addr dlpi_addr;
-    const char *dlpi_name;
-    const Elf32_Phdr *dlpi_phdr;
-    Elf32_Half dlpi_phnum;
-};
-
 
 // Values for r_debug->state
 enum {
@@ -90,8 +100,8 @@ typedef struct soinfo soinfo;
 
 struct soinfo
 {
-    const char name[SOINFO_NAME_LEN];
-    Elf32_Phdr *phdr;
+    char name[SOINFO_NAME_LEN];
+    const Elf32_Phdr *phdr;
     int phnum;
     unsigned entry;
     unsigned base;
@@ -101,8 +111,8 @@ struct soinfo
 
     unsigned *dynamic;
 
-    unsigned wrprotect_start;
-    unsigned wrprotect_end;
+    unsigned unused2; // DO NOT USE, maintained for compatibility
+    unsigned unused3; // DO NOT USE, maintained for compatibility
 
     soinfo *next;
     unsigned flags;
@@ -134,48 +144,59 @@ struct soinfo
     void (*init_func)(void);
     void (*fini_func)(void);
 
-#ifdef ANDROID_ARM_LINKER
+#if defined(ANDROID_ARM_LINKER)
     /* ARM EABI section used for stack unwinding. */
     unsigned *ARM_exidx;
     unsigned ARM_exidx_count;
+#elif defined(ANDROID_MIPS_LINKER)
+#if 0
+     /* not yet */
+     unsigned *mips_pltgot
 #endif
+     unsigned mips_symtabno;
+     unsigned mips_local_gotno;
+     unsigned mips_gotsym;
+#endif /* ANDROID_*_LINKER */
 
     unsigned refcount;
     struct link_map linkmap;
 
     int constructors_called;
 
-    Elf32_Addr gnu_relro_start;
-    unsigned gnu_relro_len;
-
+    /* When you read a virtual address from the ELF file, add this
+     * value to get the corresponding address in the process' address space */
+    Elf32_Addr load_bias;
+    int has_text_relocations;
 };
 
 
 extern soinfo libdl_info;
 
-#ifdef ANDROID_ARM_LINKER
 
+#include <asm/elf.h>
+
+#if defined(ANDROID_ARM_LINKER)
+
+// These aren't defined in <arch-arm/asm/elf.h>.
+#define R_ARM_REL32      3
 #define R_ARM_COPY       20
 #define R_ARM_GLOB_DAT   21
 #define R_ARM_JUMP_SLOT  22
 #define R_ARM_RELATIVE   23
 
-/* According to the AAPCS specification, we only
- * need the above relocations. However, in practice,
- * the following ones turn up from time to time.
- */
-#define R_ARM_ABS32      2
-#define R_ARM_REL32      3
+#elif defined(ANDROID_MIPS_LINKER)
+
+// These aren't defined in <arch-arm/mips/elf.h>.
+#define R_MIPS_JUMP_SLOT       127
+
+#define DT_MIPS_PLTGOT         0x70000032
+#define DT_MIPS_RWPLT          0x70000034
 
 #elif defined(ANDROID_X86_LINKER)
 
-#define R_386_32         1
-#define R_386_PC32       2
-#define R_386_GLOB_DAT   6
-#define R_386_JUMP_SLOT  7
-#define R_386_RELATIVE   8
+// x86 has everything it needs in <arch-arm/x86/elf.h>.
 
-#endif
+#endif /* ANDROID_*_LINKER */
 
 #ifndef DT_INIT_ARRAY
 #define DT_INIT_ARRAY      25
@@ -202,19 +223,17 @@ extern soinfo libdl_info;
 #endif
 
 soinfo *find_library(const char *name);
-unsigned unload_library(soinfo *si);
-Elf32_Sym *lookup_in_library(soinfo *si, const char *name);
 Elf32_Sym *lookup(const char *name, soinfo **found, soinfo *start);
 soinfo *find_containing_library(const void *addr);
-Elf32_Sym *find_containing_symbol(const void *addr, soinfo *si);
 const char *linker_get_error(void);
-void call_constructors_recursive(soinfo *si);
 
-#ifdef ANDROID_ARM_LINKER 
-typedef long unsigned int *_Unwind_Ptr;
-_Unwind_Ptr dl_unwind_find_exidx(_Unwind_Ptr pc, int *pcount);
-#elif defined(ANDROID_X86_LINKER)
-int dl_iterate_phdr(int (*cb)(struct dl_phdr_info *, size_t, void *), void *);
+int soinfo_unload(soinfo* si);
+Elf32_Sym *soinfo_find_symbol(soinfo* si, const void *addr);
+Elf32_Sym *soinfo_lookup(soinfo *si, const char *name);
+void soinfo_call_constructors(soinfo *si);
+
+#ifdef __cplusplus
+};
 #endif
 
 #endif

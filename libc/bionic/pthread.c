@@ -25,31 +25,32 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include <sys/types.h>
-#include <unistd.h>
+
+#include <assert.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <limits.h>
+#include <malloc.h>
+#include <memory.h>
+#include <pthread.h>
 #include <signal.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <sys/atomics.h>
-#include <bionic_tls.h>
 #include <sys/mman.h>
-#include <pthread.h>
-#include <time.h>
-#include "pthread_internal.h"
-#include "thread_private.h"
-#include <limits.h>
-#include <memory.h>
-#include <assert.h>
-#include <malloc.h>
-#include <bionic_futex.h>
-#include <bionic_atomic_inline.h>
 #include <sys/prctl.h>
 #include <sys/stat.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <bionic_pthread.h>
+#include <sys/types.h>
+#include <time.h>
+#include <unistd.h>
+
+#include "bionic_atomic_inline.h"
+#include "bionic_futex.h"
+#include "bionic_pthread.h"
+#include "bionic_tls.h"
+#include "pthread_internal.h"
+#include "thread_private.h"
 
 extern void pthread_debug_mutex_lock_check(pthread_mutex_t *mutex);
 extern void pthread_debug_mutex_unlock_check(pthread_mutex_t *mutex);
@@ -80,6 +81,8 @@ int  __futex_wait_ex(volatile void *ftx, int pshared, int val, const struct time
 
 void ATTRIBUTES _thread_created_hook(pid_t thread_id);
 
+static const int kPthreadInitFailed = 1;
+
 #define PTHREAD_ATTR_FLAG_DETACHED      0x00000001
 #define PTHREAD_ATTR_FLAG_USER_STACK    0x00000002
 
@@ -97,35 +100,16 @@ static const pthread_attr_t gDefaultPthreadAttr = {
     .sched_priority = 0
 };
 
-#define  INIT_THREADS  1
-
-static pthread_internal_t*  gThreadList = NULL;
+static pthread_internal_t* gThreadList = NULL;
 static pthread_mutex_t gThreadListLock = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t gDebuggerNotificationLock = PTHREAD_MUTEX_INITIALIZER;
 
 
-/* we simply malloc/free the internal pthread_internal_t structures. we may
- * want to use a different allocation scheme in the future, but this one should
- * be largely enough
- */
-static pthread_internal_t*
-_pthread_internal_alloc(void)
-{
-    pthread_internal_t*   thread;
-
-    thread = calloc( sizeof(*thread), 1 );
-    if (thread)
-        thread->intern = 1;
-
-    return thread;
-}
-
 static void
-_pthread_internal_free( pthread_internal_t*  thread )
+_pthread_internal_free(pthread_internal_t* thread)
 {
-    if (thread && thread->intern) {
-        thread->intern = 0;  /* just in case */
-        free (thread);
+    if (thread != NULL) {
+        free(thread);
     }
 }
 
@@ -133,8 +117,8 @@ _pthread_internal_free( pthread_internal_t*  thread )
 static void
 _pthread_internal_remove_locked( pthread_internal_t*  thread )
 {
-    thread->next->pref = thread->pref;
-    thread->pref[0]    = thread->next;
+    thread->next->prev = thread->prev;
+    thread->prev[0]    = thread->next;
 }
 
 static void
@@ -146,14 +130,17 @@ _pthread_internal_remove( pthread_internal_t*  thread )
 }
 
 __LIBC_ABI_PRIVATE__ void
-_pthread_internal_add( pthread_internal_t*  thread )
+_pthread_internal_add(pthread_internal_t* thread)
 {
     pthread_mutex_lock(&gThreadListLock);
-    thread->pref = &gThreadList;
-    thread->next = thread->pref[0];
-    if (thread->next)
-        thread->next->pref = &thread->next;
-    thread->pref[0] = thread;
+
+    thread->prev = &gThreadList;
+    thread->next = *(thread->prev);
+    if (thread->next != NULL) {
+        thread->next->prev = &thread->next;
+    }
+    *(thread->prev) = thread;
+
     pthread_mutex_unlock(&gThreadListLock);
 }
 
@@ -194,32 +181,38 @@ void  __init_tls(void**  tls, void*  thread)
 
 
 /*
- * This trampoline is called from the assembly clone() function
+ * This trampoline is called from the assembly _pthread_clone() function.
  */
 void __thread_entry(int (*func)(void*), void *arg, void **tls)
 {
-    int retValue;
-    pthread_internal_t * thrInfo;
-
     // Wait for our creating thread to release us. This lets it have time to
-    // notify gdb about this thread before it starts doing anything.
+    // notify gdb about this thread before we start doing anything.
     //
     // This also provides the memory barrier needed to ensure that all memory
     // accesses previously made by the creating thread are visible to us.
-    pthread_mutex_t * start_mutex = (pthread_mutex_t *)&tls[TLS_SLOT_SELF];
+    pthread_mutex_t* start_mutex = (pthread_mutex_t*) &tls[TLS_SLOT_SELF];
     pthread_mutex_lock(start_mutex);
     pthread_mutex_destroy(start_mutex);
 
-    thrInfo = (pthread_internal_t *) tls[TLS_SLOT_THREAD_ID];
+    pthread_internal_t* thread = (pthread_internal_t*) tls[TLS_SLOT_THREAD_ID];
+    __init_tls(tls, thread);
 
-    __init_tls( tls, thrInfo );
+    if ((thread->internal_flags & kPthreadInitFailed) != 0) {
+        pthread_exit(NULL);
+    }
 
-    pthread_exit( (void*)func(arg) );
+    int result = func(arg);
+    pthread_exit((void*) result);
 }
 
+#include <private/logd.h>
+
 __LIBC_ABI_PRIVATE__
-void _init_thread(pthread_internal_t * thread, pid_t kernel_id, pthread_attr_t * attr, void * stack_base)
+int _init_thread(pthread_internal_t* thread, pid_t kernel_id, pthread_attr_t* attr,
+                 void* stack_base, bool add_to_thread_list)
 {
+    int error = 0;
+
     if (attr == NULL) {
         thread->attr = gDefaultPthreadAttr;
     } else {
@@ -228,40 +221,46 @@ void _init_thread(pthread_internal_t * thread, pid_t kernel_id, pthread_attr_t *
     thread->attr.stack_base = stack_base;
     thread->kernel_id       = kernel_id;
 
-    // set the scheduling policy/priority of the thread
+    // Make a note of whether the user supplied this stack (so we know whether or not to free it).
+    if (attr->stack_base == stack_base) {
+        thread->attr.flags |= PTHREAD_ATTR_FLAG_USER_STACK;
+    }
+
+    // Set the scheduling policy/priority of the thread.
     if (thread->attr.sched_policy != SCHED_NORMAL) {
         struct sched_param param;
         param.sched_priority = thread->attr.sched_priority;
-        sched_setscheduler(kernel_id, thread->attr.sched_policy, &param);
+        if (sched_setscheduler(kernel_id, thread->attr.sched_policy, &param) == -1) {
+            // For back compat reasons, we just warn about possible invalid sched_policy
+            const char* msg = "pthread_create sched_setscheduler call failed: %s\n";
+            __libc_android_log_print(ANDROID_LOG_WARN, "libc", msg, strerror(errno));
+        }
     }
 
     pthread_cond_init(&thread->join_cond, NULL);
     thread->join_count = 0;
-
     thread->cleanup_stack = NULL;
+
+    if (add_to_thread_list) {
+        _pthread_internal_add(thread);
+    }
+
+    return error;
 }
-
-
-/* XXX stacks not reclaimed if thread spawn fails */
-/* XXX stacks address spaces should be reused if available again */
 
 static void *mkstack(size_t size, size_t guard_size)
 {
-    void * stack;
-
     pthread_mutex_lock(&mmap_lock);
 
-    stack = mmap(NULL, size,
-                 PROT_READ | PROT_WRITE,
-                 MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE,
-                 -1, 0);
-
-    if(stack == MAP_FAILED) {
+    int prot = PROT_READ | PROT_WRITE;
+    int flags = MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE;
+    void* stack = mmap(NULL, size, prot, flags, -1, 0);
+    if (stack == MAP_FAILED) {
         stack = NULL;
         goto done;
     }
 
-    if(mprotect(stack, guard_size, PROT_NONE)){
+    if (mprotect(stack, guard_size, PROT_NONE) == -1) {
         munmap(stack, size);
         stack = NULL;
         goto done;
@@ -298,13 +297,7 @@ done:
 int pthread_create(pthread_t *thread_out, pthread_attr_t const * attr,
                    void *(*start_routine)(void *), void * arg)
 {
-    char*   stack;
-    void**  tls;
-    int tid;
-    pthread_mutex_t * start_mutex;
-    pthread_internal_t * thread;
-    int                  madestack = 0;
-    int     old_errno = errno;
+    int old_errno = errno;
 
     /* this will inform the rest of the C library that at least one thread
      * was created. this will enforce certain functions to acquire/release
@@ -315,31 +308,28 @@ int pthread_create(pthread_t *thread_out, pthread_attr_t const * attr,
      */
     __isthreaded = 1;
 
-    thread = _pthread_internal_alloc();
-    if (thread == NULL)
+    pthread_internal_t* thread = calloc(sizeof(*thread), 1);
+    if (thread == NULL) {
         return ENOMEM;
+    }
 
     if (attr == NULL) {
         attr = &gDefaultPthreadAttr;
     }
 
     // make sure the stack is PAGE_SIZE aligned
-    size_t stackSize = (attr->stack_size +
-                        (PAGE_SIZE-1)) & ~(PAGE_SIZE-1);
-
-    if (!attr->stack_base) {
-        stack = mkstack(stackSize, attr->guard_size);
-        if(stack == NULL) {
+    size_t stack_size = (attr->stack_size + (PAGE_SIZE-1)) & ~(PAGE_SIZE-1);
+    uint8_t* stack = attr->stack_base;
+    if (stack == NULL) {
+        stack = mkstack(stack_size, attr->guard_size);
+        if (stack == NULL) {
             _pthread_internal_free(thread);
             return ENOMEM;
         }
-        madestack = 1;
-    } else {
-        stack = attr->stack_base;
     }
 
     // Make room for TLS
-    tls = (void**)(stack + stackSize - BIONIC_TLS_SLOTS*sizeof(void*));
+    void** tls = (void**)(stack + stack_size - BIONIC_TLS_SLOTS*sizeof(void*));
 
     // Create a mutex for the thread in TLS_SLOT_SELF to wait on once it starts so we can keep
     // it from doing anything until after we notify the debugger about it
@@ -347,43 +337,47 @@ int pthread_create(pthread_t *thread_out, pthread_attr_t const * attr,
     // This also provides the memory barrier we need to ensure that all
     // memory accesses previously performed by this thread are visible to
     // the new thread.
-    start_mutex = (pthread_mutex_t *) &tls[TLS_SLOT_SELF];
+    pthread_mutex_t* start_mutex = (pthread_mutex_t*) &tls[TLS_SLOT_SELF];
     pthread_mutex_init(start_mutex, NULL);
     pthread_mutex_lock(start_mutex);
 
     tls[TLS_SLOT_THREAD_ID] = thread;
 
-    tid = __pthread_clone((int(*)(void*))start_routine, tls,
-                CLONE_FILES | CLONE_FS | CLONE_VM | CLONE_SIGHAND
-                | CLONE_THREAD | CLONE_SYSVSEM | CLONE_DETACHED,
-                arg);
+    int flags = CLONE_FILES | CLONE_FS | CLONE_VM | CLONE_SIGHAND |
+                CLONE_THREAD | CLONE_SYSVSEM | CLONE_DETACHED;
+    int tid = __pthread_clone((int(*)(void*))start_routine, tls, flags, arg);
 
-    if(tid < 0) {
-        int  result;
-        if (madestack)
-            munmap(stack, stackSize);
+    if (tid < 0) {
+        int clone_errno = errno;
+        pthread_mutex_unlock(start_mutex);
+        if (stack != attr->stack_base) {
+            munmap(stack, stack_size);
+        }
         _pthread_internal_free(thread);
-        result = errno;
         errno = old_errno;
-        return result;
+        return clone_errno;
     }
 
-    _init_thread(thread, tid, (pthread_attr_t*)attr, stack);
+    int init_errno = _init_thread(thread, tid, (pthread_attr_t*) attr, stack, true);
+    if (init_errno != 0) {
+        // Mark the thread detached and let its __thread_entry run to
+        // completion. (It'll just exit immediately, cleaning up its resources.)
+        thread->internal_flags |= kPthreadInitFailed;
+        thread->attr.flags |= PTHREAD_ATTR_FLAG_DETACHED;
+        pthread_mutex_unlock(start_mutex);
+        errno = old_errno;
+        return init_errno;
+    }
 
-    _pthread_internal_add(thread);
-
-    if (!madestack)
-        thread->attr.flags |= PTHREAD_ATTR_FLAG_USER_STACK;
-
-    // Notify any debuggers about the new thread
+    // Notify any debuggers about the new thread.
     pthread_mutex_lock(&gDebuggerNotificationLock);
     _thread_created_hook(tid);
     pthread_mutex_unlock(&gDebuggerNotificationLock);
 
-    // Let the thread do it's thing
+    // Publish the pthread_t and let the thread run.
+    *thread_out = (pthread_t) thread;
     pthread_mutex_unlock(start_mutex);
 
-    *thread_out = (pthread_t)thread;
     return 0;
 }
 
@@ -593,6 +587,17 @@ void pthread_exit(void * retval)
         _pthread_internal_remove(thread);
         _pthread_internal_free(thread);
     } else {
+        pthread_mutex_lock(&gThreadListLock);
+
+       /* make sure that the thread struct doesn't have stale pointers to a stack that
+        * will be unmapped after the exit call below.
+        */
+        if (!user_stack) {
+            thread->attr.stack_base = NULL;
+            thread->attr.stack_size = 0;
+            thread->tls = NULL;
+        }
+
        /* the join_count field is used to store the number of threads waiting for
         * the termination of this thread with pthread_join(),
         *
@@ -605,7 +610,6 @@ void pthread_exit(void * retval)
         * is gone (as well as its TLS area). when another thread calls pthread_join()
         * on it, it will immediately free the thread and return.
         */
-        pthread_mutex_lock(&gThreadListLock);
         thread->return_value = retval;
         if (thread->join_count > 0) {
             pthread_cond_broadcast(&thread->join_cond);
@@ -1925,8 +1929,8 @@ int pthread_key_create(pthread_key_t *key, void (*destructor_function)(void *))
 
 /* This deletes a pthread_key_t. note that the standard mandates that this does
  * not call the destructor of non-NULL key values. Instead, it is the
- * responsability of the caller to properly dispose of the corresponding data
- * and resources, using any mean it finds suitable.
+ * responsibility of the caller to properly dispose of the corresponding data
+ * and resources, using any means it finds suitable.
  *
  * On the other hand, this function will clear the corresponding key data
  * values in all known threads. this prevents later (invalid) calls to
@@ -1958,7 +1962,9 @@ int pthread_key_delete(pthread_key_t key)
          * similarly, it is possible to have thr->tls == NULL for threads that
          * were just recently created through pthread_create() but whose
          * startup trampoline (__thread_entry) hasn't been run yet by the
-         * scheduler. so check for this too.
+         * scheduler. thr->tls will also be NULL after it's stack has been
+         * unmapped but before the ongoing pthread_join() is finished.
+         * so check for this too.
          */
         if (thr->join_count < 0 || !thr->tls)
             continue;
@@ -2188,7 +2194,7 @@ int  pthread_once( pthread_once_t*  once_control,  void (*init_routine)(void) )
     for (;;) {
         /* Try to atomically set the INITIALIZING flag.
          * This requires a cmpxchg loop, and we may need
-         * to exit prematurely if we detect that 
+         * to exit prematurely if we detect that
          * COMPLETED is now set.
          */
         int32_t  oldval, newval;

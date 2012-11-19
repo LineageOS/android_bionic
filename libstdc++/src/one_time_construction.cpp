@@ -1,19 +1,17 @@
 /*
- * one_time_construction.cpp
- *
  * Copyright 2006 The Android Open Source Project
- *
- * This file contains C++ ABI support functions for one time
- * constructors as defined in the "Run-time ABI for the ARM Architecture"
- * section 4.4.2
  */
 
 #include <stddef.h>
 #include <sys/atomics.h>
 #include <endian.h>
-#include <bionic_futex.h>
-#include <bionic_atomic_inline.h>
+#include <private/bionic_futex.h>
+#include <private/bionic_atomic_inline.h>
 
+// This file contains C++ ABI support functions for one time
+// constructors as defined in the "Run-time ABI for the ARM Architecture"
+// section 4.4.2
+//
 // ARM C++ ABI and Itanium/x86 C++ ABI has different definition for
 // one time construction:
 //

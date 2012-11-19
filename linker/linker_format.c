@@ -172,6 +172,21 @@ vsnprintf(char *buff, size_t bufsize, const char *format, va_list args)
     return format_buffer(buff, bufsize, format, args);
 }
 
+/* The pthread implementation uses snprintf(). If we define it here, we
+ * avoid pulling the stdio vfprintf() implementation into the linker
+ * saving about 19KB of machine code.
+ */
+int
+snprintf(char* buff, size_t bufsize, const char* format, ...)
+{
+    va_list args;
+    int ret;
+    va_start(args, format);
+    ret = vsnprintf(buff, bufsize, format, args);
+    va_end(args);
+    return ret;
+}
+
 #if LINKER_DEBUG
 
 #if !LINKER_DEBUG_TO_LOG
@@ -297,7 +312,7 @@ static int log_vprint(int prio, const char *tag, const char *fmt, va_list  args)
 
 #else /* !CUSTOM_LOG_VPRINT */
 
-extern int __libc_android_log_vprint(int  prio, const char* tag, const char*  format, va_list ap);
+extern "C" int __libc_android_log_vprint(int  prio, const char* tag, const char*  format, va_list ap);
 
 #endif /* !CUSTOM_LOG_VPRINT */
 
@@ -396,20 +411,6 @@ format_integer(char *buffer, size_t buffsize, uint64_t value, int base, int isSi
     }
 
     format_number(buffer, buffsize, value, base, "0123456789");
-}
-
-/* Write an octal into a buffer, assumes buffsize > 2 */
-static void
-format_octal(char *buffer, size_t buffsize, uint64_t value, int isSigned)
-{
-    format_integer(buffer, buffsize, value, 8, isSigned);
-}
-
-/* Write a decimal into a buffer, assumes buffsize > 2 */
-static void
-format_decimal(char *buffer, size_t buffsize, uint64_t value, int isSigned)
-{
-    format_integer(buffer, buffsize, value, 10, isSigned);
 }
 
 /* Write an hexadecimal into a buffer, isCap is true for capital alphas.
