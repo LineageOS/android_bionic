@@ -641,33 +641,35 @@ static int open_library(const char *name)
     return -1;
 }
 
-// Returns 'true' if the library is prelinked or on failure so we error out
-// either way. We no longer support prelinking.
-static bool is_prelinked(int fd, const char* name)
-{
-    struct prelink_info_t {
-        long mmap_addr;
-        char tag[4]; // "PRE ".
-    };
+typedef struct {
+    long mmap_addr;
+    char tag[4]; /* 'P', 'R', 'E', ' ' */
+} prelink_info_t;
 
+/* Returns the requested base address if the library is prelinked,
+ * and 0 otherwise.  */
+static unsigned long
+is_prelinked(int fd, const char *name)
+{
     off_t sz = lseek(fd, -sizeof(prelink_info_t), SEEK_END);
     if (sz < 0) {
-        DL_ERR("lseek failed: %s", strerror(errno));
-        return true;
+        DL_ERR("lseek() failed!");
+        return 0;
     }
 
     prelink_info_t info;
     int rc = TEMP_FAILURE_RETRY(read(fd, &info, sizeof(info)));
     if (rc != sizeof(info)) {
-        DL_ERR("could not read prelink_info_t structure for \"%s\":", name, strerror(errno));
-        return true;
+        WARN("Could not read prelink_info_t structure for `%s`\n", name);
+        return 0;
     }
 
-    if (memcmp(info.tag, "PRE ", 4) == 0) {
-        DL_ERR("prelinked libraries no longer supported: %s", name);
-        return true;
+    if (memcmp(info.tag, "PRE ", 4)) {
+        WARN("`%s` is not a prelinked library\n", name);
+        return 0;
     }
-    return false;
+
+    return (unsigned long)info.mmap_addr;
 }
 
 /* verify_elf_header
@@ -781,10 +783,21 @@ static soinfo* load_library(const char* name)
         return NULL;
     }
 
-    // We no longer support pre-linked libraries.
-    if (is_prelinked(fd.fd, name)) {
-        return NULL;
+    unsigned req_base = (unsigned) is_prelinked(fd.fd, name);
+    if (req_base == (unsigned)-1) {
+        DL_ERR("%5d can't read end of library: %s: %s", pid, name,
+               strerror(errno));
+		return NULL;
     }
+    if (req_base != 0) {
+        TRACE("[ %5d - Prelinked library '%s' requesting base @ 0x%08x ]\n",
+              pid, name, req_base);
+    } else {
+        TRACE("[ %5d - Non-prelinked library '%s' found. ]\n", pid, name);
+    }
+
+    TRACE("[ %5d - '%s' (%s) wants base=0x%08x sz=0x%08x ]\n", pid, name,
+          (req_base ? "prelinked" : "not pre-linked"), req_base, ext_sz);
 
     // Reserve address space for all loadable segments.
     void* load_start = NULL;
@@ -792,6 +805,7 @@ static soinfo* load_library(const char* name)
     Elf32_Addr load_bias = 0;
     ret = phdr_table_reserve_memory(phdr_table,
                                     phdr_count,
+									req_base,
                                     &load_start,
                                     &load_size,
                                     &load_bias);

@@ -61,6 +61,7 @@ phdr_table_get_load_size(const Elf32_Phdr* phdr_table,
 int
 phdr_table_reserve_memory(const Elf32_Phdr* phdr_table,
                           size_t phdr_count,
+                          Elf32_Addr required_base,
                           void** load_start,
                           Elf32_Addr* load_size,
                           Elf32_Addr* load_bias);
