@@ -218,6 +218,8 @@ Elf32_Addr phdr_table_get_load_size(const Elf32_Phdr* phdr_table,
  * Input:
  *   phdr_table    -> program header table
  *   phdr_count    -> number of entries in the tables
+ *   required_base -> for prelinked libraries, mandatory load address
+ *                    of the first loadable segment. 0 otherwise.
  * Output:
  *   load_start    -> first page of reserved address space range
  *   load_size     -> size in bytes of reserved address space range
@@ -229,18 +231,22 @@ Elf32_Addr phdr_table_get_load_size(const Elf32_Phdr* phdr_table,
 int
 phdr_table_reserve_memory(const Elf32_Phdr* phdr_table,
                           size_t phdr_count,
+                          Elf32_Addr required_base,
                           void** load_start,
                           Elf32_Addr* load_size,
                           Elf32_Addr* load_bias)
 {
     Elf32_Addr size = phdr_table_get_load_size(phdr_table, phdr_count);
+
     if (size == 0) {
         errno = EINVAL;
         return -1;
     }
 
     int mmap_flags = MAP_PRIVATE | MAP_ANONYMOUS;
-    void* start = mmap(NULL, size, PROT_NONE, mmap_flags, -1, 0);
+    if (required_base != 0)
+        mmap_flags |= MAP_FIXED;
+    void* start = mmap((void*)required_base, size, PROT_NONE, mmap_flags, -1, 0);
     if (start == MAP_FAILED) {
         return -1;
     }
