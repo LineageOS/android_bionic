@@ -22,7 +22,6 @@
 #include <assert.h>
 #include <sha1.h>
 #include <string.h>
-#include <endian.h>
 
 #if !HAVE_SHA1_H
 
@@ -33,7 +32,8 @@
  * I got the idea of expanding during the round function from SSLeay
  */
 #if BYTE_ORDER == LITTLE_ENDIAN
-# define blk0(i) swap32(block->l[i])
+# define blk0(i) (block->l[i] = (rol(block->l[i],24)&0xFF00FF00) \
+    |(rol(block->l[i],8)&0x00FF00FF))
 #else
 # define blk0(i) block->l[i]
 #endif
@@ -50,15 +50,14 @@
 #define R4(v,w,x,y,z,i) z+=(w^x^y)+blk(i)+0xCA62C1D6+rol(v,5);w=rol(w,30);
 
 typedef union {
-    uint8_t c[SHA1_BLOCK_SIZE];
-    uint32_t l[SHA1_BLOCK_SIZE/4];
+    uint8_t c[64];
+    uint32_t l[16];
 } CHAR64LONG16;
 
 /*
  * Hash a single 512-bit block. This is the core of the algorithm.
  */
-void SHA1Transform(uint32_t state[SHA1_DIGEST_LENGTH/4],
-                   const uint8_t buffer[SHA1_BLOCK_SIZE])
+void SHA1Transform(uint32_t state[5], const uint8_t buffer[64])
 {
     uint32_t a, b, c, d, e;
     CHAR64LONG16 *block;
@@ -72,7 +71,7 @@ void SHA1Transform(uint32_t state[SHA1_DIGEST_LENGTH/4],
 
 #ifdef SHA1HANDSOFF
     block = &workspace;
-    (void)memcpy(block, buffer, SHA1_BLOCK_SIZE);
+    (void)memcpy(block, buffer, 64);
 #else
     block = (CHAR64LONG16 *)(void *)buffer;
 #endif
@@ -126,16 +125,12 @@ void SHA1Init(SHA1_CTX *context)
     assert(context != 0);
 
     /* SHA1 initialization constants */
-    *context = (SHA1_CTX) {
-        .state = {
-            0x67452301,
-            0xEFCDAB89,
-            0x98BADCFE,
-            0x10325476,
-            0xC3D2E1F0,
-        },
-        .count = 0,
-    };
+    context->state[0] = 0x67452301;
+    context->state[1] = 0xEFCDAB89;
+    context->state[2] = 0x98BADCFE;
+    context->state[3] = 0x10325476;
+    context->state[4] = 0xC3D2E1F0;
+    context->count[0] = context->count[1] = 0;
 }
 
 
@@ -145,67 +140,51 @@ void SHA1Init(SHA1_CTX *context)
 void SHA1Update(SHA1_CTX *context, const uint8_t *data, unsigned int len)
 {
     unsigned int i, j;
-    unsigned int partial, done;
-    const uint8_t *src;
 
     assert(context != 0);
     assert(data != 0);
 
-    partial = context->count % SHA1_BLOCK_SIZE;
-    context->count += len;
-    done = 0;
-    src = data;
-
-    if ((partial + len) >= SHA1_BLOCK_SIZE) {
-        if (partial) {
-            done = -partial;
-            memcpy(context->buffer + partial, data, done + SHA1_BLOCK_SIZE);
-            src = context->buffer;
-        }
-        do {
-            SHA1Transform(context->state, src);
-            done += SHA1_BLOCK_SIZE;
-            src = data + done;
-        } while (done + SHA1_BLOCK_SIZE <= len);
-        partial = 0;
+    j = context->count[0];
+    if ((context->count[0] += len << 3) < j)
+	context->count[1] += (len>>29)+1;
+    j = (j >> 3) & 63;
+    if ((j + len) > 63) {
+	(void)memcpy(&context->buffer[j], data, (i = 64-j));
+	SHA1Transform(context->state, context->buffer);
+	for ( ; i + 63 < len; i += 64)
+	    SHA1Transform(context->state, &data[i]);
+	j = 0;
+    } else {
+	i = 0;
     }
-    memcpy(context->buffer + partial, src, len - done);
+    (void)memcpy(&context->buffer[j], &data[i], len - i);
 }
 
 
 /*
  * Add padding and return the message digest.
  */
-void SHA1Final(uint8_t digest[SHA1_DIGEST_LENGTH], SHA1_CTX *context)
+void SHA1Final(uint8_t digest[20], SHA1_CTX *context)
 {
-    uint32_t i, index, pad_len;
-    uint64_t bits;
-    static const uint8_t padding[SHA1_BLOCK_SIZE] = { 0x80, };
+    unsigned int i;
+    uint8_t finalcount[8];
 
     assert(digest != 0);
     assert(context != 0);
 
-#if BYTE_ORDER == LITTLE_ENDIAN
-    bits = swap64(context->count << 3);
-#else
-    bits = context->count << 3;
-#endif
-
-    /* Pad out to 56 mod 64 */
-    index = context->count & 0x3f;
-    pad_len = (index < 56) ? (56 - index) : ((64 + 56) - index);
-    SHA1Update(context, padding, pad_len);
-
-    /* Append length */
-    SHA1Update(context, (const uint8_t *)&bits, sizeof(bits));
+    for (i = 0; i < 8; i++) {
+	finalcount[i] = (uint8_t)((context->count[(i >= 4 ? 0 : 1)]
+	 >> ((3-(i & 3)) * 8) ) & 255);	 /* Endian independent */
+    }
+    SHA1Update(context, (const uint8_t *)"\200", 1);
+    while ((context->count[0] & 504) != 448)
+	SHA1Update(context, (const uint8_t *)"\0", 1);
+    SHA1Update(context, finalcount, 8);  /* Should cause a SHA1Transform() */
 
     if (digest) {
-        for (i = 0; i < SHA1_DIGEST_LENGTH/4; i++)
-#if BYTE_ORDER == LITTLE_ENDIAN
-            ((uint32_t *)digest)[i] = swap32(context->state[i]);
-#else
-            ((uint32_t *)digest)[i] = context->state[i];
-#endif
+	for (i = 0; i < 20; i++)
+	    digest[i] = (uint8_t)
+		((context->state[i>>2] >> ((3-(i & 3)) * 8) ) & 255);
     }
 }
 
