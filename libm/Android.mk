@@ -193,7 +193,9 @@ ifeq ($(TARGET_OS)-$(TARGET_ARCH),linux-x86)
 	i387/s_scalbnl.S \
 	i387/s_scalbn.S \
 	i387/s_scalbnf.S \
-	i387/e_sqrtf.S
+	i387/e_sqrtf.S \
+	src/s_cos.c \
+	src/s_sin.c
 
   libm_common_includes = $(LOCAL_PATH)/i386 $(LOCAL_PATH)/i387
 endif
