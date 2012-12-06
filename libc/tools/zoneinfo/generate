@@ -92,7 +92,7 @@ def upgrade_to(ftp, filename):
   subprocess.check_call(['javac', '-d', '.',
                          '%s/ZoneCompactor.java' % bionic_libc_tools_zoneinfo_dir,
                          '%s/ZoneInfo.java' % bionic_libc_tools_zoneinfo_dir])
-  subprocess.check_call(['java', 'ZoneCompactor', 'setup', 'data'])
+  subprocess.check_call(['java', '-classpath', '.', 'ZoneCompactor', 'setup', 'data'])
 
   print 'Updating bionic from %s to %s...' % (current_tzdata_version(), version)
   # Move the .dat and .idx files...
@@ -116,7 +116,8 @@ ftp.cwd('tz/releases')
 tzdata_filenames = []
 for filename in ftp.nlst():
   if filename.startswith('tzdata20'):
-    tzdata_filenames.append(filename)
+    if filename.endswith('tar.gz'):
+      tzdata_filenames.append(filename)
 tzdata_filenames.sort()
 
 # If you're several releases behind, we'll walk you through the upgrades one by one.

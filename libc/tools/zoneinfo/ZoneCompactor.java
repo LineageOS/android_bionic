@@ -55,11 +55,13 @@ public class ZoneCompactor {
 
         InputStream in = new FileInputStream(inFile);
         byte[] buf = new byte[8192];
+        int length = 0;
         while (true) {
             int nbytes = in.read(buf);
             if (nbytes == -1) {
                 break;
             }
+            length += nbytes;
             out.write(buf, 0, nbytes);
 
             byte[] nret = new byte[ret.length + nbytes];
@@ -67,6 +69,8 @@ public class ZoneCompactor {
             System.arraycopy(buf, 0, nret, ret.length, nbytes);
             ret = nret;
         }
+	if (length%4 != 0)
+            out.write(new byte[] {00,00,00,00}, 0, 4 - length % 4);
         out.flush();
         return ret;
     }
@@ -105,6 +109,9 @@ public class ZoneCompactor {
                     lengths.put(s, new Integer((int)length));
 
                     start += length;
+                    if (start % 4 != 0)
+                        start += 4 - start % 4;
+
                     byte[] data = copyFile(f, zoneInfo);
 
                     TimeZone tz = ZoneInfo.make(s, data);
