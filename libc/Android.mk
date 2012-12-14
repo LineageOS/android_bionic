@@ -380,7 +380,6 @@ libc_common_src_files += \
 	arch-arm/bionic/memcmp.S \
 	arch-arm/bionic/memcmp16.S \
 	arch-arm/bionic/memcpy.S \
-	arch-arm/bionic/memset.S \
 	arch-arm/bionic/setjmp.S \
 	arch-arm/bionic/sigsetjmp.S \
 	arch-arm/bionic/strcpy.S \
@@ -443,6 +442,29 @@ libc_arch_static_src_files := \
 
 libc_arch_dynamic_src_files := \
 	arch-arm/bionic/exidx_dynamic.c
+
+ifeq ($(ARCH_ARM_HAVE_ARMV7A),true)
+libc_common_src_files += \
+	arch-arm/bionic/armv7/memchr.S \
+	arch-arm/bionic/armv7/memset.S \
+	arch-arm/bionic/armv7/strchr.S \
+	arch-arm/bionic/armv7/strcpy.c \
+	arch-arm/bionic/armv7/strlen.S
+else
+libc_common_src_files += \
+	string/memchr.c \
+	arch-arm/bionic/memset.S \
+	string/strchr.c \
+	arch-arm/bionic/strcpy.S \
+	arch-arm/bionic/strlen.c.arm
+endif
+
+else # arm
+
+libc_common_src_files += \
+	string/memchr.c \
+	string/strchr.c
+	
 endif # arm
 
 ifeq ($(TARGET_ARCH),x86)
@@ -625,6 +647,9 @@ else # !arm
         libc_crt_target_cflags += -DUSE_SSSE3=1
     endif
   endif # x86
+  ifeq ($(ARCH_ARM_HAVE_ARMV7A),true)
+    libc_common_cflags += -DNEON_UNALIGNED_ACCESS -DNEON_MEMCPY_ALIGNMENT_DIVIDER=224
+  endif
 endif # !arm
 
 ifeq ($(TARGET_ARCH),x86)
