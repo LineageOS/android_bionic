@@ -508,6 +508,9 @@ libc_common_src_files += \
 	arch-mips/string/mips_strlen.c
 
 libc_common_src_files += \
+	bionic/memmove_words.c
+
+libc_common_src_files += \
 	string/bcopy.c \
 	string/memcmp.c \
 	string/strcmp.c \
