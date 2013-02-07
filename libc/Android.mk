@@ -401,7 +401,7 @@ libc_common_src_files += \
 	arch-arm/bionic/memmove.S \
 	bionic/memmove_words.c
 else
-ifneq (, $(filter true,$(TARGET_USE_KRAIT_BIONIC_OPTIMIZATION) $(TARGET_USE_SPARROW_BIONIC_OPTIMIZATION)))
+ifeq ($(ARCH_ARM_HAVE_ARMV7A),true)
  libc_common_src_files += \
 	arch-arm/bionic/memmove.S
  else # Other ARM
@@ -617,6 +617,9 @@ ifeq ($(TARGET_ARCH),arm)
   endif
   ifeq ($(TARGET_CORTEX_CACHE_LINE_32),true)
     libc_common_cflags += -DCORTEX_CACHE_LINE_32
+  endif
+  ifeq ($(ARCH_ARM_HAVE_ARMV7A),true)
+    libc_common_cflags += -DNEON_UNALIGNED_ACCESS -DNEON_MEMSET_DIVIDER=132
   endif
 else # !arm
   ifeq ($(TARGET_ARCH),x86)
