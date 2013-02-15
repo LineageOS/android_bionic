@@ -591,6 +591,17 @@ ifeq ($(TARGET_ARCH),arm)
     libc_common_cflags += -DARCH_ARM_USE_NON_NEON_MEMCPY
   endif
 
+
+  ifeq ($(ARCH_ARM_HAVE_NEON_UNALIGNED_ACCESS),true)
+    libc_common_cflags += -DNEON_UNALIGNED_ACCESS
+  endif
+  ifneq ($(ARCH_ARM_NEON_MEMCPY_ALIGNMENT_DIVIDER),)
+    libc_common_cflags += -DNEON_MEMCPY_ALIGNMENT_DIVIDER=$(ARCH_ARM_NEON_MEMCPY_ALIGNMENT_DIVIDER)
+  endif
+  ifneq ($(ARCH_ARM_NEON_MEMSET_DIVIDER),)
+    libc_common_cflags += -DNEON_MEMSET_DIVIDER=$(ARCH_ARM_NEON_MEMSET_DIVIDER)
+  endif
+
   # Add in defines to activate SCORPION_NEON_OPTIMIZATION
   ifeq ($(TARGET_USE_SCORPION_BIONIC_OPTIMIZATION),true)
     libc_common_cflags += -DSCORPION_NEON_OPTIMIZATION
