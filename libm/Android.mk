@@ -160,7 +160,7 @@ ifeq ($(TARGET_ARCH),arm)
 	src/s_scalbnf.c \
 	src/e_sqrtf.c
 
-  ifeq ($(ARCH_ARM_HAVE_ARMV7A),true)
+  ifeq ($(ARCH_ARM_HAVE_NEON),true)
     libm_common_src_files += \
       arm/e_pow.S
   endif
