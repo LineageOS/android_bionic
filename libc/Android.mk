@@ -408,7 +408,7 @@ libc_common_src_files += \
 	arch-arm/bionic/memmove.S \
 	bionic/memmove_words.c
 else
-ifneq (, $(filter true,$(TARGET_USE_KRAIT_BIONIC_OPTIMIZATION) $(TARGET_USE_SPARROW_BIONIC_OPTIMIZATION)))
+ifeq ($(ARCH_ARM_HAVE_NEON),true)
  libc_common_src_files += \
 	arch-arm/bionic/memmove.S
  else # Other ARM
