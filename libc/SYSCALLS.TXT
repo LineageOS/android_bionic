@@ -197,6 +197,7 @@ int     __statfs64:statfs64(const char *, size_t, struct statfs *)  266,268,255
 long    unshare(unsigned long)  337,310,303
 
 # time
+int           adjtimex (struct timex *) 124
 int           pause ()                       29
 int           gettimeofday(struct timeval*, struct timezone*)       78
 int           settimeofday(const struct timeval*, const struct timezone*)   79
@@ -208,6 +209,7 @@ int           clock_getres(clockid_t clk_id, struct timespec *res)   264,266,264
 int           clock_nanosleep(clockid_t clock_id, int flags, const struct timespec *req, struct timespec *rem)  265,267,265
 int           getitimer(int, const struct itimerval *)   105
 int           setitimer(int, const struct itimerval *, struct itimerval *)  104
+int           stime(time_t *) 25
 int           __timer_create:timer_create(clockid_t clockid, struct sigevent *evp, timer_t *timerid)    257,259,257
 int           __timer_settime:timer_settime(timer_t, int, const struct itimerspec*, struct itimerspec*) 258,260,258
 int           __timer_gettime:timer_gettime(timer_t, struct itimerspec*)                                259,261,259
@@ -289,6 +291,8 @@ int     klogctl:syslog(int, char *, int)   103
 int     sysinfo(struct sysinfo *)  116
 int     personality(unsigned long)  136
 long    perf_event_open(struct perf_event_attr *attr_uptr, pid_t pid, int cpu, int group_fd, unsigned long flags) 364
+int     swapoff(const char *) 115
+int     swapon(const char *, int) 87
 
 # futex
 int	futex(void *, int, int, void *, void *, int) 240,240,238
