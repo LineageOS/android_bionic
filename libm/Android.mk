@@ -177,6 +177,11 @@ ifeq ($(TARGET_ARCH),arm)
   endif
 
   libm_common_includes = $(LOCAL_PATH)/arm
+
+else
+  libm_common_src_files += \
+	src/s_cos.c \
+	src/s_sin.c
 endif
 
 ifeq ($(TARGET_OS)-$(TARGET_ARCH),linux-x86)
@@ -196,9 +201,7 @@ ifeq ($(TARGET_ARCH),mips)
 	src/s_scalbln.c \
 	src/s_scalbn.c \
 	src/s_scalbnf.c \
-	src/e_sqrtf.c \
-	src/s_sin.c \
-	src/s_cos.c
+	src/e_sqrtf.c
 
   libm_common_includes = $(LOCAL_PATH)/mips
   # Need to build *rint* functions
@@ -216,8 +219,6 @@ LOCAL_SRC_FILES := \
 LOCAL_ARM_MODE := arm
 LOCAL_C_INCLUDES += $(libm_common_includes)
 LOCAL_CFLAGS := $(libm_common_cflags)
-
-LOCAL_CFLAGS:= $(libm_common_cflags)
 
 LOCAL_MODULE:= libm
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
@@ -238,8 +239,6 @@ LOCAL_ARM_MODE := arm
 
 LOCAL_C_INCLUDES += $(libm_common_includes)
 LOCAL_CFLAGS := $(libm_common_cflags)
-
-LOCAL_CFLAGS:= $(libm_common_cflags)
 
 LOCAL_MODULE:= libm
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
