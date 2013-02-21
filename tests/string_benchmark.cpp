@@ -110,3 +110,24 @@ static void BM_strlen(int iters, int nbytes) {
   delete[] s;
 }
 BENCHMARK(BM_strlen)->AT_COMMON_SIZES;
+
+static void BM_strcmp(int iters, int nbytes) {
+  StopBenchmarkTiming();
+  char* src = new char[nbytes]; char* dst = new char[nbytes];
+  memset(src, 'x', nbytes);
+  memset(dst, 'x', nbytes);
+  StartBenchmarkTiming();
+
+  volatile int c __attribute__((unused)) = 0;
+  for (int i = 0; i < iters; i++) {
+    c += strcmp(dst, src);
+  }
+
+  StopBenchmarkTiming();
+  SetBenchmarkBytesProcessed(int64_t(iters) * int64_t(nbytes));
+  delete[] src;
+  delete[] dst;
+}
+BENCHMARK(BM_strcmp)->AT_COMMON_SIZES;
+
+
