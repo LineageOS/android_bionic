@@ -83,7 +83,7 @@ strcmp:
         cmpcs   r2, r3
         beq     1b
         subs    r0, r2, r3
-        RETURN
+        bx      lr
 
 
 #elif (__ARM_ARCH__ >= 6)
@@ -504,7 +504,7 @@ compute_return_value:
 #ifndef __thumb2__
         ldr     r4, [sp], #4
 #endif
-        RETURN
+        bx      lr
 
 
 strcmp_unaligned:
@@ -622,7 +622,7 @@ strcmp_unaligned:
         cmpcs   r2, r3
         beq     1b
         sub     r0, r2, r3
-        RETURN
+        bx      lr
 
 2:
         str     r5, [sp, #-4]!
@@ -766,7 +766,7 @@ strcmp_unaligned:
         //ldmfd   sp!, {r4, r5}
         ldr     r4, [sp], #4
         ldr     r5, [sp], #4
-        RETURN
+        bx      lr
 8:
         and     r2, t1, LSB
         and     r0, w2, LSB
@@ -781,7 +781,7 @@ strcmp_unaligned:
         //ldmfd   sp!, {r4, r5}
         ldr     r4, [sp], #4
         ldr     r5, [sp], #4
-        RETURN
+        bx      lr
 
 #endif /* !(defined (_ISA_THUMB_2) || defined (_ISA_ARM_6)
             defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED) ||
