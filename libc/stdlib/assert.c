@@ -39,8 +39,10 @@ __assert(const char *file, int line, const char *failedexpr)
 	(void)fprintf(stderr,
 	    "assertion \"%s\" failed: file \"%s\", line %d\n",
 	    failedexpr, file, line);
+#ifndef NDEBUG
 	abort();
 	/* NOTREACHED */
+#endif
 }
 
 void
@@ -49,6 +51,8 @@ __assert2(const char *file, int line, const char *func, const char *failedexpr)
 	(void)fprintf(stderr,
 	    "assertion \"%s\" failed: file \"%s\", line %d, function \"%s\"\n",
 	    failedexpr, file, line, func);
+#ifndef NDEBUG
 	abort();
 	/* NOTREACHED */
+#endif
 }
