@@ -184,11 +184,21 @@ libm_common_src_files += fake_long_double.c
 	  arm/e_sqrt.S
     libm_common_cflags += -DKRAIT_NEON_OPTIMIZATION -fno-if-conversion
   else
-    libm_common_src_files += \
-	  upstream-freebsd/lib/msun/src/s_cos.c \
-	  upstream-freebsd/lib/msun/src/s_sin.c \
-	  upstream-freebsd/lib/msun/src/e_sqrtf.c \
-	  upstream-freebsd/lib/msun/src/e_sqrt.c
+      ifeq ($(TARGET_USE_QCOM_BIONIC_OPTIMIZATION),true)
+        libm_common_src_files += \
+	      arm/e_pow.S \
+	      arm/s_cos.S \
+	      arm/s_sin.S \
+	      arm/e_sqrtf.S \
+	      arm/e_sqrt.S
+        libm_common_cflags += -DKRAIT_NEON_OPTIMIZATION -fno-if-conversion
+      else
+        libm_common_src_files += \
+	      upstream-freebsd/lib/msun/src/s_cos.c \
+	      upstream-freebsd/lib/msun/src/s_sin.c \
+	      upstream-freebsd/lib/msun/src/e_sqrtf.c \
+	      upstream-freebsd/lib/msun/src/e_sqrt.c
+      endif
   endif
 
 # TODO: on Android, "long double" is "double".
