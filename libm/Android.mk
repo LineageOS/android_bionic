@@ -62,8 +62,6 @@ libm_common_src_files += \
     upstream-freebsd/lib/msun/src/e_scalbf.c \
     upstream-freebsd/lib/msun/src/e_sinh.c \
     upstream-freebsd/lib/msun/src/e_sinhf.c \
-    upstream-freebsd/lib/msun/src/e_sqrt.c \
-    upstream-freebsd/lib/msun/src/e_sqrtf.c \
     upstream-freebsd/lib/msun/src/k_cos.c \
     upstream-freebsd/lib/msun/src/k_cosf.c \
     upstream-freebsd/lib/msun/src/k_exp.c \
@@ -173,7 +171,7 @@ libm_common_src_files += \
     upstream-freebsd/lib/msun/src/w_cabs.c \
     upstream-freebsd/lib/msun/src/w_cabsf.c \
     upstream-freebsd/lib/msun/src/w_drem.c \
-    upstream-freebsd/lib/msun/src/w_dremf.c \
+    upstream-freebsd/lib/msun/src/w_dremf.c
 
 libm_common_src_files += fake_long_double.c
 
@@ -181,12 +179,16 @@ libm_common_src_files += fake_long_double.c
     libm_common_src_files += \
 	  arm/e_pow.S	\
 	  arm/s_cos.S	\
-	  arm/s_sin.S
+	  arm/s_sin.S	\
+	  arm/e_sqrtf.S	\
+	  arm/e_sqrt.S
     libm_common_cflags += -DKRAIT_NEON_OPTIMIZATION -fno-if-conversion
   else
     libm_common_src_files += \
 	  upstream-freebsd/lib/msun/src/s_cos.c \
-	  upstream-freebsd/lib/msun/src/s_sin.c
+	  upstream-freebsd/lib/msun/src/s_sin.c \
+	  upstream-freebsd/lib/msun/src/e_sqrtf.c \
+	  upstream-freebsd/lib/msun/src/e_sqrt.c
   endif
 
 # TODO: on Android, "long double" is "double".
