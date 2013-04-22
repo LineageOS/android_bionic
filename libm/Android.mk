@@ -53,7 +53,6 @@ libm_common_src_files:= \
 	src/e_scalbf.c \
 	src/e_sinh.c \
 	src/e_sinhf.c \
-	src/e_sqrt.c \
 	src/k_cos.c \
 	src/k_cosf.c \
 	src/k_rem_pio2.c \
@@ -157,24 +156,27 @@ ifeq ($(TARGET_ARCH),arm)
 	src/e_ldexpf.c \
 	src/s_scalbln.c \
 	src/s_scalbn.c \
-	src/s_scalbnf.c \
-	src/e_sqrtf.c
+	src/s_scalbnf.c
 
   ifeq ($(TARGET_USE_KRAIT_BIONIC_OPTIMIZATION),true)
     libm_common_src_files += \
 	  arm/e_pow.S \
 	  arm/s_cos.S \
-	  arm/s_sin.S
+	  arm/s_sin.S \
+	  arm/e_sqrtf.S \
+	  arm/e_sqrt.S
     libm_common_cflags += -DKRAIT_NEON_OPTIMIZATION -fno-if-conversion
   else
     libm_common_src_files += \
 	  src/s_cos.c \
-	  src/s_sin.c
+	  src/s_sin.c \
+	  src/e_sqrtf.c \
+	  src/e_sqrt.c
   endif
 
   ifeq ($(TARGET_USE_SPARROW_BIONIC_OPTIMIZATION),true)
     libm_common_src_files += \
-          arm/e_pow.S
+	  arm/e_pow.S
     libm_common_cflags += -DSPARROW_NEON_OPTIMIZATION
   endif
 
@@ -189,7 +191,8 @@ ifeq ($(TARGET_ARCH),arm)
 else
   libm_common_src_files += \
 	src/s_cos.c \
-	src/s_sin.c
+	src/s_sin.c \
+	src/e_sqrt.c
 endif
 
 ifeq ($(TARGET_OS)-$(TARGET_ARCH),linux-x86)
