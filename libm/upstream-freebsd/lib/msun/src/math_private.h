@@ -433,6 +433,7 @@ irintl(long double x)
 
 #if defined(KRAIT_NEON_OPTIMIZATION)
 int	__kernel_rem_pio2(double*,double*,int,int,int) __attribute__((pcs("aapcs-vfp")));
+double	__full_ieee754_pow(double,double);
 #ifndef INLINE_REM_PIO2
 int	__ieee754_rem_pio2(double,double*) __attribute__((pcs("aapcs-vfp")));
 #endif

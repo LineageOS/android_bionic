@@ -33,6 +33,7 @@
 #define int_1               d29
 #define double_1            d28
 @ sign and 2^int_n fixup:
+#define maxrange            r12
 #define expadjustment       d7
 #define literals            r10
 @ Values which exist within both polynomial implementations:
@@ -99,12 +100,17 @@
 #define vmov_f32            fconsts
 #define vmovne_f64          fconstdne
 
-ENTRY(pow_neon)
+#define KRAIT_NO_AAPCS_VFP_MODE
+
+ENTRY(pow)
 #if defined(KRAIT_NO_AAPCS_VFP_MODE)
      @ ARM ABI has inputs coming in via r registers, lets move to a d register
     vmov            x, x_lw, x_hw
 #endif
     push            {r4, r5, r6, r7, r8, r9, r10, lr}
+
+    movw            maxrange, #0x0000
+    movt            maxrange, #0x4010
 
     @ pre-staged bp values
     vldr            bpa, .LbpA
@@ -175,6 +181,11 @@ ENTRY(pow_neon)
 
 .Lxle2to3over5:
 
+    cmp             x_hw, maxrange
+    cmpls           y_hw, maxrange
+    movt            maxrange, #0x3f00
+    cmpls           maxrange, x_hw
+
     @ load log2 polynomial series constants
     vldm            literals!, {k4, k3, k2, k1}
 
@@ -185,6 +196,8 @@ ENTRY(pow_neon)
 
     vsub.f64        u, ss, bp
     vadd.f64        v, ss, bp
+
+    bhi             .LuseFullImpl
 
     @ s = (x-1)/(x+1)
     vdiv.f64        ss, u, v
@@ -392,6 +405,10 @@ ENTRY(pow_neon)
     @ leave directly returning whatever is in Return_lw and Return_hw
     pop             {r4, r5, r6, r7, r8, r9, r10, pc}
 
+.LuseFullImpl:
+    pop             {r4, r5, r6, r7, r8, r9, r10, lr}
+    b               __full_ieee754_pow
+
 .align 6
 .LliteralTable:
 @ Least-sqares tuned constants for 11th order (log2((1+s)/(1-s)):
@@ -439,4 +456,4 @@ ENTRY(pow_neon)
 
 .Ltwoto1o4: @ 2^1/4
     .long       0x0a31b715, 0x3ff306fe
-END(pow_neon)
+END(pow)
