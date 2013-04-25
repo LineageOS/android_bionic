@@ -258,6 +258,7 @@ cpackl(long double x, long double y)
 
 /* fdlibm kernel function */
 #if defined(KRAIT_NEON_OPTIMIZATION)
+double	__full_ieee754_pow(double,double);
 int	__ieee754_rem_pio2(double,double*) __attribute__((pcs("aapcs-vfp")));
 double	__kernel_sin(double,double,int) __attribute__((pcs("aapcs-vfp")));
 double	__kernel_cos(double,double) __attribute__((pcs("aapcs-vfp")));
