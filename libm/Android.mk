@@ -160,13 +160,9 @@ ifeq ($(TARGET_ARCH),arm)
 	src/s_scalbnf.c \
 	src/e_sqrtf.c
 
-  ifeq ($(ARCH_ARM_HAVE_NEON),true)
-    libm_common_src_files += \
-      arm/e_pow.S
-  endif
-
   ifeq ($(TARGET_USE_KRAIT_BIONIC_OPTIMIZATION),true)
     libm_common_src_files += \
+	  arm/e_pow.S \
 	  arm/s_cos.S \
 	  arm/s_sin.S
     libm_common_cflags += -DKRAIT_NEON_OPTIMIZATION -fno-if-conversion
@@ -174,6 +170,18 @@ ifeq ($(TARGET_ARCH),arm)
     libm_common_src_files += \
 	  src/s_cos.c \
 	  src/s_sin.c
+  endif
+
+  ifeq ($(TARGET_USE_SPARROW_BIONIC_OPTIMIZATION),true)
+    libm_common_src_files += \
+          arm/e_pow.S
+    libm_common_cflags += -DSPARROW_NEON_OPTIMIZATION
+  endif
+
+  ifeq ($(TARGET_USE_SCORPION_BIONIC_OPTIMIZATION),true)
+    libm_common_src_files += \
+          arm/e_pow.S
+    libm_common_cflags += -DSCORPION_NEON_OPTIMIZATION
   endif
 
   libm_common_includes = $(LOCAL_PATH)/arm

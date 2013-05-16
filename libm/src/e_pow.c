@@ -61,7 +61,7 @@ static char rcsid[] = "$FreeBSD: src/lib/msun/src/e_pow.c,v 1.11 2005/02/04 18:2
 #include "math.h"
 #include "math_private.h"
 
-#if defined(__ARM_NEON__)
+#if defined(KRAIT_NEON_OPTIMIZATION) || defined(SPARROW_NEON_OPTIMIZATION) || defined(SCORPION_NEON_OPTIMIZATION)
 #if defined(KRAIT_NO_AAPCS_VFP_MODE)
 double pow_neon(double x, double y);
 #else
@@ -229,7 +229,7 @@ __ieee754_pow(double x, double y)
 	    t1 = u+v;
 	    SET_LOW_WORD(t1,0);
 	    t2 = v-(t1-u);
-#if defined(__ARM_NEON__)
+#if defined(KRAIT_NEON_OPTIMIZATION) || defined(SPARROW_NEON_OPTIMIZATION) || defined(SCORPION_NEON_OPTIMIZATION)
 	} else if (ix <= 0x40100000 && iy <= 0x40100000 && hy > 0 && hx > 0) {
 #if defined(KRAIT_NO_AAPCS_VFP_MODE)
 		return pow_neon(x,y);
