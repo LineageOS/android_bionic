@@ -158,13 +158,9 @@ ifeq ($(TARGET_ARCH),arm)
 	src/s_scalbn.c \
 	src/s_scalbnf.c
 
-  ifeq ($(ARCH_ARM_HAVE_NEON),true)
-    libm_common_src_files += \
-      arm/e_pow.S
-  endif
-
   ifeq ($(TARGET_USE_KRAIT_BIONIC_OPTIMIZATION),true)
     libm_common_src_files += \
+	  arm/e_pow.S \
 	  arm/s_cos.S \
 	  arm/s_sin.S \
 	  arm/e_sqrtf.S \
@@ -178,8 +174,13 @@ ifeq ($(TARGET_ARCH),arm)
 	  src/e_sqrt.c
   endif
 
-  libm_common_includes = $(LOCAL_PATH)/arm
+  ifeq ($(TARGET_USE_SPARROW_BIONIC_OPTIMIZATION),true)
+    libm_common_src_files += \
+	  arm/e_pow.S
+    libm_common_cflags += -DSPARROW_NEON_OPTIMIZATION
+  endif
 
+  libm_common_includes = $(LOCAL_PATH)/arm
 else
   libm_common_src_files += \
 	src/s_cos.c \
@@ -223,6 +224,8 @@ LOCAL_ARM_MODE := arm
 LOCAL_C_INCLUDES += $(libm_common_includes)
 LOCAL_CFLAGS := $(libm_common_cflags)
 
+LOCAL_CFLAGS:= $(libm_common_cflags)
+
 LOCAL_MODULE:= libm
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
 
@@ -242,6 +245,8 @@ LOCAL_ARM_MODE := arm
 
 LOCAL_C_INCLUDES += $(libm_common_includes)
 LOCAL_CFLAGS := $(libm_common_cflags)
+
+LOCAL_CFLAGS:= $(libm_common_cflags)
 
 LOCAL_MODULE:= libm
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
