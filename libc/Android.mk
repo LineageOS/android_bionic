@@ -385,6 +385,7 @@ libc_common_src_files += \
 	arch-arm/bionic/strcpy.S \
 	arch-arm/bionic/strcmp.S \
 	arch-arm/bionic/syscall.S \
+	arch-arm/bionic/ulcmp.S \
 	string/strncmp.c \
 	unistd/socketcalls.c
 
