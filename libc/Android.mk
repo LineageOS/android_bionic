@@ -96,7 +96,6 @@ libc_common_src_files := \
 	stdlib/toupper_.c \
 	string/index.c \
 	string/strcasecmp.c \
-	string/strcat.c \
 	string/strchr.c \
 	string/strcspn.c \
 	string/strdup.c \
@@ -369,6 +368,23 @@ libc_common_src_files += \
 	string/strncmp.c \
 #	bionic/memmove.c.arm \
 #	string/bcopy.c \
+	string/strncat.c \
+	string/strncpy.c \
+	bionic/strchr.cpp \
+	string/strrchr.c \
+	bionic/memchr.c \
+	bionic/memrchr.c \
+	string/index.c \
+	bionic/strnlen.c \
+	string/strlcat.c \
+	string/strlcpy.c \
+	upstream-freebsd/lib/libc/string/wcschr.c \
+	upstream-freebsd/lib/libc/string/wcsrchr.c \
+	upstream-freebsd/lib/libc/string/wcscmp.c \
+	upstream-freebsd/lib/libc/string/wcscpy.c \
+	upstream-freebsd/lib/libc/string/wmemcmp.c \
+	upstream-freebsd/lib/libc/string/wcslen.c \
+	upstream-freebsd/lib/libc/string/wcscat.c
 
 # These files need to be arm so that gdbserver
 # can set breakpoints in them without messing
