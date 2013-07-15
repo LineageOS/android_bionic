@@ -96,7 +96,6 @@ libc_common_src_files := \
 	stdlib/toupper_.c \
 	string/index.c \
 	string/strcasecmp.c \
-	string/strcat.c \
 	string/strchr.c \
 	string/strcspn.c \
 	string/strdup.c \
