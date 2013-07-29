@@ -295,6 +295,11 @@ extern "C" void* valloc(size_t bytes) {
 #include <stdio.h>
 #include "private/libc_logging.h"
 
+unsigned int malloc_sig_enabled = 0;
+unsigned int max_allocation_limit;
+unsigned int min_allocation_report_limit;
+const char* process_name;
+
 template<typename FunctionType>
 static void InitMallocFunction(void* malloc_impl_handler, FunctionType* func, const char* prefix, const char* suffix) {
   char symbol[128];
@@ -396,6 +401,21 @@ static void malloc_init_impl() {
       }
       so_name = "libc_malloc_debug_qemu.so";
       break;
+    case 40:
+      malloc_sig_enabled = 1;
+      char debug_proc_size[PROP_VALUE_MAX];
+      if (__system_property_get("libc.debug.malloc.maxprocsize", debug_proc_size))
+        max_allocation_limit = atoi(debug_proc_size);
+      else
+        max_allocation_limit = 30 * 1024 * 1024; // In Bytes [Default is 30 MB]
+      if (__system_property_get("libc.debug.malloc.minalloclim", debug_proc_size))
+        min_allocation_report_limit = atoi(debug_proc_size);
+      else
+        min_allocation_report_limit = 10 * 1024; // In Bytes [Default is 10 KB]
+      process_name = getprogname();
+
+      so_name = "libc_malloc_debug_leak.so";
+      break;
     default:
       error_log("%s: Debug level %d is unknown\n", getprogname(), g_malloc_debug_level);
       return;
@@ -455,6 +475,9 @@ static void malloc_init_impl() {
       break;
     case 20:
       InitMalloc(malloc_impl_handle, &malloc_dispatch_table, "qemu_instrumented");
+      break;
+    case 40:
+      InitMalloc(malloc_impl_handle, &malloc_dispatch_table, "chk");
       break;
     default:
       break;
