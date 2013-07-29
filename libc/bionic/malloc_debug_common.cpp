@@ -295,6 +295,11 @@ unsigned int gMallocDebugBacklog;
 
 /* The value of libc.debug.malloc. */
 int gMallocDebugLevel;
+unsigned int malloc_double_free_backlog;
+unsigned int malloc_sig_enabled = 0;
+unsigned int max_allocation_limit;
+unsigned int min_allocation_report_limit;
+const char* process_name;
 
 static void InitMalloc(MallocDebug* table, const char* prefix) {
   __libc_format_log(ANDROID_LOG_INFO, "libc", "%s: using libc.debug.malloc %d (%s)\n",
@@ -416,6 +421,22 @@ static void malloc_init_impl() {
             }
             so_name = "/system/lib/libc_malloc_debug_qemu.so";
             break;
+        case 40:
+            malloc_sig_enabled = 1;
+            char debug_proc_size[PROP_VALUE_MAX];
+            if (__system_property_get("libc.debug.malloc.maxprocsize", debug_proc_size))
+                max_allocation_limit = atoi(debug_proc_size);
+            else
+                max_allocation_limit = 30 * 1024 * 1024; // In Bytes [Default is 30 MB]
+            if (__system_property_get("libc.debug.malloc.minalloclim", debug_proc_size))
+                min_allocation_report_limit = atoi(debug_proc_size);
+            else
+                min_allocation_report_limit = 10 * 1024; // In Bytes [Default is 10 KB]
+            process_name = __progname;
+
+            so_name = "/system/lib/libc_malloc_debug_leak.so";
+            break;
+
         default:
             error_log("%s: Debug level %d is unknown\n", __progname, gMallocDebugLevel);
             return;
@@ -476,6 +497,8 @@ static void malloc_init_impl() {
         case 20:
             InitMalloc(&gMallocUse, "qemu_instrumented");
             break;
+        case 40:
+            InitMalloc(&gMallocUse, "chk");
         default:
             break;
     }
