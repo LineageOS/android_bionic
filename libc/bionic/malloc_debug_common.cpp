@@ -396,6 +396,9 @@ static void malloc_init_impl() {
       }
       so_name = "libc_malloc_debug_qemu.so";
       break;
+    case 40:
+      so_name = "libc_malloc_debug_leak.so";
+      break;
     default:
       error_log("%s: Debug level %d is unknown\n", getprogname(), g_malloc_debug_level);
       return;
@@ -455,6 +458,9 @@ static void malloc_init_impl() {
       break;
     case 20:
       InitMalloc(malloc_impl_handle, &malloc_dispatch_table, "qemu_instrumented");
+      break;
+    case 40:
+      InitMalloc(malloc_impl_handle, &malloc_dispatch_table, "chk");
       break;
     default:
       break;
