@@ -15,10 +15,16 @@ _LIBC_ARCH_COMMON_SRC_FILES := \
     arch-arm/bionic/setjmp.S \
     arch-arm/bionic/sigsetjmp.S \
     arch-arm/bionic/strcpy.S \
-    arch-arm/bionic/strlen.c.arm \
     arch-arm/bionic/syscall.S \
     arch-arm/bionic/tgkill.S \
     arch-arm/bionic/tkill.S \
+
+# cortex-a9 without neon
+ifneq ($(TARGET_CPU_VARIANT),tegra2)
+  _LIBC_ARCH_COMMON_SRC_FILES := \
+    arch-arm/bionic/strlen.c.arm \
+
+endif
 
 # These are used by the static and dynamic versions of the libc
 # respectively.
