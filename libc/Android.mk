@@ -4,6 +4,7 @@ include $(LOCAL_PATH)/arch-$(TARGET_ARCH)/syscalls.mk
 
 # Define the common source files for all the libc instances
 # =========================================================
+
 libc_common_src_files := \
 	$(syscall_src) \
 	unistd/abort.c \
@@ -151,7 +152,6 @@ libc_common_src_files := \
 	bionic/ldexp.c \
 	bionic/lseek64.c \
 	bionic/md5.c \
-	bionic/memchr.c \
 	bionic/memmem.c \
 	bionic/memrchr.c \
 	bionic/memswap.c \
@@ -232,6 +232,13 @@ libc_common_src_files := \
 	netbsd/nameser/ns_netint.c \
 	netbsd/nameser/ns_print.c \
 	netbsd/nameser/ns_samedomain.c \
+
+# cortex-a9 without neon
+ifneq ($(TARGET_CPU_VARIANT),tegra2)
+    libc_common_src_files += \
+        bionic/memchr.c \
+
+endif
 
 libc_bionic_src_files := \
     bionic/assert.cpp \
