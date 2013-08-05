@@ -131,14 +131,15 @@ TEST(string, strsignal_concurrent) {
 // expected result and then run function and compare what we got.
 // These tests contributed by Intel Corporation.
 // TODO: make these tests more intention-revealing and less random.
+template<class Character>
 struct StringTestState {
   StringTestState(size_t MAX_LEN) : MAX_LEN(MAX_LEN) {
     int max_alignment = 64;
 
     // TODO: fix the tests to not sometimes use twice their specified "MAX_LEN".
-    glob_ptr = reinterpret_cast<char*>(valloc(2 * MAX_LEN + max_alignment));
-    glob_ptr1 = reinterpret_cast<char*>(valloc(2 * MAX_LEN + max_alignment));
-    glob_ptr2 = reinterpret_cast<char*>(valloc(2 * MAX_LEN + max_alignment));
+    glob_ptr = reinterpret_cast<Character*>(valloc(2 * sizeof(Character) * MAX_LEN + max_alignment));
+    glob_ptr1 = reinterpret_cast<Character*>(valloc(2 * sizeof(Character) * MAX_LEN + max_alignment));
+    glob_ptr2 = reinterpret_cast<Character*>(valloc(2 * sizeof(Character) * MAX_LEN + max_alignment));
 
     InitLenArray();
 
@@ -163,12 +164,12 @@ struct StringTestState {
   }
 
   const size_t MAX_LEN;
-  char *ptr, *ptr1, *ptr2;
+  Character *ptr, *ptr1, *ptr2;
   size_t n;
   int len[ITER + 1];
 
  private:
-  char *glob_ptr, *glob_ptr1, *glob_ptr2;
+  Character *glob_ptr, *glob_ptr1, *glob_ptr2;
 
   // Calculate input lengths and fill state.len with them.
   // Test small lengths with more density than big ones. Manually push
@@ -188,7 +189,7 @@ struct StringTestState {
 };
 
 TEST(string, strcat) {
-  StringTestState state(SMALL);
+  StringTestState<char> state(SMALL);
   for (size_t i = 1; i < state.n; i++) {
     for (size_t j = 0; j < POS_ITER; j++) {
       state.NewIteration();
@@ -209,10 +210,178 @@ TEST(string, strcat) {
   }
 }
 
+// one byte target with "\0" source
+TEST(string, strcpy2) {
+  char buf[1];
+  char* orig = strdup("");
+  strcpy(buf, orig);
+  ASSERT_EQ('\0', buf[0]);
+  free(orig);
+}
+
+// multibyte target where we under fill target
+TEST(string, strcpy3) {
+  char buf[10];
+  char* orig = strdup("12345");
+  memset(buf, 'A', sizeof(buf));
+  strcpy(buf, orig);
+  ASSERT_EQ('1',  buf[0]);
+  ASSERT_EQ('2',  buf[1]);
+  ASSERT_EQ('3',  buf[2]);
+  ASSERT_EQ('4',  buf[3]);
+  ASSERT_EQ('5',  buf[4]);
+  ASSERT_EQ('\0', buf[5]);
+  ASSERT_EQ('A',  buf[6]);
+  ASSERT_EQ('A',  buf[7]);
+  ASSERT_EQ('A',  buf[8]);
+  ASSERT_EQ('A',  buf[9]);
+  free(orig);
+}
+
+// multibyte target where we fill target exactly
+TEST(string, strcpy4) {
+  char buf[10];
+  char* orig = strdup("123456789");
+  memset(buf, 'A', sizeof(buf));
+  strcpy(buf, orig);
+  ASSERT_EQ('1',  buf[0]);
+  ASSERT_EQ('2',  buf[1]);
+  ASSERT_EQ('3',  buf[2]);
+  ASSERT_EQ('4',  buf[3]);
+  ASSERT_EQ('5',  buf[4]);
+  ASSERT_EQ('6',  buf[5]);
+  ASSERT_EQ('7',  buf[6]);
+  ASSERT_EQ('8',  buf[7]);
+  ASSERT_EQ('9',  buf[8]);
+  ASSERT_EQ('\0', buf[9]);
+  free(orig);
+}
+
+TEST(string, strcat2) {
+  char buf[10];
+  memset(buf, 'A', sizeof(buf));
+  buf[0] = 'a';
+  buf[1] = '\0';
+  char* res = strcat(buf, "01234");
+  ASSERT_EQ(buf, res);
+  ASSERT_EQ('a',  buf[0]);
+  ASSERT_EQ('0',  buf[1]);
+  ASSERT_EQ('1',  buf[2]);
+  ASSERT_EQ('2',  buf[3]);
+  ASSERT_EQ('3',  buf[4]);
+  ASSERT_EQ('4',  buf[5]);
+  ASSERT_EQ('\0', buf[6]);
+  ASSERT_EQ('A',  buf[7]);
+  ASSERT_EQ('A',  buf[8]);
+  ASSERT_EQ('A',  buf[9]);
+}
+
+TEST(string, strcat3) {
+  char buf[10];
+  memset(buf, 'A', sizeof(buf));
+  buf[0] = 'a';
+  buf[1] = '\0';
+  char* res = strcat(buf, "01234567");
+  ASSERT_EQ(buf, res);
+  ASSERT_EQ('a',  buf[0]);
+  ASSERT_EQ('0',  buf[1]);
+  ASSERT_EQ('1',  buf[2]);
+  ASSERT_EQ('2',  buf[3]);
+  ASSERT_EQ('3',  buf[4]);
+  ASSERT_EQ('4',  buf[5]);
+  ASSERT_EQ('5', buf[6]);
+  ASSERT_EQ('6',  buf[7]);
+  ASSERT_EQ('7',  buf[8]);
+  ASSERT_EQ('\0',  buf[9]);
+}
+
+TEST(string, strncat2) {
+  char buf[10];
+  memset(buf, 'A', sizeof(buf));
+  buf[0] = 'a';
+  buf[1] = '\0';
+  char* res = strncat(buf, "01234", sizeof(buf) - strlen(buf) - 1);
+  ASSERT_EQ(buf, res);
+  ASSERT_EQ('a',  buf[0]);
+  ASSERT_EQ('0',  buf[1]);
+  ASSERT_EQ('1',  buf[2]);
+  ASSERT_EQ('2',  buf[3]);
+  ASSERT_EQ('3',  buf[4]);
+  ASSERT_EQ('4',  buf[5]);
+  ASSERT_EQ('\0', buf[6]);
+  ASSERT_EQ('A',  buf[7]);
+  ASSERT_EQ('A',  buf[8]);
+  ASSERT_EQ('A',  buf[9]);
+}
+
+TEST(string, strncat3) {
+  char buf[10];
+  memset(buf, 'A', sizeof(buf));
+  buf[0] = 'a';
+  buf[1] = '\0';
+  char* res = strncat(buf, "0123456789", 5);
+  ASSERT_EQ(buf, res);
+  ASSERT_EQ('a',  buf[0]);
+  ASSERT_EQ('0',  buf[1]);
+  ASSERT_EQ('1',  buf[2]);
+  ASSERT_EQ('2',  buf[3]);
+  ASSERT_EQ('3',  buf[4]);
+  ASSERT_EQ('4',  buf[5]);
+  ASSERT_EQ('\0', buf[6]);
+  ASSERT_EQ('A',  buf[7]);
+  ASSERT_EQ('A',  buf[8]);
+  ASSERT_EQ('A',  buf[9]);
+}
+
+TEST(string, strncat4) {
+  char buf[10];
+  memset(buf, 'A', sizeof(buf));
+  buf[0] = 'a';
+  buf[1] = '\0';
+  char* res = strncat(buf, "01234567", 8);
+  ASSERT_EQ(buf, res);
+  ASSERT_EQ('a',  buf[0]);
+  ASSERT_EQ('0',  buf[1]);
+  ASSERT_EQ('1',  buf[2]);
+  ASSERT_EQ('2',  buf[3]);
+  ASSERT_EQ('3',  buf[4]);
+  ASSERT_EQ('4',  buf[5]);
+  ASSERT_EQ('5', buf[6]);
+  ASSERT_EQ('6',  buf[7]);
+  ASSERT_EQ('7',  buf[8]);
+  ASSERT_EQ('\0',  buf[9]);
+}
+
+TEST(string, strncat5) {
+  char buf[10];
+  memset(buf, 'A', sizeof(buf));
+  buf[0] = 'a';
+  buf[1] = '\0';
+  char* res = strncat(buf, "01234567", 9);
+  ASSERT_EQ(buf, res);
+  ASSERT_EQ('a',  buf[0]);
+  ASSERT_EQ('0',  buf[1]);
+  ASSERT_EQ('1',  buf[2]);
+  ASSERT_EQ('2',  buf[3]);
+  ASSERT_EQ('3',  buf[4]);
+  ASSERT_EQ('4',  buf[5]);
+  ASSERT_EQ('5', buf[6]);
+  ASSERT_EQ('6',  buf[7]);
+  ASSERT_EQ('7',  buf[8]);
+  ASSERT_EQ('\0',  buf[9]);
+}
+
+TEST(string, strchr_with_0) {
+  char buf[10];
+  const char* s = "01234";
+  memcpy(buf, s, strlen(s) + 1);
+  EXPECT_TRUE(strchr(buf, '\0') == (buf + strlen(s)));
+}
+
 TEST(string, strchr) {
   int seek_char = random() & 255;
 
-  StringTestState state(SMALL);
+  StringTestState<char> state(SMALL);
   for (size_t i = 1; i < state.n; i++) {
     for (size_t j = 0; j < POS_ITER; j++) {
       state.NewIteration();
@@ -243,7 +412,7 @@ TEST(string, strchr) {
 }
 
 TEST(string, strcmp) {
-  StringTestState state(SMALL);
+  StringTestState<char> state(SMALL);
   for (size_t i = 1; i < state.n; i++) {
     for (size_t j = 0; j < POS_ITER; j++) {
       state.NewIteration();
@@ -280,7 +449,7 @@ TEST(string, strcmp) {
 }
 
 TEST(string, strcpy) {
-  StringTestState state(SMALL);
+  StringTestState<char> state(SMALL);
   for (size_t j = 0; j < POS_ITER; j++) {
     state.NewIteration();
 
@@ -307,41 +476,8 @@ TEST(string, strcpy) {
 
 
 #if __BIONIC__
-// We have to say "DeathTest" here so gtest knows to run this test (which exits)
-// in its own process.
-TEST(string_DeathTest, strcpy_fortified) {
-  ::testing::FLAGS_gtest_death_test_style = "threadsafe";
-  char buf[10];
-  char *orig = strdup("0123456789");
-  ASSERT_EXIT(strcpy(buf, orig), testing::KilledBySignal(SIGSEGV), "");
-  free(orig);
-}
-
-TEST(string_DeathTest, strlen_fortified) {
-  ::testing::FLAGS_gtest_death_test_style = "threadsafe";
-  char buf[10];
-  memcpy(buf, "0123456789", sizeof(buf));
-  ASSERT_EXIT(printf("%d", strlen(buf)), testing::KilledBySignal(SIGSEGV), "");
-}
-
-TEST(string_DeathTest, strchr_fortified) {
-  ::testing::FLAGS_gtest_death_test_style = "threadsafe";
-  char buf[10];
-  memcpy(buf, "0123456789", sizeof(buf));
-  ASSERT_EXIT(printf("%s", strchr(buf, 'a')), testing::KilledBySignal(SIGSEGV), "");
-}
-
-TEST(string_DeathTest, strrchr_fortified) {
-  ::testing::FLAGS_gtest_death_test_style = "threadsafe";
-  char buf[10];
-  memcpy(buf, "0123456789", sizeof(buf));
-  ASSERT_EXIT(printf("%s", strrchr(buf, 'a')), testing::KilledBySignal(SIGSEGV), "");
-}
-#endif
-
-#if __BIONIC__
 TEST(string, strlcat) {
-  StringTestState state(SMALL);
+  StringTestState<char> state(SMALL);
   for (size_t i = 0; i < state.n; i++) {
     for (size_t j = 0; j < POS_ITER; j++) {
       state.NewIteration();
@@ -370,7 +506,7 @@ TEST(string, strlcat) {
 
 #if __BIONIC__
 TEST(string, strlcpy) {
-  StringTestState state(SMALL);
+  StringTestState<char> state(SMALL);
   for (size_t j = 0; j < POS_ITER; j++) {
     state.NewIteration();
 
@@ -404,7 +540,7 @@ TEST(string, strlcpy) {
 #endif
 
 TEST(string, strncat) {
-  StringTestState state(SMALL);
+  StringTestState<char> state(SMALL);
   for (size_t i = 1; i < state.n; i++) {
     for (size_t j = 0; j < POS_ITER; j++) {
       state.NewIteration();
@@ -430,7 +566,7 @@ TEST(string, strncat) {
 }
 
 TEST(string, strncmp) {
-  StringTestState state(SMALL);
+  StringTestState<char> state(SMALL);
   for (size_t i = 1; i < state.n; i++) {
     for (size_t j = 0; j < POS_ITER; j++) {
       state.NewIteration();
@@ -467,7 +603,7 @@ TEST(string, strncmp) {
 }
 
 TEST(string, strncpy) {
-  StringTestState state(SMALL);
+  StringTestState<char> state(SMALL);
   for (size_t j = 0; j < ITER; j++) {
     state.NewIteration();
 
@@ -495,7 +631,7 @@ TEST(string, strncpy) {
 
 TEST(string, strrchr) {
   int seek_char = random() & 255;
-  StringTestState state(SMALL);
+  StringTestState<char> state(SMALL);
   for (size_t i = 1; i < state.n; i++) {
     for (size_t j = 0; j < POS_ITER; j++) {
       state.NewIteration();
@@ -527,7 +663,7 @@ TEST(string, strrchr) {
 
 TEST(string, memchr) {
   int seek_char = random() & 255;
-  StringTestState state(SMALL);
+  StringTestState<char> state(SMALL);
   for (size_t i = 0; i < state.n; i++) {
     for (size_t j = 0; j < POS_ITER; j++) {
       state.NewIteration();
@@ -550,7 +686,7 @@ TEST(string, memchr) {
 
 TEST(string, memrchr) {
   int seek_char = random() & 255;
-  StringTestState state(SMALL);
+  StringTestState<char> state(SMALL);
   for (size_t i = 0; i < state.n; i++) {
     for (size_t j = 0; j < POS_ITER; j++) {
       state.NewIteration();
@@ -572,7 +708,7 @@ TEST(string, memrchr) {
 }
 
 TEST(string, memcmp) {
-  StringTestState state(SMALL);
+  StringTestState<char> state(SMALL);
   for (size_t i = 0; i < state.n; i++) {
     for (size_t j = 0; j < POS_ITER; j++) {
       state.NewIteration();
@@ -593,8 +729,61 @@ TEST(string, memcmp) {
   }
 }
 
+#if defined(__BIONIC__)
+extern "C" int __memcmp16(const unsigned short *ptr1, const unsigned short *ptr2, size_t n);
+
+TEST(string, __memcmp16) {
+  StringTestState<unsigned short> state(SMALL);
+
+  for (size_t i = 0; i < state.n; i++) {
+    for (size_t j = 0; j < POS_ITER; j++) {
+      state.NewIteration();
+
+      unsigned short mask = 0xffff;
+      unsigned short c1 = rand() & mask;
+      unsigned short c2 = rand() & mask;
+
+      std::fill(state.ptr1, state.ptr1 + state.MAX_LEN, c1);
+      std::fill(state.ptr2, state.ptr2 + state.MAX_LEN, c1);
+
+      int pos = (state.len[i] == 0) ? 0 : (random() % state.len[i]);
+      state.ptr2[pos] = c2;
+
+      int expected = (static_cast<unsigned short>(c1) - static_cast<unsigned short>(c2));
+      int actual = __memcmp16(state.ptr1, state.ptr2, (size_t) state.MAX_LEN);
+
+      ASSERT_EQ(expected, actual);
+    }
+  }
+}
+#endif
+
+TEST(string, wmemcmp) {
+  StringTestState<wchar_t> state(SMALL);
+
+  for (size_t i = 0; i < state.n; i++) {
+    for (size_t j = 0; j < POS_ITER; j++) {
+      state.NewIteration();
+
+      long long mask = ((long long) 1 << 8 * sizeof(wchar_t)) - 1;
+      int c1 = rand() & mask;
+      int c2 = rand() & mask;
+      wmemset(state.ptr1, c1, state.MAX_LEN);
+      wmemset(state.ptr2, c1, state.MAX_LEN);
+
+      int pos = (state.len[i] == 0) ? 0 : (random() % state.len[i]);
+      state.ptr2[pos] = c2;
+
+      int expected = (static_cast<int>(c1) - static_cast<int>(c2));
+      int actual = wmemcmp(state.ptr1, state.ptr2, (size_t) state.MAX_LEN);
+
+      ASSERT_EQ(signum(expected), signum(actual));
+    }
+  }
+}
+
 TEST(string, memcpy) {
-  StringTestState state(LARGE);
+  StringTestState<char> state(LARGE);
   int rand = random() & 255;
   for (size_t i = 0; i < state.n - 1; i++) {
     for (size_t j = 0; j < POS_ITER; j++) {
@@ -616,7 +805,7 @@ TEST(string, memcpy) {
 }
 
 TEST(string, memset) {
-  StringTestState state(LARGE);
+  StringTestState<char> state(LARGE);
   char ch = random () & 255;
   for (size_t i = 0; i < state.n - 1; i++) {
     for (size_t j = 0; j < POS_ITER; j++) {
@@ -638,7 +827,7 @@ TEST(string, memset) {
 }
 
 TEST(string, memmove) {
-  StringTestState state(LARGE);
+  StringTestState<char> state(LARGE);
   for (size_t i = 0; i < state.n - 1; i++) {
     for (size_t j = 0; j < POS_ITER; j++) {
       state.NewIteration();
@@ -659,7 +848,7 @@ TEST(string, memmove) {
 }
 
 TEST(string, bcopy) {
-  StringTestState state(LARGE);
+  StringTestState<char> state(LARGE);
   for (size_t i = 0; i < state.n; i++) {
     for (size_t j = 0; j < POS_ITER; j++) {
       state.NewIteration();
@@ -678,7 +867,7 @@ TEST(string, bcopy) {
 }
 
 TEST(string, bzero) {
-  StringTestState state(LARGE);
+  StringTestState<char> state(LARGE);
   for (size_t j = 0; j < ITER; j++) {
     state.NewIteration();
 

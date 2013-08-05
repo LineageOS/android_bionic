@@ -33,6 +33,12 @@
 #include <stdio.h>
 #include <string.h>
 
+extern int __pthread_cond_timedwait(pthread_cond_t*, pthread_mutex_t*, const struct timespec*,
+                                    clockid_t);
+
+extern int __pthread_cond_timedwait_relative(pthread_cond_t*, pthread_mutex_t*,
+                                             const struct timespec*);
+
 // Normal (i.e. non-SIGEV_THREAD) timers are created directly by the kernel
 // and are passed as is to/from the caller.
 //
@@ -80,9 +86,6 @@
 
 /* the maximum value of overrun counters */
 #define  DELAYTIMER_MAX    0x7fffffff
-
-#define  __likely(x)   __builtin_expect(!!(x),1)
-#define  __unlikely(x) __builtin_expect(!!(x),0)
 
 typedef struct thr_timer          thr_timer_t;
 typedef struct thr_timer_table    thr_timer_table_t;
@@ -282,6 +285,49 @@ thr_timer_unlock( thr_timer_t*  t )
     pthread_mutex_unlock(&t->mutex);
 }
 
+
+static __inline__ void timespec_add(struct timespec* a, const struct timespec* b) {
+  a->tv_sec  += b->tv_sec;
+  a->tv_nsec += b->tv_nsec;
+  if (a->tv_nsec >= 1000000000) {
+    a->tv_nsec -= 1000000000;
+    a->tv_sec  += 1;
+  }
+}
+
+static __inline__ void timespec_sub(struct timespec* a, const struct timespec* b) {
+  a->tv_sec  -= b->tv_sec;
+  a->tv_nsec -= b->tv_nsec;
+  if (a->tv_nsec < 0) {
+    a->tv_nsec += 1000000000;
+    a->tv_sec  -= 1;
+  }
+}
+
+static __inline__ void timespec_zero(struct timespec* a) {
+  a->tv_sec = a->tv_nsec = 0;
+}
+
+static __inline__ int timespec_is_zero(const struct timespec* a) {
+  return (a->tv_sec == 0 && a->tv_nsec == 0);
+}
+
+static __inline__ int timespec_cmp(const struct timespec* a, const struct timespec* b) {
+  if (a->tv_sec  < b->tv_sec)  return -1;
+  if (a->tv_sec  > b->tv_sec)  return +1;
+  if (a->tv_nsec < b->tv_nsec) return -1;
+  if (a->tv_nsec > b->tv_nsec) return +1;
+  return 0;
+}
+
+static __inline__ int timespec_cmp0(const struct timespec* a) {
+  if (a->tv_sec < 0) return -1;
+  if (a->tv_sec > 0) return +1;
+  if (a->tv_nsec < 0) return -1;
+  if (a->tv_nsec > 0) return +1;
+  return 0;
+}
+
 /** POSIX TIMERS APIs */
 
 extern int __timer_create(clockid_t, struct sigevent*, timer_t*);
@@ -294,7 +340,7 @@ static void* timer_thread_start(void*);
 
 int timer_create(clockid_t clock_id, struct sigevent* evp, timer_t* timer_id) {
   // If not a SIGEV_THREAD timer, the kernel can handle it without our help.
-  if (__likely(evp == NULL || evp->sigev_notify != SIGEV_THREAD)) {
+  if (__predict_true(evp == NULL || evp->sigev_notify != SIGEV_THREAD)) {
     return __timer_create(clock_id, evp, timer_id);
   }
 
@@ -360,7 +406,7 @@ int timer_create(clockid_t clock_id, struct sigevent* evp, timer_t* timer_id) {
 int
 timer_delete( timer_t  id )
 {
-    if ( __likely(!TIMER_ID_IS_WRAPPED(id)) )
+    if ( __predict_true(!TIMER_ID_IS_WRAPPED(id)) )
         return __timer_delete( id );
     else
     {
@@ -422,7 +468,7 @@ timer_gettime( timer_t  id, struct itimerspec*  ospec )
         return -1;
     }
 
-    if ( __likely(!TIMER_ID_IS_WRAPPED(id)) ) {
+    if ( __predict_true(!TIMER_ID_IS_WRAPPED(id)) ) {
         return __timer_gettime( id, ospec );
     } else {
         thr_timer_t*  timer = thr_timer_from_id(id);
@@ -450,7 +496,7 @@ timer_settime( timer_t                   id,
         return -1;
     }
 
-    if ( __likely(!TIMER_ID_IS_WRAPPED(id)) ) {
+    if ( __predict_true(!TIMER_ID_IS_WRAPPED(id)) ) {
         return __timer_settime( id, flags, spec, ospec );
     } else {
         thr_timer_t*        timer = thr_timer_from_id(id);
@@ -494,7 +540,7 @@ timer_settime( timer_t                   id,
 int
 timer_getoverrun(timer_t  id)
 {
-    if ( __likely(!TIMER_ID_IS_WRAPPED(id)) ) {
+    if ( __predict_true(!TIMER_ID_IS_WRAPPED(id)) ) {
         return __timer_getoverrun( id );
     } else {
         thr_timer_t*  timer = thr_timer_from_id(id);
