@@ -211,6 +211,11 @@
 #define __statement(x)	(x)
 #endif
 
+#define __nonnull(args) __attribute__((__nonnull__ args))
+
+#define __printflike(x, y) __attribute__((__format__(printf, x, y))) __nonnull((x))
+#define __scanflike(x, y) __attribute__((__format__(scanf, x, y))) __nonnull((x))
+
 /*
  * C99 defines the restrict type qualifier keyword, which was made available
  * in GCC 2.92.
@@ -325,6 +330,12 @@
 #define __wur __attribute__((__warn_unused_result__))
 #else
 #define __wur
+#endif
+
+#if __GNUC_PREREQ__(4, 3)
+#define __errordecl(name, msg) extern void name(void) __attribute__((__error__(msg)))
+#else
+#define __errordecl(name, msg) extern void name(void)
 #endif
 
 /*
@@ -515,13 +526,18 @@
 #define  __BIONIC__   1
 #include <android/api-level.h>
 
-#if defined(_FORTIFY_SOURCE) && _FORTIFY_SOURCE > 0 && defined(__OPTIMIZE__) && __OPTIMIZE__ > 0 && !defined(__clang__)
+#if defined(_FORTIFY_SOURCE) && _FORTIFY_SOURCE > 0 && defined(__OPTIMIZE__) && __OPTIMIZE__ > 0
 #define __BIONIC_FORTIFY 1
+#if _FORTIFY_SOURCE == 2
+#define __bos(s) __builtin_object_size((s), 1)
+#else
+#define __bos(s) __builtin_object_size((s), 0)
+#endif
+
 #define __BIONIC_FORTIFY_INLINE \
     extern inline \
     __attribute__ ((always_inline)) \
-    __attribute__ ((gnu_inline)) \
-    __attribute__ ((artificial))
+    __attribute__ ((gnu_inline))
 #endif
 #define __BIONIC_FORTIFY_UNKNOWN_SIZE ((size_t) -1)
 

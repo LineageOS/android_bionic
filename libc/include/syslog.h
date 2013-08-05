@@ -98,18 +98,18 @@ struct syslog_data {
 
 #define SYSLOG_DATA_INIT {-1, 0, 0, 0, (const char *)0, LOG_USER, 0xff}
 
-#define _PATH_LOG  "/dev/kmsg"
+#define _PATH_LOG  "/dev/syslog"
 
 extern void	closelog(void);
 extern void	openlog(const char *, int, int);
 extern int	setlogmask(int);
-extern void	syslog(int, const char *, ...);
-extern void	vsyslog(int, const char *, va_list);
+extern void	syslog(int, const char *, ...) __printflike(2, 3);
+extern void	vsyslog(int, const char *, va_list) __printflike(2, 0);
 extern void	closelog_r(struct syslog_data *);
 extern void	openlog_r(const char *, int, int, struct syslog_data *);
 extern int	setlogmask_r(int, struct syslog_data *);
-extern void	syslog_r(int, struct syslog_data *, const char *, ...);
-extern void	vsyslog_r(int, struct syslog_data *, const char *, va_list);
+extern void	syslog_r(int, struct syslog_data *, const char *, ...) __printflike(3, 4);
+extern void	vsyslog_r(int, struct syslog_data *, const char *, va_list) __printflike(3, 0);
 
 __END_DECLS
 

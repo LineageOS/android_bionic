@@ -30,6 +30,7 @@
 
 #include <pthread.h>
 #include <stdbool.h>
+#include <sys/cdefs.h>
 
 __BEGIN_DECLS
 
@@ -41,11 +42,12 @@ typedef struct pthread_internal_t
     pid_t                       tid;
     bool                        allocated_on_heap;
     pthread_cond_t              join_cond;
-    int                         join_count;
     void*                       return_value;
     int                         internal_flags;
     __pthread_cleanup_t*        cleanup_stack;
     void**                      tls;         /* thread-local storage area */
+
+    void* alternate_signal_stack;
 
     /*
      * The dynamic linker implements dlerror(3), which makes it hard for us to implement this
@@ -63,70 +65,20 @@ pthread_internal_t* __get_thread(void);
 __LIBC_HIDDEN__ void pthread_key_clean_all(void);
 __LIBC_HIDDEN__ void _pthread_internal_remove_locked(pthread_internal_t* thread);
 
+/* Has the thread been detached by a pthread_join or pthread_detach call? */
 #define PTHREAD_ATTR_FLAG_DETACHED      0x00000001
+
+/* Was the thread's stack allocated by the user rather than by us? */
 #define PTHREAD_ATTR_FLAG_USER_STACK    0x00000002
+
+/* Has the thread been joined by another thread? */
+#define PTHREAD_ATTR_FLAG_JOINED        0x00000004
+
+/* Has the thread already exited but not been joined? */
+#define PTHREAD_ATTR_FLAG_ZOMBIE        0x00000008
 
 __LIBC_HIDDEN__ extern pthread_internal_t* gThreadList;
 __LIBC_HIDDEN__ extern pthread_mutex_t gThreadListLock;
-
-/* needed by posix-timers.c */
-
-static __inline__ void timespec_add( struct timespec*  a, const struct timespec*  b )
-{
-    a->tv_sec  += b->tv_sec;
-    a->tv_nsec += b->tv_nsec;
-    if (a->tv_nsec >= 1000000000) {
-        a->tv_nsec -= 1000000000;
-        a->tv_sec  += 1;
-    }
-}
-
-static  __inline__ void timespec_sub( struct timespec*  a, const struct timespec*  b )
-{
-    a->tv_sec  -= b->tv_sec;
-    a->tv_nsec -= b->tv_nsec;
-    if (a->tv_nsec < 0) {
-        a->tv_nsec += 1000000000;
-        a->tv_sec  -= 1;
-    }
-}
-
-static  __inline__ void timespec_zero( struct timespec*  a )
-{
-    a->tv_sec = a->tv_nsec = 0;
-}
-
-static  __inline__ int timespec_is_zero( const struct timespec*  a )
-{
-    return (a->tv_sec == 0 && a->tv_nsec == 0);
-}
-
-static  __inline__ int timespec_cmp( const struct timespec*  a, const struct timespec*  b )
-{
-    if (a->tv_sec  < b->tv_sec)  return -1;
-    if (a->tv_sec  > b->tv_sec)  return +1;
-    if (a->tv_nsec < b->tv_nsec) return -1;
-    if (a->tv_nsec > b->tv_nsec) return +1;
-    return 0;
-}
-
-static  __inline__ int timespec_cmp0( const struct timespec*  a )
-{
-    if (a->tv_sec < 0) return -1;
-    if (a->tv_sec > 0) return +1;
-    if (a->tv_nsec < 0) return -1;
-    if (a->tv_nsec > 0) return +1;
-    return 0;
-}
-
-extern int  __pthread_cond_timedwait(pthread_cond_t*,
-                                     pthread_mutex_t*,
-                                     const struct timespec*,
-                                     clockid_t);
-
-extern int  __pthread_cond_timedwait_relative(pthread_cond_t*,
-                                              pthread_mutex_t*,
-                                              const struct timespec*);
 
 /* needed by fork.c */
 extern void __timer_table_start_stop(int  stop);
