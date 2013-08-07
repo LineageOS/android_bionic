@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fae47921_98487d89",
+        "filename": "libc/Android.mk",
+        "patchSetId": 3
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 6886
+      },
+      "writtenOn": "2013-08-07T09:55:09Z",
+      "side": 1,
+      "message": "Change TARGET_CPU_VARIANT to another. If changed in the device config, it could interfere when building CM for a tegra2 device.",
+      "revId": "2f06160e648e7b038ee369dfcb3532c134f3f2ad",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
