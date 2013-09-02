@@ -104,7 +104,7 @@ def UpgradeTo(ftp, data_filename):
                          '%s/ZoneCompactor.java' % bionic_libc_tools_zoneinfo_dir,
                          '%s/libcore/util/ZoneInfo.java' % libcore_src_dir,
                          '%s/libcore/io/BufferIterator.java' % libcore_src_dir])
-  subprocess.check_call(['java', 'ZoneCompactor',
+  subprocess.check_call(['java', '-classpath', '.', 'ZoneCompactor',
                          'setup', 'data', 'extracted/zone.tab',
                          bionic_libc_zoneinfo_dir, new_version])
 
