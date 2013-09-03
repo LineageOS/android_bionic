@@ -1,4 +1,8 @@
 /*-
+ * Written by Bernhard Rosenkränzer <Bernhard.Rosenkranzer@linaro.org>
+ * based on the implementations of sin() and cos() found in other Bionic
+ * files.
+ *
  * Copyright (c) 2010 The Android Open Source Project
  * All rights reserved.
  *
@@ -26,26 +30,155 @@
  */
 #define _GNU_SOURCE 1
 #include <math.h>
+#define INLINE_KERNEL_COSDF
+#define INLINE_KERNEL_SINDF
+#include "upstream-freebsd/lib/msun/src/math_private.h"
+#include "upstream-freebsd/lib/msun/src/k_cosf.c"
+#include "upstream-freebsd/lib/msun/src/k_sinf.c"
 
-// Disable sincos optimization for all functions in this file,
-// otherwise gcc would generate infinite calls.
-// Refer to gcc PR46926.
-// -fno-builtin-sin or -fno-builtin-cos can disable sincos optimization,
-// but these two options do not work inside optimize pragma in-file.
-// Thus we just enforce -O0 when compiling this file.
+/* Small multiples of pi/2 rounded to double precision. */
+static const double
+	s1pio2 = 1*M_PI_2,		/* 0x3FF921FB, 0x54442D18 */
+	s2pio2 = 2*M_PI_2,		/* 0x400921FB, 0x54442D18 */
+	s3pio2 = 3*M_PI_2,		/* 0x4012D97C, 0x7F3321D2 */
+	s4pio2 = 4*M_PI_2;		/* 0x401921FB, 0x54442D18 */
+
+/* For implementation details, see src/s_sin.c, src/s_cos.c */
+void sincos(double x, double *psin, double *pcos)
+{
+	double y[2], z=0.0;
+	int32_t n, ix;
+
+	/* High word of x. */
+	GET_HIGH_WORD(ix, x);
+
+	/* |x| ~< pi/4 */
+	ix &= 0x7fffffff;
+	if(ix <= 0x3fe921fb) {
+		if(ix < 0x3e400000) { /* \x\ < 2**-27 */
+			if((int)x==0) { /* generate inexact */
+				*psin = x;
+				*pcos = 1.0;
+				return;
+			}
+		}
+		*psin = __kernel_sin(x, z, 0);
+		*pcos = __kernel_cos(x, z);
+		return;
+	} else if(ix>=0x7ff00000) { /* sin(Inf or NaN) and cos(Inf or NaN) is NaN */
+		*psin = *pcos = x-x;
+		return;
+	} else {
+		n = __ieee754_rem_pio2(x, y);
+		switch(n&3) {
+			case 0:
+				*psin = __kernel_sin(y[0],y[1],1);
+				*pcos = __kernel_cos(y[0],y[1]);
+				return;
+			case 1:
+				*psin = __kernel_cos(y[0],y[1]);
+				*pcos = -__kernel_sin(y[0],y[1],1);
+				return;
+			case 2:
+				*psin = -__kernel_sin(y[0],y[1],1);
+				*pcos = -__kernel_cos(y[0],y[1]);
+				return;
+			default:
+				*psin = -__kernel_cos(y[0],y[1]);
+				*pcos = __kernel_sin(y[0],y[1],1);
+				return;
+		}
+	}
+}
+
+/* For implementation details, see src/s_sinf.c, src/s_cosf.c */
+void sincosf(float x, float *psin, float *pcos)
+{
+	float y[2];
+	int32_t n, hx, ix;
+
+	GET_FLOAT_WORD(hx, x);
+	ix = hx & 0x7fffffff;
+
+	if(ix <= 0x3f490fda) {			/* |x| ~<= pi/4 */
+		if(ix < 0x39800000) {		/* |x| < 2**-12 */
+			if(((int)x)==0) {	/* x with inexact if x != 0 */
+				*psin = x;
+				*pcos = 1.0;
+				return;
+			}
+		}
+		*psin = __kernel_sindf(x);
+		*pcos = __kernel_cosdf(x);
+		return;
+	} else if(ix <= 0x407b53d1) {		/* |x| ~<= 5*pi/4 */
+		if(ix <= 0x4016cbe3) {		/* |x| ~<= 3pi/4 */
+			if(hx>0) {
+				*psin = __kernel_cosdf(x - s1pio2);
+				*pcos = __kernel_sindf(s1pio2 - x);
+				return;
+			} else {
+				*psin = -__kernel_cosdf(x + s1pio2);
+				*pcos = __kernel_sindf(x + s1pio2);
+				return;
+			}
+		} else {
+			*psin = __kernel_sindf((hx > 0 ? s2pio2 : -s2pio2) - x);
+			*pcos = -__kernel_cosdf(x + (hx > 0 ? -s2pio2 : s2pio2));
+			return;
+		}
+	} else if(ix <= 0x40e231d5) {		/* |x| ~<= 9*pi/4 */
+		if(ix <= 0x40afeddf) {		/* |x| ~<= 7*pi/4 */
+			if(hx>0) {
+				*psin = -__kernel_cosdf(x - s3pio2);
+				*pcos = __kernel_sindf(x - s3pio2);
+				return;
+			} else {
+				*psin = __kernel_cosdf(x + s3pio2);
+				*pcos = __kernel_sindf(-s3pio2 - x);
+				return;
+			}
+		} else {
+			*psin = __kernel_sindf(x + (hx > 0 ? -s4pio2 : s4pio2));
+			*pcos = __kernel_cosdf(x + (hx > 0 ? -s4pio2 : s4pio2));
+			return;
+		}
+	} else if(ix>=0x7f800000) {		/* sin and cos (Inf or NaN) is NaN */
+		*psin = *pcos = x-x;
+		return;
+	} else {
+		n = __ieee754_rem_pio2f(x,y);
+		switch(n&3) {
+		case 0:
+			*psin = __kernel_sindf((double)y[0]+y[1]);
+			*pcos = __kernel_cosdf((double)y[0]+y[1]);
+			return;
+		case 1:
+			*psin = __kernel_cosdf((double)y[0]+y[1]);
+			*pcos = __kernel_sindf(-(double)y[0]-y[1]);
+			return;
+		case 2:
+			*psin = __kernel_sindf(-(double)y[0]-y[1]);
+			*pcos = -__kernel_cosdf((double)y[0]+y[1]);
+			return;
+		default:
+			*psin = -__kernel_cosdf((double)y[0]+y[1]);
+			*pcos = __kernel_sindf((double)y[0]+y[1]);
+			return;
+		}
+	}
+}
+
+/* We can't use a properly optimized version here since Android fakes
+ * long double bits (see fake_long_double.c)
+ * Also, can't allow gcc to optimize because sinl() followed by cosl()
+ * might be merged into sincosl(), causing an infinite loop.
+ * Unfortunately, we can't just pass -fno-builtin-sin -fno-builtin-cos
+ * in a #pragma.
+ */
 #pragma GCC optimize ("O0")
-
-void sincos(double x, double* p_sin, double* p_cos) {
-  *p_sin = sin(x);
-  *p_cos = cos(x);
-}
-
-void sincosf(float x, float* p_sinf, float* p_cosf) {
-  *p_sinf = sinf(x);
-  *p_cosf = cosf(x);
-}
-
-void sincosl(long double x, long double* p_sinl, long double* p_cosl) {
-  *p_sinl = sinl(x);
-  *p_cosl = cosl(x);
+void  sincosl(long double x, long double *psin, long double *pcos)
+{
+	*psin = sinl(x);
+	*pcos = cosl(x);
 }
