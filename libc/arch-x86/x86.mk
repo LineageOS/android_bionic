@@ -20,6 +20,7 @@ _LIBC_ARCH_COMMON_SRC_FILES := \
     arch-x86/string/strcmp_wrapper.S \
     arch-x86/string/strlen_wrapper.S \
     arch-x86/string/strncmp_wrapper.S \
+    arch-x86/string/strcat.S \
 
 _LIBC_ARCH_STATIC_SRC_FILES := \
     bionic/dl_iterate_phdr_static.c \
