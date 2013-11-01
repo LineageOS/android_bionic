@@ -124,11 +124,6 @@ __bionic_memory_barrier(void)
 }
 #endif /* !ANDROID_SMP */
 
-/* LDREX/STREX routines broken on ARMv6 */
-#  if __ARM_ARCH__ == 6
-#    define BROKEN_REX
-#  endif
-
 /* Compare-and-swap, without any explicit barriers. Note that this functions
  * returns 0 on success, and 1 on failure. The opposite convention is typically
  * used on other platforms.
@@ -140,7 +135,7 @@ __bionic_memory_barrier(void)
  *
  * LDREX/STREX are only available starting from ARMv6
  */
-#if defined(__ARM_HAVE_LDREX_STREX) && !defined(BROKEN_REX)
+#ifdef __ARM_HAVE_LDREX_STREX
 __ATOMIC_INLINE__ int
 __bionic_cmpxchg(int32_t old_value, int32_t new_value, volatile int32_t* ptr)
 {
@@ -187,7 +182,7 @@ __bionic_cmpxchg(int32_t old_value, int32_t new_value, volatile int32_t* ptr)
  *   ARMv6+ => use LDREX/STREX
  *   < ARMv6 => use SWP instead.
  */
-#if defined(__ARM_HAVE_LDREX_STREX) && !defined(BROKEN_REX)
+#ifdef __ARM_HAVE_LDREX_STREX
 __ATOMIC_INLINE__ int32_t
 __bionic_swap(int32_t new_value, volatile int32_t* ptr)
 {
@@ -221,7 +216,7 @@ __bionic_swap(int32_t new_value, volatile int32_t* ptr)
 /* Atomic increment - without any barriers
  * This returns the old value
  */
-#if defined(__ARM_HAVE_LDREX_STREX) && !defined(BROKEN_REX)
+#ifdef __ARM_HAVE_LDREX_STREX
 __ATOMIC_INLINE__ int32_t
 __bionic_atomic_inc(volatile int32_t* ptr)
 {
@@ -255,7 +250,7 @@ __bionic_atomic_inc(volatile int32_t* ptr)
 /* Atomic decrement - without any barriers
  * This returns the old value.
  */
-#if defined(__ARM_HAVE_LDREX_STREX) && !defined(BROKEN_REX)
+#ifdef __ARM_HAVE_LDREX_STREX
 __ATOMIC_INLINE__ int32_t
 __bionic_atomic_dec(volatile int32_t* ptr)
 {
