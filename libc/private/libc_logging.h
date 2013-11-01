@@ -36,22 +36,7 @@
 
 __BEGIN_DECLS
 
-enum {
-  BIONIC_EVENT_MEMCPY_BUFFER_OVERFLOW = 80100,
-  BIONIC_EVENT_STRCAT_BUFFER_OVERFLOW = 80105,
-  BIONIC_EVENT_MEMMOVE_BUFFER_OVERFLOW = 80110,
-  BIONIC_EVENT_STRNCAT_BUFFER_OVERFLOW = 80115,
-  BIONIC_EVENT_STRNCPY_BUFFER_OVERFLOW = 80120,
-  BIONIC_EVENT_MEMSET_BUFFER_OVERFLOW = 80125,
-  BIONIC_EVENT_STRCPY_BUFFER_OVERFLOW = 80130,
-
-  BIONIC_EVENT_STRCAT_INTEGER_OVERFLOW = 80200,
-  BIONIC_EVENT_STRNCAT_INTEGER_OVERFLOW = 80205,
-
-  BIONIC_EVENT_RESOLVER_OLD_RESPONSE = 80300,
-  BIONIC_EVENT_RESOLVER_WRONG_SERVER = 80305,
-  BIONIC_EVENT_RESOLVER_WRONG_QUERY = 80310,
-};
+#include "libc_events.h"
 
 enum {
   ANDROID_LOG_UNKNOWN = 0,
@@ -79,7 +64,16 @@ __LIBC_HIDDEN__ void __libc_set_abort_message(const char* msg);
 //
 
 __LIBC_HIDDEN__ __noreturn void __libc_fatal(const char* format, ...)
-    __attribute__((__format__(printf, 1, 2)));
+    __printflike(1, 2);
+
+//
+// Formats a message to the log (priority 'fatal'), but doesn't abort.
+// Used by the malloc implementation to ensure that debuggerd dumps memory
+// around the bad address.
+//
+
+__LIBC_HIDDEN__ void __libc_fatal_no_abort(const char* format, ...)
+    __printflike(1, 2);
 
 //
 // Formatting routines for the C library's internal debugging.
@@ -87,13 +81,13 @@ __LIBC_HIDDEN__ __noreturn void __libc_fatal(const char* format, ...)
 //
 
 __LIBC_HIDDEN__ int __libc_format_buffer(char* buffer, size_t buffer_size, const char* format, ...)
-    __attribute__((__format__(printf, 3, 4)));
+    __printflike(3, 4);
 
 __LIBC_HIDDEN__ int __libc_format_fd(int fd, const char* format, ...)
-    __attribute__((__format__(printf, 2, 3)));
+    __printflike(2, 3);
 
 __LIBC_HIDDEN__ int __libc_format_log(int priority, const char* tag, const char* format, ...)
-    __attribute__((__format__(printf, 3, 4)));
+    __printflike(3, 4);
 
 __LIBC_HIDDEN__ int __libc_format_log_va_list(int priority, const char* tag, const char* format,
                                               va_list ap);

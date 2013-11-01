@@ -6,67 +6,33 @@ include $(LOCAL_PATH)/arch-$(TARGET_ARCH)/syscalls.mk
 # =========================================================
 libc_common_src_files := \
 	$(syscall_src) \
-	unistd/abort.c \
 	unistd/alarm.c \
 	unistd/exec.c \
 	unistd/fnmatch.c \
-	unistd/getopt_long.c \
 	unistd/syslog.c \
 	unistd/system.c \
 	unistd/time.c \
 	stdio/asprintf.c \
-	stdio/clrerr.c \
-	stdio/fclose.c \
-	stdio/fdopen.c \
-	stdio/feof.c \
-	stdio/ferror.c \
 	stdio/fflush.c \
 	stdio/fgetc.c \
-	stdio/fgetln.c \
-	stdio/fgetpos.c \
-	stdio/fgets.c \
-	stdio/fileno.c \
 	stdio/findfp.c \
-	stdio/flags.c \
-	stdio/fopen.c \
 	stdio/fprintf.c \
-	stdio/fpurge.c \
 	stdio/fputc.c \
-	stdio/fputs.c \
 	stdio/fread.c \
 	stdio/freopen.c \
 	stdio/fscanf.c \
 	stdio/fseek.c \
-	stdio/fsetpos.c \
 	stdio/ftell.c \
-	stdio/funopen.c \
 	stdio/fvwrite.c \
-	stdio/fwalk.c \
-	stdio/fwrite.c \
-	stdio/getc.c \
-	stdio/getchar.c \
 	stdio/gets.c \
-	stdio/makebuf.c \
-	stdio/mktemp.c \
 	stdio/printf.c \
-	stdio/putc.c \
-	stdio/putchar.c \
-	stdio/puts.c \
-	stdio/putw.c \
 	stdio/refill.c \
-	stdio/remove.c \
 	stdio/rewind.c \
-	stdio/rget.c \
 	stdio/scanf.c \
-	stdio/setbuf.c \
-	stdio/setbuffer.c \
-	stdio/setvbuf.c \
 	stdio/snprintf.c\
 	stdio/sprintf.c \
 	stdio/sscanf.c \
 	stdio/stdio.c \
-	stdio/tempnam.c \
-	stdio/tmpnam.c \
 	stdio/ungetc.c \
 	stdio/vasprintf.c \
 	stdio/vfprintf.c \
@@ -77,13 +43,11 @@ libc_common_src_files := \
 	stdio/vscanf.c \
 	stdio/vsscanf.c \
 	stdio/wbuf.c \
-	stdio/wsetup.c \
 	stdlib/atexit.c \
 	stdlib/ctype_.c \
 	stdlib/exit.c \
 	stdlib/getenv.c \
 	stdlib/putenv.c \
-	stdlib/qsort.c \
 	stdlib/setenv.c \
 	stdlib/strtod.c \
 	stdlib/strtoimax.c \
@@ -94,29 +58,16 @@ libc_common_src_files := \
 	stdlib/strtoumax.c \
 	stdlib/tolower_.c \
 	stdlib/toupper_.c \
-	string/index.c \
 	string/strcasecmp.c \
-	string/strcat.c \
-	string/strchr.c \
 	string/strcspn.c \
 	string/strdup.c \
-	string/strlcat.c \
-	string/strlcpy.c \
-	string/strncat.c \
-	string/strncpy.c \
 	string/strpbrk.c \
-	string/strrchr.c \
 	string/strsep.c \
 	string/strspn.c \
 	string/strstr.c \
 	string/strtok.c \
 	wchar/wcswidth.c \
 	wchar/wcsxfrm.c \
-	tzcode/asctime.c \
-	tzcode/difftime.c \
-	tzcode/localtime.c \
-	tzcode/strftime.c \
-	tzcode/strptime.c \
 	bionic/arc4random.c \
 	bionic/atoi.c \
 	bionic/atol.c \
@@ -151,11 +102,9 @@ libc_common_src_files := \
 	bionic/ldexp.c \
 	bionic/lseek64.c \
 	bionic/md5.c \
-	bionic/memchr.c \
 	bionic/memmem.c \
-	bionic/memrchr.c \
 	bionic/memswap.c \
-	bionic/mmap.c \
+	bionic/name_mem.c \
 	bionic/openat.c \
 	bionic/open.c \
 	bionic/pathconf.c \
@@ -170,7 +119,6 @@ libc_common_src_files := \
 	bionic/recv.c \
 	bionic/sched_cpualloc.c \
 	bionic/sched_cpucount.c \
-	bionic/sched_getaffinity.c \
 	bionic/sched_getcpu.c \
 	bionic/semaphore.c \
 	bionic/send.c \
@@ -190,11 +138,11 @@ libc_common_src_files := \
 	bionic/sleep.c \
 	bionic/statfs.c \
 	bionic/strndup.c \
-	bionic/strnlen.c \
 	bionic/strntoimax.c \
 	bionic/strntoumax.c \
 	bionic/strtotimeval.c \
 	bionic/system_properties.c \
+	bionic/system_properties_compat.c \
 	bionic/tcgetpgrp.c \
 	bionic/tcsetpgrp.c \
 	bionic/thread_atexit.c \
@@ -233,22 +181,40 @@ libc_common_src_files := \
 	netbsd/nameser/ns_print.c \
 	netbsd/nameser/ns_samedomain.c \
 
+# Fortify implementations of libc functions.
+libc_common_src_files += \
+    bionic/__fgets_chk.cpp \
+    bionic/__memcpy_chk.cpp \
+    bionic/__memmove_chk.cpp \
+    bionic/__memset_chk.cpp \
+    bionic/__strcat_chk.cpp \
+    bionic/__strchr_chk.cpp \
+    bionic/__strcpy_chk.cpp \
+    bionic/__strlcat_chk.cpp \
+    bionic/__strlcpy_chk.cpp \
+    bionic/__strlen_chk.cpp \
+    bionic/__strncat_chk.cpp \
+    bionic/__strncpy_chk.cpp \
+    bionic/__strrchr_chk.cpp \
+    bionic/__umask_chk.cpp \
+    bionic/__vsnprintf_chk.cpp \
+    bionic/__vsprintf_chk.cpp \
+
 libc_bionic_src_files := \
+    bionic/abort.cpp \
     bionic/assert.cpp \
     bionic/brk.cpp \
     bionic/dirent.cpp \
     bionic/__errno.c \
     bionic/eventfd_read.cpp \
     bionic/eventfd_write.cpp \
-    bionic/__fgets_chk.cpp \
+    bionic/futimens.cpp \
     bionic/getauxval.cpp \
     bionic/getcwd.cpp \
     bionic/libc_init_common.cpp \
     bionic/libc_logging.cpp \
     bionic/libgen.cpp \
-    bionic/__memcpy_chk.cpp \
-    bionic/__memmove_chk.cpp \
-    bionic/__memset_chk.cpp \
+    bionic/mmap.cpp \
     bionic/pthread_attr.cpp \
     bionic/pthread_detach.cpp \
     bionic/pthread_equal.cpp \
@@ -264,56 +230,88 @@ libc_bionic_src_files := \
     bionic/raise.cpp \
     bionic/sbrk.cpp \
     bionic/scandir.cpp \
+    bionic/sched_getaffinity.cpp \
     bionic/__set_errno.cpp \
     bionic/setlocale.cpp \
     bionic/signalfd.cpp \
     bionic/sigwait.cpp \
-    bionic/__strcat_chk.cpp \
-    bionic/__strcpy_chk.cpp \
+    bionic/statvfs.cpp \
     bionic/strerror.cpp \
     bionic/strerror_r.cpp \
-    bionic/__strlcat_chk.cpp \
-    bionic/__strlcpy_chk.cpp \
-    bionic/__strlen_chk.cpp \
-    bionic/__strncat_chk.cpp \
-    bionic/__strncpy_chk.cpp \
     bionic/strsignal.cpp \
     bionic/stubs.cpp \
     bionic/sysconf.cpp \
     bionic/tdestroy.cpp \
     bionic/tmpfile.cpp \
-    bionic/__umask_chk.cpp \
-    bionic/__vsnprintf_chk.cpp \
-    bionic/__vsprintf_chk.cpp \
     bionic/wait.cpp \
     bionic/wchar.cpp \
 
+libc_tzcode_src_files := \
+    tzcode/asctime.c \
+    tzcode/difftime.c \
+    tzcode/localtime.c \
+    tzcode/strftime.c \
+    tzcode/strptime.c \
+
 libc_upstream_freebsd_src_files := \
+    upstream-freebsd/lib/libc/stdio/clrerr.c \
+    upstream-freebsd/lib/libc/stdio/fclose.c \
+    upstream-freebsd/lib/libc/stdio/fdopen.c \
+    upstream-freebsd/lib/libc/stdio/feof.c \
+    upstream-freebsd/lib/libc/stdio/ferror.c \
+    upstream-freebsd/lib/libc/stdio/fgetln.c \
+    upstream-freebsd/lib/libc/stdio/fgetpos.c \
+    upstream-freebsd/lib/libc/stdio/fgets.c \
+    upstream-freebsd/lib/libc/stdio/fileno.c \
+    upstream-freebsd/lib/libc/stdio/flags.c \
+    upstream-freebsd/lib/libc/stdio/fopen.c \
+    upstream-freebsd/lib/libc/stdio/fpurge.c \
+    upstream-freebsd/lib/libc/stdio/fputs.c \
+    upstream-freebsd/lib/libc/stdio/fsetpos.c \
+    upstream-freebsd/lib/libc/stdio/funopen.c \
+    upstream-freebsd/lib/libc/stdio/fwalk.c \
+    upstream-freebsd/lib/libc/stdio/fwrite.c \
+    upstream-freebsd/lib/libc/stdio/getc.c \
+    upstream-freebsd/lib/libc/stdio/getchar.c \
+    upstream-freebsd/lib/libc/stdio/makebuf.c \
+    upstream-freebsd/lib/libc/stdio/mktemp.c \
+    upstream-freebsd/lib/libc/stdio/putc.c \
+    upstream-freebsd/lib/libc/stdio/putchar.c \
+    upstream-freebsd/lib/libc/stdio/puts.c \
+    upstream-freebsd/lib/libc/stdio/putw.c \
+    upstream-freebsd/lib/libc/stdio/remove.c \
+    upstream-freebsd/lib/libc/stdio/rget.c \
+    upstream-freebsd/lib/libc/stdio/setbuf.c \
+    upstream-freebsd/lib/libc/stdio/setbuffer.c \
+    upstream-freebsd/lib/libc/stdio/setvbuf.c \
+    upstream-freebsd/lib/libc/stdio/tempnam.c \
+    upstream-freebsd/lib/libc/stdio/tmpnam.c \
+    upstream-freebsd/lib/libc/stdio/wsetup.c \
+    upstream-freebsd/lib/libc/stdlib/abs.c \
+    upstream-freebsd/lib/libc/stdlib/getopt_long.c \
+    upstream-freebsd/lib/libc/stdlib/imaxabs.c \
+    upstream-freebsd/lib/libc/stdlib/imaxdiv.c \
+    upstream-freebsd/lib/libc/stdlib/labs.c \
+    upstream-freebsd/lib/libc/stdlib/llabs.c \
+    upstream-freebsd/lib/libc/stdlib/qsort.c \
     upstream-freebsd/lib/libc/stdlib/realpath.c \
     upstream-freebsd/lib/libc/string/wcpcpy.c \
     upstream-freebsd/lib/libc/string/wcpncpy.c \
     upstream-freebsd/lib/libc/string/wcscasecmp.c \
-    upstream-freebsd/lib/libc/string/wcscat.c \
-    upstream-freebsd/lib/libc/string/wcschr.c \
-    upstream-freebsd/lib/libc/string/wcscmp.c \
-    upstream-freebsd/lib/libc/string/wcscpy.c \
     upstream-freebsd/lib/libc/string/wcscspn.c \
     upstream-freebsd/lib/libc/string/wcsdup.c \
     upstream-freebsd/lib/libc/string/wcslcat.c \
     upstream-freebsd/lib/libc/string/wcslcpy.c \
-    upstream-freebsd/lib/libc/string/wcslen.c \
     upstream-freebsd/lib/libc/string/wcsncasecmp.c \
     upstream-freebsd/lib/libc/string/wcsncat.c \
     upstream-freebsd/lib/libc/string/wcsncmp.c \
     upstream-freebsd/lib/libc/string/wcsncpy.c \
     upstream-freebsd/lib/libc/string/wcsnlen.c \
     upstream-freebsd/lib/libc/string/wcspbrk.c \
-    upstream-freebsd/lib/libc/string/wcsrchr.c \
     upstream-freebsd/lib/libc/string/wcsspn.c \
     upstream-freebsd/lib/libc/string/wcsstr.c \
     upstream-freebsd/lib/libc/string/wcstok.c \
     upstream-freebsd/lib/libc/string/wmemchr.c \
-    upstream-freebsd/lib/libc/string/wmemcmp.c \
     upstream-freebsd/lib/libc/string/wmemcpy.c \
     upstream-freebsd/lib/libc/string/wmemmove.c \
     upstream-freebsd/lib/libc/string/wmemset.c \
@@ -369,6 +367,23 @@ libc_common_src_files += \
 	bionic/memmove.c.arm \
 	string/bcopy.c \
 	string/strncmp.c \
+	string/strncat.c \
+	string/strncpy.c \
+	bionic/strchr.cpp \
+	string/strrchr.c \
+	bionic/memchr.c \
+	bionic/memrchr.c \
+	string/index.c \
+	bionic/strnlen.c \
+	string/strlcat.c \
+	string/strlcpy.c \
+	upstream-freebsd/lib/libc/string/wcschr.c \
+	upstream-freebsd/lib/libc/string/wcsrchr.c \
+	upstream-freebsd/lib/libc/string/wcscmp.c \
+	upstream-freebsd/lib/libc/string/wcscpy.c \
+	upstream-freebsd/lib/libc/string/wmemcmp.c \
+	upstream-freebsd/lib/libc/string/wcslen.c \
+	upstream-freebsd/lib/libc/string/wcscat.c
 
 # These files need to be arm so that gdbserver
 # can set breakpoints in them without messing
@@ -392,7 +407,6 @@ libc_common_src_files += \
     bionic/pthread-rwlocks.c \
     bionic/pthread-timers.c \
     bionic/ptrace.c \
-    string/strcpy.c \
 
 libc_static_common_src_files += \
     bionic/pthread.c \
@@ -407,7 +421,25 @@ libc_common_src_files += \
 	string/bcopy.c \
 	string/strcmp.c \
 	string/strcpy.c \
-	string/strncmp.c
+	string/strncmp.c \
+	string/strcat.c \
+	string/strncat.c \
+	string/strncpy.c \
+	bionic/strchr.cpp \
+	string/strrchr.c \
+	bionic/memchr.c \
+	bionic/memrchr.c \
+	string/index.c \
+	bionic/strnlen.c \
+	string/strlcat.c \
+	string/strlcpy.c \
+	upstream-freebsd/lib/libc/string/wcschr.c \
+	upstream-freebsd/lib/libc/string/wcsrchr.c \
+	upstream-freebsd/lib/libc/string/wcscmp.c \
+	upstream-freebsd/lib/libc/string/wcscpy.c \
+	upstream-freebsd/lib/libc/string/wmemcmp.c \
+	upstream-freebsd/lib/libc/string/wcslen.c \
+	upstream-freebsd/lib/libc/string/wcscat.c
 
 libc_common_src_files += \
 	bionic/pthread-atfork.c \
@@ -468,14 +500,6 @@ libc_common_cflags := \
     -DPOSIX_MISTAKE \
     -DLOG_ON_HEAP_ERROR \
     -Wall -Wextra
-
-# these macro definitions are required to implement the
-# 'timezone' and 'daylight' global variables, as well as
-# properly update the 'tm_gmtoff' field in 'struct tm'.
-#
-libc_common_cflags += \
-    -DTM_GMTOFF=tm_gmtoff \
-    -DUSG_COMPAT=1
 
 ifeq ($(strip $(DEBUG_BIONIC_LIBC)),true)
   libc_common_cflags += -DDEBUG
@@ -554,23 +578,17 @@ libc_crt_target_cflags += \
 # static C++ destructors are properly called on dlclose().
 #
 ifeq ($(TARGET_ARCH),arm)
-    libc_crtbegin_extension := c
     libc_crt_target_so_cflags :=
 endif
 ifeq ($(TARGET_ARCH),mips)
-    libc_crtbegin_extension := S
     libc_crt_target_so_cflags := -fPIC
 endif
 ifeq ($(TARGET_ARCH),x86)
-    libc_crtbegin_extension := c
     libc_crt_target_so_cflags := -fPIC
 endif
-ifeq ($(libc_crtbegin_extension),)
-    $(error $(TARGET_ARCH) not supported)
-endif
 libc_crt_target_so_cflags += $(libc_crt_target_cflags)
-libc_crt_target_crtbegin_file := $(LOCAL_PATH)/arch-$(TARGET_ARCH)/bionic/crtbegin.$(libc_crtbegin_extension)
-libc_crt_target_crtbegin_so_file := $(LOCAL_PATH)/arch-$(TARGET_ARCH)/bionic/crtbegin_so.$(libc_crtbegin_extension)
+libc_crt_target_crtbegin_file := $(LOCAL_PATH)/arch-$(TARGET_ARCH)/bionic/crtbegin.c
+libc_crt_target_crtbegin_so_file := $(LOCAL_PATH)/arch-$(TARGET_ARCH)/bionic/crtbegin_so.c
 
 # See the comment in crtbrand.c for the reason why we need to generate
 # crtbrand.s before generating crtbrand.o.
@@ -687,6 +705,28 @@ include $(BUILD_STATIC_LIBRARY)
 
 
 # ========================================================
+# libc_tzcode.a - upstream 'tzcode' code
+# ========================================================
+
+include $(CLEAR_VARS)
+
+LOCAL_SRC_FILES := $(libc_tzcode_src_files)
+LOCAL_CFLAGS := \
+    $(libc_common_cflags) \
+    -std=gnu99 \
+    -DSTD_INSPIRED=1 \
+    -DTZDIR=\"/system/usr/share/zoneinfo\" \
+    -DTM_GMTOFF=tm_gmtoff \
+    -DUSG_COMPAT=1
+LOCAL_C_INCLUDES := $(libc_common_c_includes)
+LOCAL_MODULE := libc_tzcode
+LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
+LOCAL_SYSTEM_SHARED_LIBRARIES :=
+
+include $(BUILD_STATIC_LIBRARY)
+
+
+# ========================================================
 # libc_freebsd.a - upstream FreeBSD C library code
 # ========================================================
 #
@@ -761,7 +801,12 @@ LOCAL_CFLAGS := $(libc_common_cflags) \
 LOCAL_C_INCLUDES := $(libc_common_c_includes)
 LOCAL_MODULE := libc_common
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
-LOCAL_WHOLE_STATIC_LIBRARIES := libbionic_ssp libc_bionic libc_freebsd libc_netbsd
+LOCAL_WHOLE_STATIC_LIBRARIES := \
+    libbionic_ssp \
+    libc_bionic \
+    libc_freebsd \
+    libc_netbsd \
+    libc_tzcode
 LOCAL_SYSTEM_SHARED_LIBRARIES :=
 
 # TODO: split out the asflags.

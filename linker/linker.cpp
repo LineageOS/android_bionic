@@ -440,17 +440,14 @@ dl_iterate_phdr(int (*cb)(dl_phdr_info *info, size_t size, void *data),
 #endif
 
 static Elf32_Sym* soinfo_elf_lookup(soinfo* si, unsigned hash, const char* name) {
-    Elf32_Sym* s;
     Elf32_Sym* symtab = si->symtab;
     const char* strtab = si->strtab;
-    unsigned n;
 
     TRACE_TYPE(LOOKUP, "SEARCH %s in %s@0x%08x %08x %d",
                name, si->name, si->base, hash, hash % si->nbucket);
-    n = hash % si->nbucket;
 
-    for (n = si->bucket[hash % si->nbucket]; n != 0; n = si->chain[n]) {
-        s = symtab + n;
+    for (unsigned n = si->bucket[hash % si->nbucket]; n != 0; n = si->chain[n]) {
+        Elf32_Sym* s = symtab + n;
         if (strcmp(strtab + s->st_name, name)) continue;
 
             /* only concern ourselves with global and weak symbol definitions */
@@ -1088,17 +1085,15 @@ static int soinfo_relocate(soinfo* si, Elf32_Rel* rel, unsigned count,
 }
 
 #ifdef ANDROID_MIPS_LINKER
-static int mips_relocate_got(soinfo* si, soinfo* needed[]) {
-    unsigned *got;
-    unsigned local_gotno, gotsym, symtabno;
-    Elf32_Sym *symtab, *sym;
-    unsigned g;
-
-    got = si->plt_got;
-    local_gotno = si->mips_local_gotno;
-    gotsym = si->mips_gotsym;
-    symtabno = si->mips_symtabno;
-    symtab = si->symtab;
+static bool mips_relocate_got(soinfo* si, soinfo* needed[]) {
+    unsigned* got = si->plt_got;
+    if (got == NULL) {
+        return true;
+    }
+    unsigned local_gotno = si->mips_local_gotno;
+    unsigned gotsym = si->mips_gotsym;
+    unsigned symtabno = si->mips_symtabno;
+    Elf32_Sym* symtab = si->symtab;
 
     /*
      * got[0] is address of lazy resolver function
@@ -1109,7 +1104,7 @@ static int mips_relocate_got(soinfo* si, soinfo* needed[]) {
      */
 
     if ((si->flags & FLAG_LINKER) == 0) {
-        g = 0;
+        size_t g = 0;
         got[g++] = 0xdeadbeef;
         if (got[g] & 0x80000000) {
             got[g++] = 0xdeadfeed;
@@ -1123,9 +1118,9 @@ static int mips_relocate_got(soinfo* si, soinfo* needed[]) {
     }
 
     /* Now for the global GOT entries */
-    sym = symtab + gotsym;
+    Elf32_Sym* sym = symtab + gotsym;
     got = si->plt_got + local_gotno;
-    for (g = gotsym; g < symtabno; g++, sym++, got++) {
+    for (size_t g = gotsym; g < symtabno; g++, sym++, got++) {
         const char* sym_name;
         Elf32_Sym* s;
         soinfo* lsi;
@@ -1139,7 +1134,7 @@ static int mips_relocate_got(soinfo* si, soinfo* needed[]) {
             s = &symtab[g];
             if (ELF32_ST_BIND(s->st_info) != STB_WEAK) {
                 DL_ERR("cannot locate \"%s\"...", sym_name);
-                return -1;
+                return false;
             }
             *got = 0;
         }
@@ -1151,7 +1146,7 @@ static int mips_relocate_got(soinfo* si, soinfo* needed[]) {
              *got = lsi->load_bias + s->st_value;
         }
     }
-    return 0;
+    return true;
 }
 #endif
 
@@ -1495,18 +1490,19 @@ static bool soinfo_link_image(soinfo* si) {
         return false;
     }
 
-    /* if this is the main executable, then load all of the preloads now */
+    // If this is the main executable, then load all of the libraries from LD_PRELOAD now.
     if (si->flags & FLAG_EXE) {
         memset(gLdPreloads, 0, sizeof(gLdPreloads));
+        size_t preload_count = 0;
         for (size_t i = 0; gLdPreloadNames[i] != NULL; i++) {
             soinfo* lsi = find_library(gLdPreloadNames[i]);
-            if (lsi == NULL) {
-                strlcpy(tmp_err_buf, linker_get_error_buffer(), sizeof(tmp_err_buf));
-                DL_ERR("could not load library \"%s\" needed by \"%s\"; caused by %s",
-                       gLdPreloadNames[i], si->name, tmp_err_buf);
-                return false;
+            if (lsi != NULL) {
+                gLdPreloads[preload_count++] = lsi;
+            } else {
+                // As with glibc, failure to load an LD_PRELOAD library is just a warning.
+                DL_WARN("could not load library \"%s\" from LD_PRELOAD for \"%s\"; caused by %s",
+                        gLdPreloadNames[i], si->name, linker_get_error_buffer());
             }
-            gLdPreloads[i] = lsi;
         }
     }
 
@@ -1535,6 +1531,8 @@ static bool soinfo_link_image(soinfo* si) {
          * phdr_table_protect_segments() after all of them are applied
          * and all constructors are run.
          */
+        DL_WARN("%s has text relocations. This is wasting memory and is "
+                "a security risk. Please fix.", si->name);
         if (phdr_table_unprotect_segments(si->phdr, si->phnum, si->load_bias) < 0) {
             DL_ERR("can't unprotect loadable segments for \"%s\": %s",
                    si->name, strerror(errno));
@@ -1556,7 +1554,7 @@ static bool soinfo_link_image(soinfo* si) {
     }
 
 #ifdef ANDROID_MIPS_LINKER
-    if (mips_relocate_got(si, needed)) {
+    if (!mips_relocate_got(si, needed)) {
         return false;
     }
 #endif
@@ -1581,13 +1579,30 @@ static bool soinfo_link_image(soinfo* si) {
         return false;
     }
 
-    // If this is a setuid/setgid program, close the security hole described in
-    // ftp://ftp.freebsd.org/pub/FreeBSD/CERT/advisories/FreeBSD-SA-02:23.stdio.asc
-    if (get_AT_SECURE()) {
-        nullify_closed_stdio();
-    }
     notify_gdb_of_load(si);
     return true;
+}
+
+/*
+ * This function add vdso to internal dso list.
+ * It helps to stack unwinding through signal handlers.
+ * Also, it makes bionic more like glibc.
+ */
+static void add_vdso(KernelArgumentBlock& args UNUSED) {
+#ifdef AT_SYSINFO_EHDR
+    Elf32_Ehdr* ehdr_vdso = reinterpret_cast<Elf32_Ehdr*>(args.getauxval(AT_SYSINFO_EHDR));
+
+    soinfo* si = soinfo_alloc("[vdso]");
+    si->phdr = reinterpret_cast<Elf32_Phdr*>(reinterpret_cast<char*>(ehdr_vdso) + ehdr_vdso->e_phoff);
+    si->phnum = ehdr_vdso->e_phnum;
+    si->link_map.l_name = si->name;
+    for (size_t i = 0; i < si->phnum; ++i) {
+        if (si->phdr[i].p_type == PT_LOAD) {
+            si->link_map.l_addr = reinterpret_cast<Elf32_Addr>(ehdr_vdso) - si->phdr[i].p_vaddr;
+            break;
+        }
+    }
+#endif
 }
 
 /*
@@ -1613,6 +1628,12 @@ static Elf32_Addr __linker_init_post_relocation(KernelArgumentBlock& args, Elf32
 
     // Initialize environment functions, and get to the ELF aux vectors table.
     linker_env_init(args);
+
+    // If this is a setuid/setgid program, close the security hole described in
+    // ftp://ftp.freebsd.org/pub/FreeBSD/CERT/advisories/FreeBSD-SA-02:23.stdio.asc
+    if (get_AT_SECURE()) {
+        nullify_closed_stdio();
+    }
 
     debuggerd_init();
 
@@ -1708,6 +1729,8 @@ static Elf32_Addr __linker_init_post_relocation(KernelArgumentBlock& args, Elf32
         __libc_format_fd(2, "CANNOT LINK EXECUTABLE: %s\n", linker_get_error_buffer());
         exit(EXIT_FAILURE);
     }
+
+    add_vdso(args);
 
     si->CallPreInitConstructors();
 

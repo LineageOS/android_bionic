@@ -134,17 +134,18 @@ extern mode_t umask(mode_t);
 extern mode_t __umask_chk(mode_t);
 extern mode_t __umask_real(mode_t)
     __asm__(__USER_LABEL_PREFIX__ "umask");
-extern void __umask_error()
-    __attribute__((__error__("umask called with invalid mode")));
+__errordecl(__umask_invalid_mode, "umask called with invalid mode");
 
 __BIONIC_FORTIFY_INLINE
 mode_t umask(mode_t mode) {
+#if !defined(__clang__)
   if (__builtin_constant_p(mode)) {
     if ((mode & 0777) != mode) {
-      __umask_error();
+      __umask_invalid_mode();
     }
     return __umask_real(mode);
   }
+#endif
   return __umask_chk(mode);
 }
 #endif /* defined(__BIONIC_FORTIFY) */
@@ -167,7 +168,8 @@ extern int renameat(int olddirfd, const char *oldpath, int newdirfd, const char 
 
 # define UTIME_NOW      ((1l << 30) - 1l)
 # define UTIME_OMIT     ((1l << 30) - 2l)
-extern int utimensat (int fd, const char *path, const struct timespec times[2], int flags);
+extern int utimensat(int fd, const char *path, const struct timespec times[2], int flags);
+extern int futimens(int fd, const struct timespec times[2]);
 
 __END_DECLS
 
