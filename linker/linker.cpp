@@ -3023,7 +3023,11 @@ bool soinfo::link_image(const soinfo_list_t& global_group, const soinfo_list_t& 
 #endif
     // Make segments writable to allow text relocations to work properly. We will later call
     // phdr_table_protect_segments() after all of them are applied and all constructors are run.
+#if defined(USE_LEGACY_BLOBS)
+    DEBUG("%s has text relocations. This is wasting memory and prevents "
+#else
     DL_WARN("%s has text relocations. This is wasting memory and prevents "
+#endif
             "security hardening. Please fix.", get_realpath());
     if (phdr_table_unprotect_segments(phdr, phnum, load_bias) < 0) {
       DL_ERR("can't unprotect loadable segments for \"%s\": %s",
