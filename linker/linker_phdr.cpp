@@ -333,7 +333,7 @@ bool ElfReader::ReserveAddressSpace() {
   }
 
   load_start_ = start;
-  load_bias_ = reinterpret_cast<uint8_t*>(start) - addr;
+  load_bias_ = reinterpret_cast<uint8_t*>(start) - reinterpret_cast<uint8_t*>(min_vaddr);
   return true;
 }
 
