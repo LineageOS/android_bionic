@@ -35,6 +35,8 @@
 #include "atexit.h"
 #include "thread_private.h"
 
+__LIBC_HIDDEN__ void (*__cleanup)();
+
 /*
  * This variable is zero until a process has created a thread.
  * It is used to avoid calling locking functions in libc when they
@@ -51,9 +53,15 @@ void
 exit(int status)
 {
 	/*
-	 * Call functions registered by atexit() or _cxa_atexit()
-	 * (including the stdio cleanup routine) and then _exit().
+	 * Call functions registered by atexit() or _cxa_atexit(),
+	 * the stdio cleanup routine and then _exit().
 	 */
 	__cxa_finalize(NULL);
+
+	// POSIX requires we flush stdio buffers on exit.
+	if (__cleanup) {
+		(*__cleanup)();
+	}
+
 	_exit(status);
 }
