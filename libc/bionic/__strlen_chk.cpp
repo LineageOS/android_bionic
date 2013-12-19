@@ -26,6 +26,8 @@
  * SUCH DAMAGE.
  */
 
+#undef _FORTIFY_SOURCE
+
 #include <string.h>
 #include <stdlib.h>
 #include "libc_logging.h"
