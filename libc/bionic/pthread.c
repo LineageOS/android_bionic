@@ -391,16 +391,21 @@ int pthread_mutexattr_getpshared(pthread_mutexattr_t *attr, int *pshared)
     return 0;
 }
 
-int pthread_mutex_init(pthread_mutex_t* mutex, const pthread_mutexattr_t* attr) {
+int pthread_mutex_init(pthread_mutex_t *mutex,
+                       const pthread_mutexattr_t *attr)
+{
+    int value = 0;
+
+    if (mutex == NULL)
+        return EINVAL;
+
     if (__predict_true(attr == NULL)) {
         mutex->value = MUTEX_TYPE_BITS_NORMAL;
         return 0;
     }
 
-    int value = 0;
-    if ((*attr & MUTEXATTR_SHARED_MASK) != 0) {
+    if ((*attr & MUTEXATTR_SHARED_MASK) != 0)
         value |= MUTEX_SHARED_MASK;
-    }
 
     switch (*attr & MUTEXATTR_TYPE_MASK) {
     case PTHREAD_MUTEX_NORMAL:
@@ -577,6 +582,9 @@ int pthread_mutex_lock_impl(pthread_mutex_t *mutex)
 {
     int mvalue, mtype, tid, shared;
 
+    if (__predict_false(mutex == NULL))
+        return EINVAL;
+
     mvalue = mutex->value;
     mtype = (mvalue & MUTEX_TYPE_MASK);
     shared = (mvalue & MUTEX_SHARED_MASK);
@@ -668,6 +676,9 @@ int pthread_mutex_unlock_impl(pthread_mutex_t *mutex)
 {
     int mvalue, mtype, tid, shared;
 
+    if (__predict_false(mutex == NULL))
+        return EINVAL;
+
     mvalue = mutex->value;
     mtype  = (mvalue & MUTEX_TYPE_MASK);
     shared = (mvalue & MUTEX_SHARED_MASK);
@@ -731,6 +742,9 @@ __LIBC_HIDDEN__
 int pthread_mutex_trylock_impl(pthread_mutex_t *mutex)
 {
     int mvalue, mtype, tid, shared;
+
+    if (__predict_false(mutex == NULL))
+        return EINVAL;
 
     mvalue = mutex->value;
     mtype  = (mvalue & MUTEX_TYPE_MASK);
@@ -826,6 +840,9 @@ int pthread_mutex_lock_timeout_np_impl(pthread_mutex_t *mutex, unsigned msecs)
 
     /* compute absolute expiration time */
     __timespec_to_relative_msec(&abstime, msecs, clock);
+
+    if (__predict_false(mutex == NULL))
+        return EINVAL;
 
     mvalue = mutex->value;
     mtype  = (mvalue & MUTEX_TYPE_MASK);
