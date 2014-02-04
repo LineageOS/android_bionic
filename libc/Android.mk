@@ -214,6 +214,7 @@ libc_bionic_src_files := \
     bionic/libc_logging.cpp \
     bionic/libgen.cpp \
     bionic/mmap.cpp \
+    bionic/posix_fallocate.cpp \
     bionic/pthread_attr.cpp \
     bionic/pthread_detach.cpp \
     bionic/pthread_equal.cpp \

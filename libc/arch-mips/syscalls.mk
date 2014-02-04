@@ -71,6 +71,7 @@ syscall_src += arch-mips/syscalls/__ioctl.S
 syscall_src += arch-mips/syscalls/readv.S
 syscall_src += arch-mips/syscalls/writev.S
 syscall_src += arch-mips/syscalls/__fcntl.S
+syscall_src += arch-mips/syscalls/fallocate64.S
 syscall_src += arch-mips/syscalls/flock.S
 syscall_src += arch-mips/syscalls/fchmod.S
 syscall_src += arch-mips/syscalls/dup.S

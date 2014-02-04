@@ -71,6 +71,7 @@ syscall_src += arch-x86/syscalls/__ioctl.S
 syscall_src += arch-x86/syscalls/readv.S
 syscall_src += arch-x86/syscalls/writev.S
 syscall_src += arch-x86/syscalls/__fcntl.S
+syscall_src += arch-x86/syscalls/fallocate64.S
 syscall_src += arch-x86/syscalls/flock.S
 syscall_src += arch-x86/syscalls/fchmod.S
 syscall_src += arch-x86/syscalls/dup.S

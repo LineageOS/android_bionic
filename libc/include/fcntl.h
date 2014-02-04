@@ -43,8 +43,12 @@ __BEGIN_DECLS
 #define O_CLOEXEC  02000000
 #endif
 
+extern int  fallocate64(int, int, off64_t, off64_t);
+extern int  fallocate(int, int, off_t, off_t);
 extern int  open(const char*  path, int  mode, ...);
 extern int  openat(int fd, const char*  path, int  mode, ...);
+extern int  posix_fallocate64(int, off64_t, off64_t);
+extern int  posix_fallocate(int, off_t, off_t);
 extern int  unlinkat(int dirfd, const char *pathname, int flags);
 extern int  fcntl(int   fd, int   command, ...);
 extern int  creat(const char*  path, mode_t  mode);

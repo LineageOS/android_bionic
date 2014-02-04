@@ -164,6 +164,10 @@ ssize_t     fgetxattr(int, const char *, void *, size_t) 1
 ssize_t     flistxattr(int, char *, size_t) 1
 int         fremovexattr(int, const char *) 1
 
+# (fallocate only gets two lines because there is no 32-bit variant.)
+int fallocate64:fallocate(int, int, off64_t, off64_t) arm,mips,x86
+int fallocate|fallocate64(int, int, off_t, off_t) arm64,x86_64
+
 # file system
 int     link (const char*, const char*)  1
 int     unlink (const char*)             1
