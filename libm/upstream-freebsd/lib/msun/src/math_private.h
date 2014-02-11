@@ -723,7 +723,7 @@ irintl(long double x)
 #define	__ieee754_remainderf remainderf
 #define	__ieee754_scalbf scalbf
 
-#if defined(KRAIT_NEON_OPTIMIZATION)
+#if defined(KRAIT_NEON_OPTIMIZATION) || defined(__ARM_NEON__)
 int	__kernel_rem_pio2(double*,double*,int,int,int) __attribute__((pcs("aapcs-vfp")));
 double	__full_ieee754_pow(double,double);
 #ifndef INLINE_REM_PIO2
