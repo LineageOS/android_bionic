@@ -1,165 +1,146 @@
-/*
- * Copyright (C) 2013 The Android Open Source Project
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *  * Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *  * Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
- * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+/* Copyright (c) 2010-2011,2013 Linaro Limited
+   All rights reserved.
+
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions
+   are met:
+
+      * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+      * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+
+      * Neither the name of Linaro Limited nor the names of its
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+   HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 /*
- * Copyright (c) 2013 ARM Ltd
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the company may not be used to endorse or promote
- *    products derived from this software without specific prior written
- *    permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ARM LTD ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL ARM LTD BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+   Assumes:
+   ARMv6T2, AArch32
+
+   Adapted to Bionic by Bernhard Rosenkränzer <bero@linaro.org>
  */
 
 #include <machine/asm.h>
 
-    .syntax unified
+#ifdef __ARMEB__
+#define S2LO		lsl
+#define S2HI		lsr
+#else
+#define S2LO		lsr
+#define S2HI		lsl
+#endif
 
-    .thumb
-    .thumb_func
+	.text
+	/* This code requires Thumb.  */
+	.thumb
+	.syntax unified
+
+/* Parameters and result.  */
+#define srcin		r0
+#define result		r0
+
+/* Internal variables.  */
+#define src		r1
+#define data1a		r2
+#define data1b		r3
+#define const_m1	r12
+#define const_0		r4
+#define tmp1		r4		/* Overlaps const_0  */
+#define tmp2		r5
 
 ENTRY(strlen)
-    pld     [r0, #0]
-    mov     r1, r0
+	.p2align 6
+	pld	[srcin, #0]
+	strd	r4, r5, [sp, #-8]!
+	bic	src, srcin, #7
+	mvn	const_m1, #0
+	ands	tmp1, srcin, #7		/* (8 - bytes) to alignment.  */
+	pld	[src, #32]
+	bne.w	misaligned8
+	mov	const_0, #0
+	mov	result, #-8
+loop_aligned:
+	/* Bytes 0-7.  */
+	ldrd	data1a, data1b, [src]
+	pld	[src, #64]
+	add	result, result, #8
+start_realigned:
+	uadd8	data1a, data1a, const_m1	/* Saturating GE<0:3> set.  */
+	sel	data1a, const_0, const_m1	/* Select based on GE<0:3>.  */
+	uadd8	data1b, data1b, const_m1
+	sel	data1b, data1a, const_m1	/* Only used if d1a == 0.  */
+	cbnz	data1b, null_found
 
-    ands    r3, r0, #7
-    beq     mainloop
+	/* Bytes 8-15.  */
+	ldrd	data1a, data1b, [src, #8]
+	uadd8	data1a, data1a, const_m1	/* Saturating GE<0:3> set.  */
+	add	result, result, #8
+	sel	data1a, const_0, const_m1	/* Select based on GE<0:3>.  */
+	uadd8	data1b, data1b, const_m1
+	sel	data1b, data1a, const_m1	/* Only used if d1a == 0.  */
+	cbnz	data1b, null_found
 
-    // Align to a double word (64 bits).
-    rsb     r3, r3, #8
-    lsls    ip, r3, #31
-    beq     align_to_32
+	/* Bytes 16-23.  */
+	ldrd	data1a, data1b, [src, #16]
+	uadd8	data1a, data1a, const_m1	/* Saturating GE<0:3> set.  */
+	add	result, result, #8
+	sel	data1a, const_0, const_m1	/* Select based on GE<0:3>.  */
+	uadd8	data1b, data1b, const_m1
+	sel	data1b, data1a, const_m1	/* Only used if d1a == 0.  */
+	cbnz	data1b, null_found
 
-    ldrb    r2, [r1], #1
-    cbz     r2, update_count_and_return
+	/* Bytes 24-31.  */
+	ldrd	data1a, data1b, [src, #24]
+	add	src, src, #32
+	uadd8	data1a, data1a, const_m1	/* Saturating GE<0:3> set.  */
+	add	result, result, #8
+	sel	data1a, const_0, const_m1	/* Select based on GE<0:3>.  */
+	uadd8	data1b, data1b, const_m1
+	sel	data1b, data1a, const_m1	/* Only used if d1a == 0.  */
+	cmp	data1b, #0
+	beq	loop_aligned
 
-align_to_32:
-    bcc     align_to_64
-    ands    ip, r3, #2
-    beq     align_to_64
+null_found:
+	cmp	data1a, #0
+	itt	eq
+	addeq	result, result, #4
+	moveq	data1a, data1b
+#ifndef __ARMEB__
+	rev	data1a, data1a
+#endif
+	clz	data1a, data1a
+	ldrd	r4, r5, [sp], #8
+	add	result, result, data1a, lsr #3	/* Bits -> Bytes.  */
+	bx	lr
 
-    ldrb    r2, [r1], #1
-    cbz     r2, update_count_and_return
-    ldrb    r2, [r1], #1
-    cbz     r2, update_count_and_return
-
-align_to_64:
-    tst     r3, #4
-    beq     mainloop
-    ldr     r3, [r1], #4
-
-    sub     ip, r3, #0x01010101
-    bic     ip, ip, r3
-    ands    ip, ip, #0x80808080
-    bne     zero_in_second_register
-
-    .p2align 2
-mainloop:
-    ldrd    r2, r3, [r1], #8
-
-    pld     [r1, #64]
-
-    sub     ip, r2, #0x01010101
-    bic     ip, ip, r2
-    ands    ip, ip, #0x80808080
-    bne     zero_in_first_register
-
-    sub     ip, r3, #0x01010101
-    bic     ip, ip, r3
-    ands    ip, ip, #0x80808080
-    bne     zero_in_second_register
-    b       mainloop
-
-update_count_and_return:
-    sub     r0, r1, r0
-    sub     r0, r0, #1
-    bx      lr
-
-zero_in_first_register:
-    sub     r0, r1, r0
-    lsls    r3, ip, #17
-    bne     sub8_and_return
-    bcs     sub7_and_return
-    lsls    ip, ip, #1
-    bne     sub6_and_return
-
-    sub     r0, r0, #5
-    bx      lr
-
-sub8_and_return:
-    sub     r0, r0, #8
-    bx      lr
-
-sub7_and_return:
-    sub     r0, r0, #7
-    bx      lr
-
-sub6_and_return:
-    sub     r0, r0, #6
-    bx      lr
-
-zero_in_second_register:
-    sub     r0, r1, r0
-    lsls    r3, ip, #17
-    bne     sub4_and_return
-    bcs     sub3_and_return
-    lsls    ip, ip, #1
-    bne     sub2_and_return
-
-    sub     r0, r0, #1
-    bx      lr
-
-sub4_and_return:
-    sub     r0, r0, #4
-    bx      lr
-
-sub3_and_return:
-    sub     r0, r0, #3
-    bx      lr
-
-sub2_and_return:
-    sub     r0, r0, #2
-    bx      lr
+misaligned8:
+	ldrd	data1a, data1b, [src]
+	and	tmp2, tmp1, #3
+	rsb	result, tmp1, #0
+	lsl	tmp2, tmp2, #3			/* Bytes -> bits.  */
+	tst	tmp1, #4
+	pld	[src, #64]
+	S2HI	tmp2, const_m1, tmp2
+	orn	data1a, data1a, tmp2
+	itt	ne
+	ornne	data1b, data1b, tmp2
+	movne	data1a, const_m1
+	mov	const_0, #0
+	b	start_realigned
 END(strlen)
