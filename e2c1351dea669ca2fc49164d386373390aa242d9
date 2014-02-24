@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bae84128_a3a5a4b6",
+        "filename": "libc/arch-arm/cortex-a15/bionic/memcpy.S",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 3671
+      },
+      "writtenOn": "2014-02-24T09:53:33Z",
+      "side": 0,
+      "message": "i wonder about just adding this back\n\ni didnt try it, but it seems like it\u0027d work...\n\n(also line 107)",
+      "revId": "e2c1351dea669ca2fc49164d386373390aa242d9",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
