@@ -16,6 +16,24 @@
       "revId": "b64022be031b94c99ae02d0644b183853f9bd54a",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bae84128_b84bffaf",
+        "filename": "libc/arch-arm/scorpion/scorpion.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1778
+      },
+      "writtenOn": "2014-03-06T16:54:41Z",
+      "side": 1,
+      "message": "Same thing as in libc/arch-arm/krait/krait.mk ...\n\nbcopy is defined in memmove.S (i.e. when MEMMOVE is \u0027included above\u0027)\n \nwithout this, generic/generic.mk willl include a defn for bcopy as well from string.bcopy.c.arm",
+      "parentUuid": "bae84128_b8c13f31",
+      "revId": "b64022be031b94c99ae02d0644b183853f9bd54a",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }
