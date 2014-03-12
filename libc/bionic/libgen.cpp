@@ -105,12 +105,13 @@ int basename_r(const char* path, char* buffer, size_t buffer_size) {
 
 int dirname_r(const char* path, char* buffer, size_t buffer_size) {
   const char* endp = NULL;
+  const char* startp = NULL;
   int len;
   int result;
 
   // Empty or NULL string gets treated as ".".
   if (path == NULL || *path == '\0') {
-    path = ".";
+    startp = ".";
     len = 1;
     goto Exit;
   }
@@ -128,7 +129,7 @@ int dirname_r(const char* path, char* buffer, size_t buffer_size) {
 
   // Either the dir is "/" or there are no slashes.
   if (endp == path) {
-    path = (*endp == '/') ? "/" : ".";
+    startp = (*endp == '/') ? "/" : ".";
     len = 1;
     goto Exit;
   }
@@ -137,7 +138,8 @@ int dirname_r(const char* path, char* buffer, size_t buffer_size) {
     endp--;
   } while (endp > path && *endp == '/');
 
-  len = endp - path + 1;
+  startp = path;
+  len = endp - startp + 1;
 
  Exit:
   result = len;
@@ -156,7 +158,7 @@ int dirname_r(const char* path, char* buffer, size_t buffer_size) {
   }
 
   if (len >= 0) {
-    memcpy(buffer, path, len);
+    memcpy(buffer, startp, len);
     buffer[len] = 0;
   }
   return result;
