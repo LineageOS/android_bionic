@@ -227,7 +227,6 @@ libc_bionic_src_files := \
     bionic/pthread_setschedparam.cpp \
     bionic/pthread_sigmask.cpp \
     bionic/raise.cpp \
-    bionic/sbrk.cpp \
     bionic/scandir.cpp \
     bionic/sched_getaffinity.cpp \
     bionic/__set_errno.cpp \
