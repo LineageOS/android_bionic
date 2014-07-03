@@ -34,7 +34,9 @@
 #include <limits.h>		/* For LONG_BIT */
 #include <string.h>		/* For memset() */
 #include <sys/types.h>
+#if defined(__LP64__)
 #include <asm/sigcontext.h>
+#endif
 
 #if defined(__LP64__) || defined(__mips__)
 /* For 64-bit (and mips), the kernel's struct sigaction doesn't match the POSIX one,
