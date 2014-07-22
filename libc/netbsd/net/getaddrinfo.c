@@ -1880,6 +1880,57 @@ static bool _using_default_dns(const char *iface)
 	return false;
 }
 
+
+static bool _iface_has_ipv4_addr(const char *iface)
+{
+	int fd;
+	struct ifreq ifr;
+	struct sockaddr* sa;
+
+	if (iface == NULL || *iface == '\0') return true;
+
+	fd = socket(AF_INET, SOCK_DGRAM, 0);
+
+	strlcpy(ifr.ifr_name, iface, sizeof(iface));
+	if ( ioctl(fd, SIOCGIFADDR, &ifr) < 0 ) {
+		close(fd);
+		return false;
+	}
+	close(fd);
+
+	sa = (struct sockaddr*)&ifr.ifr_addr;
+	if ( sa->sa_family == AF_INET) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+static bool _iface_has_ipv6_addr(const char *iface)
+{
+	FILE* fp;
+	char buff[35];
+	int if_index,len,scope,dad_status;
+	char if_name[IFNAMSIZ];
+
+	if (iface == NULL || *iface == '\0') return true;
+
+	if ((fp=fopen("/proc/net/if_inet6", "r")) != NULL)
+	{
+		while (fscanf(fp, "%32s %08x %02x %02x %02x %20s\n",
+			buff, &if_index, &len,
+			&scope, &dad_status, if_name)!=EOF)
+		{
+			if (!strcmp(if_name, iface)) {
+				fclose(fp);
+				return true;
+			}
+		}
+		fclose(fp);
+	}
+	return false;
+}
+
 /*ARGSUSED*/
 static int
 _dns_getaddrinfo(void *rv, void	*cb_data, va_list ap)
@@ -1932,6 +1983,17 @@ _dns_getaddrinfo(void *rv, void	*cb_data, va_list ap)
 			if (_using_default_dns(iface)) {
 				query_ipv6 = _have_ipv6();
 				query_ipv4 = _have_ipv4();
+			} else {
+				if (_iface_has_ipv4_addr(iface)) {
+					query_ipv4 = 1;
+				} else {
+					query_ipv4 = 0;
+				}
+				if (_iface_has_ipv6_addr(iface)) {
+					query_ipv6 = 1;
+				} else {
+					query_ipv6 = 0;
+				}
 			}
 		}
 		if (query_ipv6) {
