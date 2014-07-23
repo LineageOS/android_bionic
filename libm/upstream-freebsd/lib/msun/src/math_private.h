@@ -1,6 +1,7 @@
 /*
  * ====================================================
  * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ * Copyright (c) 2013, NVIDIA CORPORATION.  All rights reserved.
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
@@ -676,10 +677,18 @@ irintl(long double x)
 #define	__ieee754_atanh	atanh
 #define	__ieee754_asin	asin
 #define	__ieee754_atan2	atan2
+#if !defined(LIBM_OPT_EXP)
 #define	__ieee754_exp	exp
+#endif
 #define	__ieee754_cosh	cosh
 #define	__ieee754_fmod	fmod
+#if !defined(LIBM_OPT_POW)
 #define	__ieee754_pow	pow
+#endif
+#if !defined(LIBM_OPT_SIN_COS)
+#define	__ieee754_sin	sin
+#define	__ieee754_cos	cos
+#endif
 #define	__ieee754_lgamma lgamma
 #define	__ieee754_gamma	gamma
 #define	__ieee754_lgamma_r lgamma_r

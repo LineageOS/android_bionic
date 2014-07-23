@@ -52,7 +52,7 @@ __FBSDID("$FreeBSD$");
 #include "e_rem_pio2.c"
 
 double
-sin(double x)
+__ieee754_sin(double x)
 {
 	double y[2],z=0.0;
 	int32_t n, ix;
