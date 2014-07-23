@@ -124,7 +124,6 @@ libm_common_src_files += \
     upstream-freebsd/lib/msun/src/s_fdim.c \
     upstream-freebsd/lib/msun/src/s_finite.c \
     upstream-freebsd/lib/msun/src/s_finitef.c \
-    upstream-freebsd/lib/msun/src/s_floor.c \
     upstream-freebsd/lib/msun/src/s_floorf.c \
     upstream-freebsd/lib/msun/src/s_fma.c \
     upstream-freebsd/lib/msun/src/s_fmaf.c \
@@ -238,6 +237,35 @@ libm_ld128_src_files += \
     upstream-freebsd/lib/msun/ld128/s_logl.c \
     upstream-freebsd/lib/msun/ld128/s_nanl.c \
 
+# s_floor.S requires neon instructions.
+ifdef TARGET_2ND_ARCH
+arch_variant := $(TARGET_2ND_ARCH_VARIANT)
+else
+arch_variant := $(TARGET_ARCH_VARIANT)
+endif
+
+# Use the C version on armv7-a since it doesn't support neon instructions.
+ifeq ($(arch_variant),armv7-a)
+LOCAL_SRC_FILES_arm += upstream-freebsd/lib/msun/src/s_floor.c
+else
+LOCAL_SRC_FILES_arm += arm/s_floor.S
+endif
+
+LOCAL_SRC_FILES_arm64 += \
+    upstream-freebsd/lib/msun/src/s_floor.c \
+
+LOCAL_SRC_FILES_mips += \
+    upstream-freebsd/lib/msun/src/s_floor.c \
+
+LOCAL_SRC_FILES_mips64 += \
+    upstream-freebsd/lib/msun/src/s_floor.c \
+
+LOCAL_SRC_FILES_x86 += \
+    upstream-freebsd/lib/msun/src/s_floor.c \
+
+LOCAL_SRC_FILES_x86_64 += \
+    upstream-freebsd/lib/msun/src/s_floor.c \
+
 # TODO: re-enable i387/e_sqrtf.S for x86, and maybe others.
 
 libm_common_cflags := \
@@ -250,6 +278,9 @@ libm_common_cflags := \
     -Wno-uninitialized \
     -Wno-unknown-pragmas \
     -fvisibility=hidden \
+
+LOCAL_ASFLAGS := \
+    -Ibionic/libc \
 
 # Workaround the GCC "(long)fn -> lfn" optimization bug which will result in
 # self recursions for lrint, lrintf, and lrintl.
