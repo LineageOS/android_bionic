@@ -113,7 +113,6 @@ libm_common_src_files += \
     upstream-freebsd/lib/msun/src/s_fdim.c \
     upstream-freebsd/lib/msun/src/s_finite.c \
     upstream-freebsd/lib/msun/src/s_finitef.c \
-    upstream-freebsd/lib/msun/src/s_floor.c \
     upstream-freebsd/lib/msun/src/s_floorf.c \
     upstream-freebsd/lib/msun/src/s_fma.c \
     upstream-freebsd/lib/msun/src/s_fmaf.c \
@@ -171,7 +170,7 @@ libm_common_src_files += \
     upstream-freebsd/lib/msun/src/w_cabs.c \
     upstream-freebsd/lib/msun/src/w_cabsf.c \
     upstream-freebsd/lib/msun/src/w_drem.c \
-    upstream-freebsd/lib/msun/src/w_dremf.c
+    upstream-freebsd/lib/msun/src/w_dremf.c \
 
 libm_common_src_files += fake_long_double.c
 
@@ -218,30 +217,50 @@ libm_common_includes := $(LOCAL_PATH)/upstream-freebsd/lib/msun/src/
 
 libm_arm_includes := $(LOCAL_PATH)/arm
 libm_arm_src_files := arm/fenv.c
-ifeq ($(TARGET_CPU_VARIANT),krait)
-  libm_arm_src_files += \
-	arm/e_pow.S	\
-	arm/s_cos.S	\
-	arm/s_sin.S	\
-	arm/e_sqrtf.S	\
-	arm/e_sqrt.S
-  libm_arm_cflags += -DKRAIT_NEON_OPTIMIZATION -fno-if-conversion
+
+ifneq ($(TARGET_ARCH),arm)
+libm_common_src_files += \
+    upstream-freebsd/lib/msun/src/s_floor.c \
+    upstream-freebsd/lib/msun/src/e_sqrt.c \
+    upstream-freebsd/lib/msun/src/e_sqrtf.c \
+    upstream-freebsd/lib/msun/src/s_cos.c \
+    upstream-freebsd/lib/msun/src/s_sin.c
+endif
+
+ifeq ($(TARGET_CPU_VARIANT),cortex-a9)
+libm_arm_src_files += \
+    arm/k_log2.S \
+    arm/e_sqrt.S \
+    arm/e_sqrtf.S \
+    arm/s_floor.S \
+    upstream-freebsd/lib/msun/src/s_cos.c \
+    upstream-freebsd/lib/msun/src/s_sin.c
 else
-  ifeq ($(TARGET_USE_QCOM_BIONIC_OPTIMIZATION),true)
-    libm_arm_src_files += \
-      arm/e_pow.S \
-      arm/s_cos.S \
-      arm/s_sin.S \
-      arm/e_sqrtf.S \
-      arm/e_sqrt.S
-    libm_arm_cflags += -DKRAIT_NEON_OPTIMIZATION -fno-if-conversion
-  else
-    libm_common_src_files += \
-      upstream-freebsd/lib/msun/src/s_cos.c \
-      upstream-freebsd/lib/msun/src/s_sin.c \
-      upstream-freebsd/lib/msun/src/e_sqrtf.c \
-      upstream-freebsd/lib/msun/src/e_sqrt.c
-    endif
+ifeq ($(TARGET_CPU_VARIANT),$(filter $(TARGET_CPU_VARIANT),cortex-a15 krait))
+libm_arm_src_files += \
+    arm/k_log2.S \
+    arm/k_exp.S \
+    arm/e_fast_exp.S \
+    arm/e_sqrt.S \
+    arm/e_sqrtf.S \
+    arm/s_floor.S \
+    arm/e_rem_pio2_fast.S \
+    arm/e_rem_pio2_large.c \
+    arm/k_sin_fast.S \
+    arm/k_cos_fast.S \
+    arm/s_sin_fast.S \
+    arm/s_cos_fast.S \
+    arm/e_pow.S
+libm_arm_cflags += -DLIBM_OPT_SIN_COS -DLIBM_OPT_EXP -DPRECISE_TRIGONOMETRIC -DKRAIT_NEON_OPTIMIZATION -fno-if-conversion
+libm_arm_asflags += -DFPU_VFPV4 -DLIBM_OPT_SIN_COS -DLIBM_OPT_EXP -DPRECISE_TRIGONOMETRIC
+else
+libm_arm_src_files += \
+    upstream-freebsd/lib/msun/src/s_floor.c \
+    upstream-freebsd/lib/msun/src/e_sqrt.c \
+    upstream-freebsd/lib/msun/src/e_sqrtf.c \
+    upstream-freebsd/lib/msun/src/s_cos.c \
+    upstream-freebsd/lib/msun/src/s_sin.c
+endif
 endif
 
 libm_x86_includes := $(LOCAL_PATH)/i386 $(LOCAL_PATH)/i387
@@ -260,6 +279,7 @@ LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
 LOCAL_ARM_MODE := arm
 LOCAL_CFLAGS := $(libm_common_cflags) $(libm_$(TARGET_ARCH)_cflags)
 LOCAL_C_INCLUDES += $(libm_common_includes) $(libm_$(TARGET_ARCH)_includes)
+LOCAL_ASFLAGS := $(libm_common_asflags)
 LOCAL_SRC_FILES := $(libm_common_src_files) $(libm_$(TARGET_ARCH)_src_files)
 LOCAL_SYSTEM_SHARED_LIBRARIES := libc
 include $(BUILD_STATIC_LIBRARY)
