@@ -59,13 +59,15 @@ setenv(const char *name, const char *value, int rewrite)
 			return (0);
 		}
 	} else {					/* create new slot */
-		size_t cnt;
+		size_t cnt = 0;
 		char **P;
 
-		for (P = environ; *P != NULL; P++)
-			;
-		cnt = P - environ;
-        P = (char **)realloc(lastenv, sizeof(char *) * (cnt + 2));
+		if (environ != NULL) {
+			for (P = environ; *P != NULL; P++)
+				;
+			cnt = P - environ;
+		}
+		P = (char **)realloc(lastenv, sizeof(char *) * (cnt + 2));
 		if (!P)
 			return (-1);
 		if (lastenv != environ)
