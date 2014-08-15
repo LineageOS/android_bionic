@@ -25,7 +25,6 @@ libc_common_src_files_arm += \
     upstream-freebsd/lib/libc/string/wcsrchr.c \
     upstream-freebsd/lib/libc/string/wmemcmp.c \
     upstream-freebsd/lib/libc/string/wmemmove.c \
-    upstream-openbsd/lib/libc/string/bcopy.c \
     upstream-openbsd/lib/libc/string/stpcpy.c \
     upstream-openbsd/lib/libc/string/stpncpy.c \
     upstream-openbsd/lib/libc/string/strlcat.c \
@@ -69,6 +68,12 @@ libc_netbsd_src_files_arm := \
 ## CPU variant specific source files
 ifeq ($(strip $(TARGET_$(my_2nd_arch_prefix)CPU_VARIANT)),)
   $(warning TARGET_$(my_2nd_arch_prefix)ARCH is arm, but TARGET_$(my_2nd_arch_prefix)CPU_VARIANT is not defined)
+endif
+ifneq ($(strip $(TARGET_$(my_2nd_arch_prefix)CPU_VARIANT)),krait)
+ifneq ($(strip $(TARGET_$(my_2nd_arch_prefix)CPU_VARIANT)),cortex-a53)
+libc_bionic_src_files_arm += \
+    upstream-openbsd/lib/libc/string/bcopy.c
+endif
 endif
 cpu_variant_mk := $(LOCAL_PATH)/arch-arm/$(TARGET_$(my_2nd_arch_prefix)CPU_VARIANT)/$(TARGET_$(my_2nd_arch_prefix)CPU_VARIANT).mk
 ifeq ($(wildcard $(cpu_variant_mk)),)
