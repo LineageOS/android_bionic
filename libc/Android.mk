@@ -411,8 +411,6 @@ libc_static_common_src_files += \
     bionic/pthread_create.cpp \
     bionic/pthread_key.cpp \
 
-libc_common_src_files += \
-    bionic/memchr.c
 endif # x86
 
 ifeq ($(TARGET_ARCH),mips)
