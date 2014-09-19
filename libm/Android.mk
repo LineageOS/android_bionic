@@ -257,10 +257,14 @@ ifeq ($(TARGET_USE_QCOM_BIONIC_OPTIMIZATION),true)
   libm_arm_includes += $(LOCAL_PATH)/../libc/
 
   libm_arm64_src_files += \
+    arm64/e_pow64.S \
     upstream-freebsd/lib/msun/src/s_cos.c \
     upstream-freebsd/lib/msun/src/s_sin.c \
     upstream-freebsd/lib/msun/src/e_sqrtf.c \
     upstream-freebsd/lib/msun/src/e_sqrt.c
+
+  libm_arm64_cflags += -DQCOM_NEON_OPTIMIZATION
+  libm_arm64_includes += $(LOCAL_PATH)/../libc/
 else
   libm_common_src_files += \
     upstream-freebsd/lib/msun/src/s_cos.c \
@@ -286,7 +290,8 @@ LOCAL_CFLAGS_arm := $(libm_arm_cflags)
 LOCAL_C_INCLUDES_arm := $(LOCAL_PATH)/arm $(libm_arm_includes)
 LOCAL_SRC_FILES_arm := arm/fenv.c $(libm_arm_src_files)
 
-LOCAL_C_INCLUDES_arm64 := $(libm_ld_includes)
+LOCAL_CFLAGS_arm64 := $(libm_arm64_cflags)
+LOCAL_C_INCLUDES_arm64 := $(libm_ld_includes) $(libm_arm64_includes)
 LOCAL_SRC_FILES_arm64 := arm64/fenv.c $(libm_ld_src_files) $(libm_arm64_src_files)
 
 LOCAL_C_INCLUDES_x86 := $(LOCAL_PATH)/i387
