@@ -50,8 +50,6 @@
 
 #define vmov_f64 fconstd
 
-ENTRY(cosl)
-END(cosl)
 ENTRY(cos)
     push            {r4, r6, r7, lr}
     vmov            d0, r0, r1
@@ -307,6 +305,14 @@ ENTRY(cos)
 .Ltwo_over_pi_ptr:
     .word           .Ltwo_over_pi-(.LPICtwo_over_pi0+8)
 END(cos)
+
+#if (__LDBL_MANT_DIG__ == 53)
+.weak cosl
+.equ  cosl, cos
+#else
+ENTRY(cosl)
+END(cosl)
+#endif
 
     .section        .rodata.npio2_hw,"a",%progbits
     .align          2

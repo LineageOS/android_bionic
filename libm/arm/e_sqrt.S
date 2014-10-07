@@ -34,3 +34,8 @@ ENTRY(sqrt)
     vmov.f64    r0, r1, d0
     bx          lr
 END(sqrt)
+
+#if (__LDBL_MANT_DIG__ == 53)
+.weak sqrtl
+.equ  sqrtl, sqrt
+#endif
