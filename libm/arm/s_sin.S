@@ -50,8 +50,6 @@
 
 #define vmov_f64 fconstd
 
-ENTRY(sinl)
-END(sinl)
 ENTRY(sin)
     push            {r4, r6, r7, lr}
     vmov            d0, r0, r1
@@ -302,6 +300,14 @@ ENTRY(sin)
 .Ltwo_over_pi_ptr:
     .word           .Ltwo_over_pi-(.LPICtwo_over_pi0+8)
 END(sin)
+
+#if (__LDBL_MANT_DIG__ == 53)
+.weak sinl
+.equ  sinl, sin
+#else
+ENTRY(sinl)
+END(sinl)
+#endif
 
     .section        .rodata.npio2_hw,"a",%progbits
     .align          2
