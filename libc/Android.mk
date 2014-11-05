@@ -83,6 +83,10 @@ libc_common_src_files += \
     bionic/__vsnprintf_chk.cpp \
     bionic/__vsprintf_chk.cpp \
 
+ifeq ($(TARGET_NEEDS_BIONIC_MD5),true)
+    libc_common_src_files += bionic/md5.c
+endif
+
 libc_bionic_src_files := \
     bionic/abort.cpp \
     bionic/accept.cpp \
