@@ -610,6 +610,10 @@ ifneq ($(BOARD_MALLOC_ALIGNMENT),)
   libc_common_cflags += -DMALLOC_ALIGNMENT=$(BOARD_MALLOC_ALIGNMENT)
 endif
 
+ifeq ($(BOARD_USES_LEGACY_MMAP),true)
+  libc_common_cflags += -DLEGACY_MMAP
+endif
+
 # Define some common conlyflags
 libc_common_conlyflags := \
     -std=gnu99
