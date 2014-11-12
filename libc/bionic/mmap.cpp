@@ -59,6 +59,18 @@ void* mmap64(void* addr, size_t size, int prot, int flags, int fd, off64_t offse
   return result;
 }
 
+#ifndef LEGACY_MMAP
 void* mmap(void* addr, size_t size, int prot, int flags, int fd, off_t offset) {
   return mmap64(addr, size, prot, flags, fd, static_cast<off64_t>(offset));
 }
+#else
+void* mmap(void *addr, size_t size, int prot, int flags, int fd, long offset)
+{
+  if (offset & ((1UL << MMAP2_SHIFT)-1))
+    {
+      errno = EINVAL;
+      return MAP_FAILED;
+    }
+  return __mmap2(addr, size, prot, flags, fd, (size_t)offset >> MMAP2_SHIFT);
+}
+#endif
