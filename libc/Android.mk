@@ -535,6 +535,10 @@ ifneq ($(BOARD_MALLOC_ALIGNMENT),)
   libc_common_cflags += -DMALLOC_ALIGNMENT=$(BOARD_MALLOC_ALIGNMENT)
 endif
 
+ifeq ($(BOARD_USES_LEGACY_MMAP),true)
+  libc_common_cflags += -DLEGACY_MMAP
+endif
+
 # Define ANDROID_SMP appropriately.
 ifeq ($(TARGET_CPU_SMP),true)
     libc_common_cflags += -DANDROID_SMP=1
