@@ -646,6 +646,10 @@ endif
 libc_malloc_src := bionic/jemalloc_wrapper.cpp
 libc_common_c_includes += external/jemalloc/include
 
+ifeq ($(BOARD_USES_LEGACY_MMAP),true)
+  libc_common_cflags += -DLEGACY_MMAP
+endif
+
 # Define some common conlyflags
 libc_common_conlyflags := \
     -std=gnu99
