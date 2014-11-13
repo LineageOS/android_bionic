@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a122d0e_72e231a1",
+        "filename": "libc/bionic/mmap.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2014-11-13T14:47:04Z",
+      "side": 1,
+      "message": "do ((a) \u0026 0x00000000ffffffff))",
+      "revId": "d94d41e87732e35a385eef40648278f7531ea9a7",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
