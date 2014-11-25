@@ -613,7 +613,15 @@ class SoinfoListAllocatorRW {
 
 // This is used by dlsym(3).  It performs symbol lookup only within the
 // specified soinfo object and its dependencies in breadth first order.
-ElfW(Sym)* dlsym_handle_lookup(soinfo* si, soinfo** found, const char* name) {
+ElfW(Sym)* dlsym_handle_lookup_old(soinfo* si, soinfo** found, const char* name) {
+  ElfW(Sym)* result = soinfo_elf_lookup(si, elfhash(name), name);
+  if (result != NULL) {
+    *found = si;
+  }
+  return result;
+}
+
+ElfW(Sym)* dlsym_handle_lookup_new(soinfo* si, soinfo** found, const char* name) {
   LinkedList<soinfo, SoinfoListAllocatorRW> visit_list;
   LinkedList<soinfo, SoinfoListAllocatorRW> visited;
   visit_list.push_back(si);
@@ -641,6 +649,15 @@ ElfW(Sym)* dlsym_handle_lookup(soinfo* si, soinfo** found, const char* name) {
   visit_list.clear();
   visited.clear();
   return nullptr;
+}
+
+ElfW(Sym)* dlsym_handle_lookup(soinfo* si, soinfo** found, const char* name) {
+  ElfW(Sym)* new_p = dlsym_handle_lookup_new(si, found, name);
+  ElfW(Sym)* old_p = dlsym_handle_lookup_old(si, found, name);
+  if (new_p != old_p) {
+     __libc_format_log(ANDROID_LOG_WARN, "libc", "crpalmer: %s %s: old=%p new=%p\n", __func__, name, old_p, new_p);
+  }
+  return old_p;
 }
 
 /* This is used by dlsym(3) to performs a global symbol lookup. If the
