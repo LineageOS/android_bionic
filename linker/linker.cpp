@@ -614,6 +614,13 @@ class SoinfoListAllocatorRW {
 // This is used by dlsym(3).  It performs symbol lookup only within the
 // specified soinfo object and its dependencies in breadth first order.
 ElfW(Sym)* dlsym_handle_lookup(soinfo* si, soinfo** found, const char* name) {
+#if 1
+  ElfW(Sym)* result = soinfo_elf_lookup(si, elfhash(name), name);
+  if (result != NULL) {
+    *found = si;
+  }
+  return result;
+#else
   LinkedList<soinfo, SoinfoListAllocatorRW> visit_list;
   LinkedList<soinfo, SoinfoListAllocatorRW> visited;
   visit_list.push_back(si);
@@ -641,6 +648,7 @@ ElfW(Sym)* dlsym_handle_lookup(soinfo* si, soinfo** found, const char* name) {
   visit_list.clear();
   visited.clear();
   return nullptr;
+#endif
 }
 
 /* This is used by dlsym(3) to performs a global symbol lookup. If the
