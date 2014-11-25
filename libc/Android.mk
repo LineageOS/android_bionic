@@ -65,6 +65,10 @@ libc_common_src_files := \
     stdio/snprintf.c\
     stdio/sprintf.c \
 
+ifeq ($(TARGET_NEEDS_BIONIC_MD5),true)
+libc_common_src_files += bionic/md5.c
+endif
+
 # Fortify implementations of libc functions.
 libc_common_src_files += \
     bionic/__FD_chk.cpp \
