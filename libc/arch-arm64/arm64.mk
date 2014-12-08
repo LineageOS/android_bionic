@@ -16,12 +16,14 @@ libc_bionic_src_files_arm64 += \
     arch-arm64/generic/bionic/strlen.S \
     arch-arm64/generic/bionic/strncmp.S \
     arch-arm64/generic/bionic/strnlen.S \
+    arch-arm64/generic/bionic/strrchr.S \
     arch-arm64/generic/bionic/wmemmove.S \
 
 libc_bionic_src_files_exclude_arm64 += \
     bionic/__memcpy_chk.cpp \
     bionic/strchr.cpp \
     bionic/strnlen.c \
+    bionic/strrchr.cpp \
 
 libc_freebsd_src_files_exclude_arm64 += \
     upstream-freebsd/lib/libc/string/wmemmove.c \
@@ -32,6 +34,7 @@ libc_openbsd_src_files_exclude_arm64 += \
     upstream-openbsd/lib/libc/string/stpcpy.c \
     upstream-openbsd/lib/libc/string/strcpy.c \
     upstream-openbsd/lib/libc/string/strncmp.c \
+
 
 #
 # Inherently architecture-specific code.
