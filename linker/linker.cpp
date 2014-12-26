@@ -50,6 +50,10 @@
 #include "linker_phdr.h"
 #include "linker_allocator.h"
 
+#ifdef ENABLE_NON_PIE_SUPPORT
+#include "non_pie.h"
+#endif
+
 /* >>> IMPORTANT NOTE - READ ME BEFORE MODIFYING <<<
  *
  * Do NOT use malloc() and friends or pthread_*() code here.
@@ -1305,7 +1309,9 @@ static int soinfo_relocate(soinfo* si, ElfW(Rel)* rel, unsigned count, soinfo* n
             *reinterpret_cast<ElfW(Addr)*>(reloc) += sym_addr - rel->r_offset;
             break;
         case R_ARM_COPY:
-#ifndef ENABLE_NON_PIE_SUPPORT
+#ifdef ENABLE_NON_PIE_SUPPORT
+            if (!allow_non_pie(si->name)) {
+#endif
             /*
              * ET_EXEC is not supported so this should not happen.
              *
@@ -1317,7 +1323,8 @@ static int soinfo_relocate(soinfo* si, ElfW(Rel)* rel, unsigned count, soinfo* n
              */
             DL_ERR("%s R_ARM_COPY relocations are not supported", si->name);
             return -1;
-#else
+#ifdef ENABLE_NON_PIE_SUPPORT
+            }
             if ((si->flags & FLAG_EXE) == 0) {
                 /*
                  * http://infocenter.arm.com/help/topic/com.arm.doc.ihi0044d/IHI0044D_aaelf.pdf
@@ -2222,13 +2229,19 @@ static ElfW(Addr) __linker_init_post_relocation(KernelArgumentBlock& args, ElfW(
     si->dynamic = NULL;
     si->ref_count = 1;
 
-#ifndef ENABLE_NON_PIE_SUPPORT
     ElfW(Ehdr)* elf_hdr = reinterpret_cast<ElfW(Ehdr)*>(si->base);
     if (elf_hdr->e_type != ET_DYN) {
+#ifdef ENABLE_NON_PIE_SUPPORT
+    if (allow_non_pie(si->name)) {
+        __libc_format_fd(2, "warning: non position independent executable (non PIE) %s allowed\n", si->name);
+    } else {
+#endif
         __libc_format_fd(2, "error: only position independent executables (PIE) are supported.\n");
         exit(EXIT_FAILURE);
+#ifdef ENABLE_NON_PIE_SUPPORT
     }
 #endif
+    }
 
     // Use LD_LIBRARY_PATH and LD_PRELOAD (but only if we aren't setuid/setgid).
     parse_LD_LIBRARY_PATH(ldpath_env);

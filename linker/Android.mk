@@ -38,8 +38,10 @@ LOCAL_CPPFLAGS += \
 # We need to access Bionic private headers in the linker.
 LOCAL_CFLAGS += -I$(LOCAL_PATH)/../libc/
 
-ifeq ($(TARGET_NEEDS_NON_PIE_SUPPORT),true)
-  LOCAL_CFLAGS += -DENABLE_NON_PIE_SUPPORT
+ifneq ($(NON_PIE_SUPPORT_HEADER_DIR),)
+    LOCAL_CFLAGS += -DENABLE_NON_PIE_SUPPORT
+    LOCAL_C_INCLUDES += $(NON_PIE_SUPPORT_HEADER_DIR)
+    LOCAL_SRC_FILES += non_pie.cpp
 endif
 
 # we don't want crtbegin.o (because we have begin.o), so unset it
