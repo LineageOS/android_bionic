@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7aa08908_db77c3d2",
+        "filename": "linker/linker.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2014-12-27T10:17:39Z",
+      "side": 1,
+      "message": "ifdef",
+      "revId": "27e9bffbf5992637f6f7fd412e1a0c7b8fc889a6",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aa08908_bb7477cf",
+        "filename": "linker/linker.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1313,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2014-12-27T10:17:39Z",
+      "side": 1,
+      "message": "Awkward logic",
+      "revId": "27e9bffbf5992637f6f7fd412e1a0c7b8fc889a6",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aa08908_1b82eb94",
+        "filename": "linker/linker.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 2233,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2014-12-27T10:17:39Z",
+      "side": 1,
+      "message": "Awkward logic",
+      "revId": "27e9bffbf5992637f6f7fd412e1a0c7b8fc889a6",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aa08908_fb7effac",
+        "filename": "linker/non_pie.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2014-12-27T10:17:39Z",
+      "side": 1,
+      "message": "for (int n \u003d 0; n \u003c array_len; n++) {\n\nPlease match the original code style.",
+      "revId": "27e9bffbf5992637f6f7fd412e1a0c7b8fc889a6",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aa08908_7b720fe7",
+        "filename": "linker/non_pie.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2014-12-27T10:17:39Z",
+      "side": 1,
+      "message": "This logic is awkward, you probably don\u0027t want to invert the normal values for true/false.",
+      "revId": "27e9bffbf5992637f6f7fd412e1a0c7b8fc889a6",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
