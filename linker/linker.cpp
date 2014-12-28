@@ -1317,7 +1317,7 @@ static int soinfo_relocate(soinfo* si, ElfW(Rel)* rel, unsigned count, soinfo* n
              *
              * http://infocenter.arm.com/help/topic/com.arm.doc.ihi0044d/IHI0044D_aaelf.pdf
              *
-             * Section 4.7.1.10 "Dynamic relocations"
+             * Section 4.6.1.10 "Dynamic relocations"
              * R_ARM_COPY may only appear in executable objects where e_type is
              * set to ET_EXEC.
              */
@@ -1329,7 +1329,7 @@ static int soinfo_relocate(soinfo* si, ElfW(Rel)* rel, unsigned count, soinfo* n
                 /*
                  * http://infocenter.arm.com/help/topic/com.arm.doc.ihi0044d/IHI0044D_aaelf.pdf
                  *
-                 * Section 4.7.1.10 "Dynamic relocations"
+                 * Section 4.6.1.10 "Dynamic relocations"
                  * R_ARM_COPY may only appear in executable objects where e_type is
                  * set to ET_EXEC.
                  *
