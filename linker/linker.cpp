@@ -1325,7 +1325,7 @@ static int soinfo_relocate(soinfo* si, ElfW(Rel)* rel, unsigned count, soinfo* n
             return -1;
 #ifdef ENABLE_NON_PIE_SUPPORT
             }
-            if ((si->flags & FLAG_EXE) == 0) {
+            if (reinterpret_cast<ElfW(Ehdr)*>(si->base)->e_type != ET_EXEC) {
                 /*
                  * http://infocenter.arm.com/help/topic/com.arm.doc.ihi0044d/IHI0044D_aaelf.pdf
                  *
@@ -1333,9 +1333,6 @@ static int soinfo_relocate(soinfo* si, ElfW(Rel)* rel, unsigned count, soinfo* n
                  * R_ARM_COPY may only appear in executable objects where e_type is
                  * set to ET_EXEC.
                  *
-                 * TODO: FLAG_EXE is set for both ET_DYN and ET_EXEC executables.
-                 * We should explicitly disallow ET_DYN executables from having
-                 * R_ARM_COPY relocations.
                  */
                 DL_ERR("%s R_ARM_COPY relocations only supported for ET_EXEC", si->name);
                 return -1;
