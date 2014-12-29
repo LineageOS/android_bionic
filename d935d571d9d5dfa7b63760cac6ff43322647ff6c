@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7aa08908_47301057",
+        "filename": "linker/linker.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 2237,
+      "author": {
+        "id": 2195
+      },
+      "writtenOn": "2014-12-29T03:18:20Z",
+      "side": 1,
+      "message": "I propose getting rid of the checks just below and above this, and instead.\n\n \n#ifdef ENABLE_NON_PIE_SUPPORT\nif (allow_non_pie(si-\u003ename)) {\n    __libc_format_fd(2, \"warning: non position independent executable (non PIE) %s allowed\\n\", si-\u003ename);\n} else {\n#endif\n    __libc_format_fd(2, \"error: only position independent executables (PIE) are supported.\\n\");\n    exit(EXIT_FAILURE);\n#ifdef ENABLE_NON_PIE_SUPPORT\n}\n#endif",
+      "revId": "d935d571d9d5dfa7b63760cac6ff43322647ff6c",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
