@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7aa08908_9cad2e34",
+        "filename": "linker/non_pie.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 3545
+      },
+      "writtenOn": "2014-12-30T03:40:19Z",
+      "side": 1,
+      "message": "We need proper naming convention for this function. The name of the function needs to be more meaningful. lib_name is meaningless since we are dealing with executables.",
+      "revId": "30d43681949efb59681bb68b9f323e53afb9dd44",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
