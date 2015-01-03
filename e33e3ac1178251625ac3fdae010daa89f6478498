@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7aa08908_43c63a68",
+        "filename": "libc/arch-arm/denver/denver.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 3671
+      },
+      "writtenOn": "2015-01-03T10:28:56Z",
+      "side": 1,
+      "message": "use spaces here instead of a tab",
+      "revId": "e33e3ac1178251625ac3fdae010daa89f6478498",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
