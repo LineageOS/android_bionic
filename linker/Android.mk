@@ -47,7 +47,7 @@ LOCAL_ASFLAGS := $(LOCAL_CFLAGS)
 
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk $(LOCAL_PATH)/linker_executable.mk
 
-LOCAL_STATIC_LIBRARIES := libc_nomalloc
+LOCAL_STATIC_LIBRARIES := libc_nomalloc libziparchive libutils libz liblog
 
 LOCAL_FORCE_STATIC_EXECUTABLE := true # not necessary when not including BUILD_EXECUTABLE
 
