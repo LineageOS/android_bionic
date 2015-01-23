@@ -78,7 +78,7 @@ extern int unshare(int);
 #ifdef _GNU_SOURCE
 
 extern int sched_getcpu(void);
-
+extern int hmp_sched_setaffinity ( void );
 
 /* Our implementation supports up to 32 independent CPUs, which is also
  * the maximum supported by the kernel at the moment. GLibc uses 1024 by

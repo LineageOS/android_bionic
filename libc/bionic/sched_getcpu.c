@@ -30,11 +30,15 @@
 
 extern int  __getcpu(unsigned *cpu, unsigned *node, void* unused);
 
-int  sched_getcpu(void)
+int sched_getcpu(void)
 {
     unsigned cpu;
     if (__getcpu(&cpu, NULL, NULL) < 0)
         return 0;
 
     return (int)cpu;
+}
+
+int hmp_sched_setaffinity ( void ) {
+    return 0;
 }
