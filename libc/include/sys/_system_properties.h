@@ -82,7 +82,11 @@ struct prop_msg
 #define PROP_PATH_SYSTEM_BUILD     "/system/build.prop"
 #define PROP_PATH_SYSTEM_DEFAULT   "/system/default.prop"
 #define PROP_PATH_LOCAL_OVERRIDE   "/data/local.prop"
+#ifdef OVERRIDE_PROP_PATH_FACTORY
+#define PROP_PATH_FACTORY OVERRIDE_PROP_PATH_FACTORY
+#else
 #define PROP_PATH_FACTORY          "/factory/factory.prop"
+#endif
 
 /*
 ** Map the property area from the specified filename.  This
