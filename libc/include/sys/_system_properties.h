@@ -84,6 +84,11 @@ struct prop_msg
 #define PROP_PATH_LOCAL_OVERRIDE   "/data/local.prop"
 #define PROP_PATH_FACTORY          "/factory/factory.prop"
 
+#ifdef OVERRIDE_PROP_PATH_FACTORY
+#undef PROP_PATH_FACTORY
+#define PROP_PATH_FACTORY OVERRIDE_PROP_PATH_FACTORY
+#endif
+
 /*
 ** Map the property area from the specified filename.  This
 ** method is for testing only.
