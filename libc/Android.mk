@@ -60,6 +60,8 @@ libc_common_src_files := \
     bionic/siginterrupt.c \
     bionic/sigsetmask.c \
     bionic/system_properties_compat.c \
+    stdio/findfp.c \
+    stdio/fread.c \
     stdio/snprintf.c\
     stdio/sprintf.c \
 
@@ -389,14 +391,12 @@ libc_upstream_openbsd_src_files := \
     upstream-openbsd/lib/libc/stdio/fgetwc.c \
     upstream-openbsd/lib/libc/stdio/fgetws.c \
     upstream-openbsd/lib/libc/stdio/fileno.c \
-    upstream-openbsd/lib/libc/stdio/findfp.c \
     upstream-openbsd/lib/libc/stdio/fprintf.c \
     upstream-openbsd/lib/libc/stdio/fpurge.c \
     upstream-openbsd/lib/libc/stdio/fputc.c \
     upstream-openbsd/lib/libc/stdio/fputs.c \
     upstream-openbsd/lib/libc/stdio/fputwc.c \
     upstream-openbsd/lib/libc/stdio/fputws.c \
-    upstream-openbsd/lib/libc/stdio/fread.c \
     upstream-openbsd/lib/libc/stdio/freopen.c \
     upstream-openbsd/lib/libc/stdio/fscanf.c \
     upstream-openbsd/lib/libc/stdio/fseek.c \
@@ -503,7 +503,10 @@ ifneq ($(TARGET_USES_LOGD),false)
 libc_common_cflags += -DTARGET_USES_LOGD
 endif
 
-use_clang := false
+use_clang := $(USE_CLANG_PLATFORM_BUILD)
+ifeq ($(use_clang),)
+  use_clang := false
+endif
 
 # Try to catch typical 32-bit assumptions that break with 64-bit pointers.
 libc_common_cflags += \
@@ -689,6 +692,7 @@ LOCAL_ADDITIONAL_DEPENDENCIES := $(libc_common_additional_dependencies)
 LOCAL_SYSTEM_SHARED_LIBRARIES :=
 
 $(eval $(call patch-up-arch-specific-flags,LOCAL_CFLAGS,libc_common_cflags))
+$(eval $(call patch-up-arch-specific-flags,LOCAL_SRC_FILES,libc_freebsd_src_files))
 include $(BUILD_STATIC_LIBRARY)
 
 
@@ -733,6 +737,13 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := $(libc_upstream_openbsd_src_files)
+ifneq (,$(filter $(TARGET_ARCH),x86 x86_64))
+  # Clang has wrong long double size or LDBL_MANT_DIG, http://b/17163651.
+  LOCAL_CLANG := false
+else
+  LOCAL_CLANG := $(use_clang)
+endif
+
 LOCAL_CFLAGS := \
     $(libc_common_cflags) \
     -Wno-sign-compare -Wno-uninitialized -Wno-unused-parameter \
@@ -746,11 +757,11 @@ LOCAL_CONLYFLAGS := $(libc_common_conlyflags)
 LOCAL_CPPFLAGS := $(libc_common_cppflags)
 LOCAL_C_INCLUDES := $(libc_common_c_includes)
 LOCAL_MODULE := libc_openbsd
-LOCAL_CLANG := $(use_clang)
 LOCAL_ADDITIONAL_DEPENDENCIES := $(libc_common_additional_dependencies)
 LOCAL_SYSTEM_SHARED_LIBRARIES :=
 
 $(eval $(call patch-up-arch-specific-flags,LOCAL_CFLAGS,libc_common_cflags))
+$(eval $(call patch-up-arch-specific-flags,LOCAL_SRC_FILES,libc_openbsd_src_files))
 include $(BUILD_STATIC_LIBRARY)
 
 
@@ -765,6 +776,13 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES_32 := $(libc_upstream_openbsd_gdtoa_src_files_32)
 LOCAL_SRC_FILES_64 := $(libc_upstream_openbsd_gdtoa_src_files_64)
+ifneq (,$(filter $(TARGET_ARCH),x86 x86_64))
+  # Clang has wrong long double size or LDBL_MANT_DIG, http://b/17163651.
+  LOCAL_CLANG := false
+else
+  LOCAL_CLANG := $(use_clang)
+endif
+
 LOCAL_CFLAGS := \
     $(libc_common_cflags) \
     -Wno-sign-compare -Wno-uninitialized \
@@ -778,7 +796,6 @@ LOCAL_CONLYFLAGS := $(libc_common_conlyflags)
 LOCAL_CPPFLAGS := $(libc_common_cppflags)
 LOCAL_C_INCLUDES := $(libc_common_c_includes)
 LOCAL_MODULE := libc_gdtoa
-LOCAL_CLANG := $(use_clang)
 LOCAL_ADDITIONAL_DEPENDENCIES := $(libc_common_additional_dependencies)
 LOCAL_SYSTEM_SHARED_LIBRARIES :=
 
@@ -795,6 +812,11 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := $(libc_bionic_src_files)
 LOCAL_CFLAGS := $(libc_common_cflags) \
     -Wframe-larger-than=2048 \
+
+ifeq ($(TARGET_ARCH),x86_64)
+  # Clang assembler has problem with ssse3-strcmp-slm.S, http://b/17302991
+  LOCAL_CLANG_ASFLAGS += -no-integrated-as
+endif
 
 LOCAL_CONLYFLAGS := $(libc_common_conlyflags)
 LOCAL_CPPFLAGS := $(libc_common_cppflags)
@@ -1144,6 +1166,7 @@ libstdcxx_common_src_files := \
 include $(CLEAR_VARS)
 LOCAL_C_INCLUDES := $(libc_common_c_includes)
 LOCAL_CFLAGS := $(libc_common_cflags)
+LOCAL_CPPFLAGS := $(libc_common_cppflags)
 LOCAL_SRC_FILES := $(libstdcxx_common_src_files)
 LOCAL_MODULE:= libstdc++
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
@@ -1156,6 +1179,7 @@ include $(BUILD_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 LOCAL_C_INCLUDES := $(libc_common_c_includes)
 LOCAL_CFLAGS := $(libc_common_cflags)
+LOCAL_CPPFLAGS := $(libc_common_cppflags)
 LOCAL_SRC_FILES := $(libstdcxx_common_src_files)
 LOCAL_MODULE:= libstdc++
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk

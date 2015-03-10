@@ -29,6 +29,23 @@
 
 #include "TemporaryFile.h"
 
+TEST(stdio, flockfile_18208568_stderr) {
+  // Check that we have a _recursive_ mutex for flockfile.
+  flockfile(stderr);
+  feof(stderr); // We don't care about the result, but this needs to take the lock.
+  funlockfile(stderr);
+}
+
+TEST(stdio, flockfile_18208568_regular) {
+  // We never had a bug for streams other than stdin/stdout/stderr, but test anyway.
+  FILE* fp = fopen("/dev/null", "w");
+  ASSERT_TRUE(fp != NULL);
+  flockfile(fp);
+  feof(fp);
+  funlockfile(fp);
+  fclose(fp);
+}
+
 TEST(stdio, tmpfile_fileno_fprintf_rewind_fgets) {
   FILE* fp = tmpfile();
   ASSERT_TRUE(fp != NULL);
@@ -676,4 +693,35 @@ TEST(stdio, fpos_t_and_seek) {
   ASSERT_EQ(EILSEQ, errno);
 
   fclose(fp);
+}
+
+// https://code.google.com/p/android/issues/detail?id=81155
+// http://b/18556607
+TEST(stdio, fread_unbuffered_pathological_performance) {
+  FILE* fp = fopen("/dev/zero", "r");
+  ASSERT_TRUE(fp != NULL);
+
+  // Make this stream unbuffered.
+  setvbuf(fp, 0, _IONBF, 0);
+
+  char buf[65*1024];
+  memset(buf, 0xff, sizeof(buf));
+
+  time_t t0 = time(NULL);
+  for (size_t i = 0; i < 1024; ++i) {
+    fread(buf, 64*1024, 1, fp);
+  }
+  time_t t1 = time(NULL);
+
+  fclose(fp);
+
+  // 1024 64KiB reads should have been very quick.
+  ASSERT_LE(t1 - t0, 1);
+
+  for (size_t i = 0; i < 64*1024; ++i) {
+    ASSERT_EQ('\0', buf[i]);
+  }
+  for (size_t i = 64*1024; i < 65*1024; ++i) {
+    ASSERT_EQ('\xff', buf[i]);
+  }
 }

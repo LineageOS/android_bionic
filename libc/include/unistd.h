@@ -177,7 +177,7 @@ extern int  acct(const char*  filepath);
 
 int getpagesize(void);
 
-extern int sysconf(int  name);
+long sysconf(int);
 
 extern int daemon(int, int);
 
@@ -197,12 +197,12 @@ extern int   tcsetpgrp(int fd, pid_t _pid);
     } while (_rc == -1 && errno == EINTR); \
     _rc; })
 
-#if defined(__BIONIC_FORTIFY)
 extern ssize_t __read_chk(int, void*, size_t, size_t);
 __errordecl(__read_dest_size_error, "read called with size bigger than destination");
 __errordecl(__read_count_toobig_error, "read called with count > SSIZE_MAX");
-extern ssize_t __read_real(int, void*, size_t)
-    __asm__(__USER_LABEL_PREFIX__ "read");
+extern ssize_t __read_real(int, void*, size_t) __RENAME(read);
+
+#if defined(__BIONIC_FORTIFY)
 
 __BIONIC_FORTIFY_INLINE
 ssize_t read(int fd, void* buf, size_t count) {

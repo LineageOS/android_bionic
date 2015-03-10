@@ -33,7 +33,7 @@
 #include <sys/cdefs.h>
 
 
-#if defined(__cplusplus) && defined(_USING_LIBCXX)
+#if defined(__cplusplus) && __cplusplus >= 201103L && defined(_USING_LIBCXX)
 # ifdef __clang__
 #  if __has_feature(cxx_atomic)
 #   define _STDATOMIC_HAVE_ATOMIC
@@ -89,6 +89,7 @@ using std::atomic_signal_fence;
 using std::memory_order;
 using std::memory_order_relaxed;
 using std::memory_order_consume;
+using std::memory_order_acquire;
 using std::memory_order_release;
 using std::memory_order_acq_rel;
 using std::memory_order_seq_cst;

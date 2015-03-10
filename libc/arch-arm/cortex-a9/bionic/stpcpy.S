@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 The Android Open Source Project
+ * Copyright (C) 2014 The Android Open Source Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,9 +26,5 @@
  * SUCH DAMAGE.
  */
 
-#include <private/bionic_asm.h>
-
-ENTRY_PRIVATE(__rt_sigreturn)
-  movl $__NR_rt_sigreturn, %eax
-  syscall
-END(__rt_sigreturn)
+#define STPCPY
+#include "string_copy.S"

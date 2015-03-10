@@ -50,6 +50,9 @@
 #  include <linux/signal.h>
 #endif
 
+#include <sys/ucontext.h>
+#define __BIONIC_HAVE_UCONTEXT_T
+
 __BEGIN_DECLS
 
 typedef int sig_atomic_t;

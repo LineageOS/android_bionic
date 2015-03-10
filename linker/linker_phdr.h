@@ -39,7 +39,7 @@
 
 class ElfReader {
  public:
-  ElfReader(const char* name, int fd);
+  ElfReader(const char* name, int fd, off64_t file_offset);
   ~ElfReader();
 
   bool Load(const android_dlextinfo* extinfo);
@@ -61,6 +61,7 @@ class ElfReader {
 
   const char* name_;
   int fd_;
+  off64_t file_offset_;
 
   ElfW(Ehdr) header_;
   size_t phdr_num_;
@@ -81,7 +82,7 @@ class ElfReader {
 };
 
 size_t phdr_table_get_load_size(const ElfW(Phdr)* phdr_table, size_t phdr_count,
-                                ElfW(Addr)* min_vaddr = NULL, ElfW(Addr)* max_vaddr = NULL);
+                                ElfW(Addr)* min_vaddr = nullptr, ElfW(Addr)* max_vaddr = nullptr);
 
 int phdr_table_protect_segments(const ElfW(Phdr)* phdr_table, size_t phdr_count, ElfW(Addr) load_bias);
 
@@ -101,7 +102,7 @@ int phdr_table_get_arm_exidx(const ElfW(Phdr)* phdr_table, size_t phdr_count, El
 #endif
 
 void phdr_table_get_dynamic_section(const ElfW(Phdr)* phdr_table, size_t phdr_count,
-                                    ElfW(Addr) load_bias,
-                                    ElfW(Dyn)** dynamic, size_t* dynamic_count, ElfW(Word)* dynamic_flags);
+                                    ElfW(Addr) load_bias, ElfW(Dyn)** dynamic,
+                                    ElfW(Word)* dynamic_flags);
 
 #endif /* LINKER_PHDR_H */

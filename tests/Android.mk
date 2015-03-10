@@ -28,6 +28,8 @@ else
 build_host := false
 endif
 
+common_additional_dependencies := $(LOCAL_PATH)/Android.mk $(LOCAL_PATH)/Android.build.mk
+
 # -----------------------------------------------------------------------------
 # All standard tests.
 # -----------------------------------------------------------------------------
@@ -112,6 +114,7 @@ libBionicStandardTests_src_files := \
     system_properties_test.cpp \
     time_test.cpp \
     uchar_test.cpp \
+    uniqueptr_test.cpp \
     unistd_test.cpp \
     wchar_test.cpp \
 
@@ -133,29 +136,7 @@ libBionicStandardTests_c_includes := \
 libBionicStandardTests_ldlibs_host := \
     -lrt \
 
-libBionicStandardTests_whole_static_libraries := \
-    libBionicUnwindTest \
-
 module := libBionicStandardTests
-module_tag := optional
-build_type := target
-build_target := STATIC_TEST_LIBRARY
-include $(LOCAL_PATH)/Android.build.mk
-build_type := host
-include $(LOCAL_PATH)/Android.build.mk
-
-# -----------------------------------------------------------------------------
-# Special stack unwinding test library compiled with special flags.
-# -----------------------------------------------------------------------------
-libBionicUnwindTest_cflags := \
-    $(test_cflags) \
-    -fexceptions \
-    -fnon-call-exceptions \
-
-libBionicUnwindTest_src_files := \
-    stack_unwinding_test_impl.c \
-
-module := libBionicUnwindTest
 module_tag := optional
 build_type := target
 build_target := STATIC_TEST_LIBRARY
@@ -170,11 +151,10 @@ $(foreach compiler,gcc clang, \
   $(foreach test,1 2, \
     $(eval fortify$(test)-tests-$(compiler)_cflags := \
       $(test_cflags) \
+      -Wno-error \
       -U_FORTIFY_SOURCE \
       -D_FORTIFY_SOURCE=$(test) \
       -DTEST_NAME=Fortify$(test)_$(compiler)); \
-    $(eval fortify$(test)-tests-$(compiler)_cflags_host := \
-      -Wno-error); \
     $(eval fortify$(test)-tests-$(compiler)_src_files := \
       fortify_test.cpp); \
     $(eval fortify_libs += fortify$(test)-tests-$(compiler)); \
@@ -249,6 +229,11 @@ bionic-unit-tests_src_files := \
     dlfcn_test.cpp \
 
 bionic-unit-tests_cflags := $(test_cflags)
+
+bionic-unit-tests_conlyflags := \
+    -fexceptions \
+    -fnon-call-exceptions \
+
 bionic-unit-tests_cppflags := $(test_cppflags)
 
 bionic-unit-tests_ldflags := \
@@ -256,6 +241,7 @@ bionic-unit-tests_ldflags := \
     -Wl,-u,DlSymTestFunction \
 
 bionic-unit-tests_c_includes := \
+    bionic/libc \
     $(call include-path-for, libpagemap) \
 
 bionic-unit-tests_shared_libraries_target := \
@@ -299,6 +285,7 @@ ifeq ($(HOST_OS)-$(HOST_ARCH),$(filter $(HOST_OS)-$(HOST_ARCH),linux-x86 linux-x
 
 bionic-unit-tests-glibc_src_files := \
     atexit_test.cpp \
+    dlfcn_test.cpp \
 
 bionic-unit-tests-glibc_whole_static_libraries := \
     libBionicStandardTests \
@@ -306,8 +293,12 @@ bionic-unit-tests-glibc_whole_static_libraries := \
 bionic-unit-tests-glibc_ldlibs := \
     -lrt -ldl \
 
+bionic-unit-tests-glibc_c_includes := \
+    bionic/libc \
+
 bionic-unit-tests-glibc_cflags := $(test_cflags)
 bionic-unit-tests-glibc_cppflags := $(test_cppflags)
+bionic-unit-tests-glibc_ldflags := -Wl,--export-dynamic
 
 module := bionic-unit-tests-glibc
 module_tag := optional
@@ -354,6 +345,22 @@ bionic-unit-tests-run-on-host: bionic-unit-tests $(TARGET_OUT_EXECUTABLES)/$(LIN
 	ANDROID_ROOT=$(TARGET_OUT) \
 	LD_LIBRARY_PATH=$(TARGET_OUT_SHARED_LIBRARIES) \
 		$(TARGET_OUT_DATA_NATIVE_TESTS)/bionic-unit-tests/bionic-unit-tests$(NATIVE_TEST_SUFFIX) $(BIONIC_TEST_FLAGS)
+endif
+
+ifeq ($(TARGET_ARCH),$(filter $(TARGET_ARCH),x86_64))
+# add target to run lp32 tests
+bionic-unit-tests-run-on-host32: bionic-unit-tests_32 $(TARGET_OUT_EXECUTABLES)/$(LINKER) $(TARGET_OUT_EXECUTABLES)/sh
+	if [ ! -d /system -o ! -d /system/bin ]; then \
+	  echo "Attempting to create /system/bin"; \
+	  sudo mkdir -p -m 0777 /system/bin; \
+	fi
+	mkdir -p $(TARGET_OUT_DATA)/local/tmp
+	cp $(TARGET_OUT_EXECUTABLES)/linker /system/bin
+	cp $(TARGET_OUT_EXECUTABLES)/sh /system/bin
+	ANDROID_DATA=$(TARGET_OUT_DATA) \
+	ANDROID_ROOT=$(TARGET_OUT) \
+	LD_LIBRARY_PATH=$(2ND_TARGET_OUT_SHARED_LIBRARIES) \
+		$(2ND_TARGET_OUT_DATA_NATIVE_TESTS)/bionic-unit-tests/bionic-unit-tests32 $(BIONIC_TEST_FLAGS)
 endif
 
 endif # linux-x86

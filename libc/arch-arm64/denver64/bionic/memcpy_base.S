@@ -1,5 +1,6 @@
 /* Copyright (c) 2012, Linaro Limited
    All rights reserved.
+   Copyright (c) 2014, NVIDIA Corporation.  All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are met:
@@ -27,12 +28,10 @@
 
 /* Assumptions:
  *
- * ARMv8-a, AArch64
+ * denver, ARMv8-a, AArch64
  * Unaligned accesses
  *
  */
-
-#include <private/bionic_asm.h>
 
 #define dstin	x0
 #define src	x1
@@ -54,12 +53,10 @@
 #define D_l	x13
 #define D_h	x14
 
-#define QA_l q0
-#define QA_h q1
-#define QB_l q2
-#define QB_h q3
-
-ENTRY(memcpy)
+#define QA_l	q0
+#define QA_h	q1
+#define QB_l	q2
+#define QB_h	q3
 
 	mov	dst, dstin
 	cmp	count, #64
@@ -142,10 +139,10 @@ ENTRY(memcpy)
 	b.ge	.Lcpy_body_large
 	/* Less than 128 bytes to copy, so handle 64 here and then jump
 	 * to the tail.  */
-	ldp QA_l, QA_h, [src]
-	ldp QB_l, QB_h, [src, #32]
-	stp QA_l, QA_h, [dst]
-	stp QB_l, QB_h, [dst, #32]
+	ldp	QA_l, QA_h, [src]
+	ldp	QB_l, QB_h, [src, #32]
+	stp	QA_l, QA_h, [dst]
+	stp	QB_l, QB_h, [dst, #32]
 	tst	count, #0x3f
 	add	src, src, #64
 	add	dst, dst, #64
@@ -156,24 +153,47 @@ ENTRY(memcpy)
 	 * 64 bytes per line this ensures the entire loop is in one line.  */
 	.p2align 6
 .Lcpy_body_large:
+	cmp	count, 65536
+	bhi	.Lcpy_body_huge
 	/* There are at least 128 bytes to copy.  */
-	ldp QA_l, QA_h, [src, #0]
+	ldp	QA_l, QA_h, [src, #0]
 	sub	dst, dst, #32		/* Pre-bias.  */
-	ldp QB_l, QB_h, [src, #32]!	/* src += 64 - Pre-bias.  */
+	ldp	QB_l, QB_h, [src, #32]!	/* src += 64 - Pre-bias.  */
 1:
-	stp QA_l, QA_h, [dst, #32]
-	ldp QA_l, QA_h, [src, #32]
-	stp QB_l, QB_h, [dst, #64]!
-	ldp QB_l, QB_h, [src, #64]!
+	stp	QA_l, QA_h, [dst, #32]
+	ldp	QA_l, QA_h, [src, #32]
+	stp	QB_l, QB_h, [dst, #64]!
+	ldp	QB_l, QB_h, [src, #64]!
 
 	subs	count, count, #64
 	b.ge	1b
 
-	stp QA_l, QA_h, [dst, #32]
-	stp QB_l, QB_h, [dst, #64]
+	stp	QA_l, QA_h, [dst, #32]
+	stp	QB_l, QB_h, [dst, #64]
 	add	src, src, #32
 	add	dst, dst, #64 + 32
 	tst	count, #0x3f
 	b.ne	.Ltail63
 	ret
-END(memcpy)
+.Lcpy_body_huge:
+	/* There are at least 128 bytes to copy.  */
+	ldp	QA_l, QA_h, [src, #0]
+	sub	dst, dst, #32		/* Pre-bias.  */
+	ldp	QB_l, QB_h, [src, #32]!
+1:
+	stnp	QA_l, QA_h, [dst, #32]
+	stnp	QB_l, QB_h, [dst, #64]
+	ldp	QA_l, QA_h, [src, #32]
+	ldp	QB_l, QB_h, [src, #64]!
+	add	dst, dst, #64
+
+	subs	count, count, #64
+	b.ge	1b
+
+	stnp	QA_l, QA_h, [dst, #32]
+	stnp	QB_l, QB_h, [dst, #64]
+	add	src, src, #32
+	add	dst, dst, #64 + 32
+	tst	count, #0x3f
+	b.ne	.Ltail63
+	ret

@@ -1,8 +1,17 @@
-# arm64 specific configs
+# 64-bit arm.
 
-libc_common_src_files_arm64 := \
+#
+# Default implementations of functions that are commonly optimized.
+#
+
+libc_bionic_src_files_arm64 += \
+    bionic/__memset_chk.cpp \
+    bionic/__strcpy_chk.cpp \
+    bionic/__strcat_chk.cpp \
     bionic/memrchr.c \
     bionic/strrchr.cpp \
+
+libc_freebsd_src_files_arm64 += \
     upstream-freebsd/lib/libc/string/wcscat.c \
     upstream-freebsd/lib/libc/string/wcschr.c \
     upstream-freebsd/lib/libc/string/wcscmp.c \
@@ -10,6 +19,8 @@ libc_common_src_files_arm64 := \
     upstream-freebsd/lib/libc/string/wcslen.c \
     upstream-freebsd/lib/libc/string/wcsrchr.c \
     upstream-freebsd/lib/libc/string/wmemcmp.c \
+
+libc_openbsd_src_files_arm64 += \
     upstream-openbsd/lib/libc/string/stpncpy.c \
     upstream-openbsd/lib/libc/string/strcat.c \
     upstream-openbsd/lib/libc/string/strlcat.c \
@@ -17,19 +28,13 @@ libc_common_src_files_arm64 := \
     upstream-openbsd/lib/libc/string/strncat.c \
     upstream-openbsd/lib/libc/string/strncpy.c \
 
-# Fortify implementations of libc functions.
-libc_common_src_files_arm64 += \
-    bionic/__memcpy_chk.cpp \
-    bionic/__memset_chk.cpp \
-    bionic/__strcpy_chk.cpp \
-    bionic/__strcat_chk.cpp \
+#
+# Inherently architecture-specific code.
+#
 
-##########################################
-### CPU specific source files
-libc_bionic_src_files_arm64 := \
+libc_bionic_src_files_arm64 += \
     arch-arm64/bionic/__bionic_clone.S \
     arch-arm64/bionic/_exit_with_stack_teardown.S \
-    arch-arm64/bionic/__rt_sigreturn.S \
     arch-arm64/bionic/_setjmp.S \
     arch-arm64/bionic/setjmp.S \
     arch-arm64/bionic/__set_tls.c \
@@ -53,7 +58,7 @@ ifeq ($(strip $(TARGET_CPU_VARIANT)),)
 endif
 cpu_variant_mk := $(LOCAL_PATH)/arch-arm64/$(TARGET_CPU_VARIANT)/$(TARGET_CPU_VARIANT).mk
 ifeq ($(wildcard $(cpu_variant_mk)),)
-$(error "TARGET_CPU_VARIANT not set or set to an unknown value. Possible values are generic, generic-neon, denver64. Use generic for devices that do not have a CPU similar to any of the supported cpu variants.")
+$(error "TARGET_CPU_VARIANT not set or set to an unknown value. Possible values are generic, denver64. Use generic for devices that do not have a CPU similar to any of the supported cpu variants.")
 endif
 include $(cpu_variant_mk)
 libc_common_additional_dependencies += $(cpu_variank_mk)

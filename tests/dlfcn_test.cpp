@@ -22,6 +22,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#include "private/ScopeGuard.h"
+
 #include <string>
 
 #define ASSERT_SUBSTR(needle, haystack) \
@@ -85,6 +87,144 @@ TEST(dlfcn, dlopen_noload) {
   ASSERT_TRUE(handle == handle2);
   ASSERT_EQ(0, dlclose(handle));
   ASSERT_EQ(0, dlclose(handle2));
+}
+
+// ifuncs are only supported on intel and arm64 for now
+#if defined(__i386__) || defined(__x86_64__)
+TEST(dlfcn, ifunc) {
+  typedef const char* (*fn_ptr)();
+
+  // ifunc's choice depends on whether IFUNC_CHOICE has a value
+  // first check the set case
+  setenv("IFUNC_CHOICE", "set", 1);
+  void* handle = dlopen("libtest_ifunc.so", RTLD_NOW);
+  ASSERT_TRUE(handle != NULL);
+  fn_ptr foo_ptr = reinterpret_cast<fn_ptr>(dlsym(handle, "foo"));
+  fn_ptr foo_library_ptr = reinterpret_cast<fn_ptr>(dlsym(handle, "foo_library"));
+  ASSERT_TRUE(foo_ptr != NULL);
+  ASSERT_TRUE(foo_library_ptr != NULL);
+  ASSERT_EQ(strncmp("set", foo_ptr(), 3), 0);
+  ASSERT_EQ(strncmp("set", foo_library_ptr(), 3), 0);
+  dlclose(handle);
+
+  // then check the unset case
+  unsetenv("IFUNC_CHOICE");
+  handle = dlopen("libtest_ifunc.so", RTLD_NOW);
+  ASSERT_TRUE(handle != NULL);
+  foo_ptr = reinterpret_cast<fn_ptr>(dlsym(handle, "foo"));
+  foo_library_ptr = reinterpret_cast<fn_ptr>(dlsym(handle, "foo_library"));
+  ASSERT_TRUE(foo_ptr != NULL);
+  ASSERT_TRUE(foo_library_ptr != NULL);
+  ASSERT_EQ(strncmp("unset", foo_ptr(), 5), 0);
+  ASSERT_EQ(strncmp("unset", foo_library_ptr(), 3), 0);
+  dlclose(handle);
+}
+
+TEST(dlfcn, ifunc_ctor_call) {
+  typedef const char* (*fn_ptr)();
+
+  void* handle = dlopen("libtest_ifunc.so", RTLD_NOW);
+  ASSERT_TRUE(handle != nullptr) << dlerror();
+  fn_ptr is_ctor_called =  reinterpret_cast<fn_ptr>(dlsym(handle, "is_ctor_called_irelative"));
+  ASSERT_TRUE(is_ctor_called != nullptr) << dlerror();
+  ASSERT_STREQ("false", is_ctor_called());
+
+  is_ctor_called =  reinterpret_cast<fn_ptr>(dlsym(handle, "is_ctor_called_jump_slot"));
+  ASSERT_TRUE(is_ctor_called != nullptr) << dlerror();
+  ASSERT_STREQ("true", is_ctor_called());
+  dlclose(handle);
+}
+#endif
+
+TEST(dlfcn, dlopen_check_relocation_dt_needed_order) {
+  // This is the structure of the test library and
+  // its dt_needed libraries
+  // libtest_relo_check_dt_needed_order.so
+  // |
+  // +-> libtest_relo_check_dt_needed_order_1.so
+  // |
+  // +-> libtest_relo_check_dt_needed_order_2.so
+  //
+  // The root library references relo_test_get_answer_lib - which is defined
+  // in both dt_needed libraries, the correct relocation should
+  // use the function defined in libtest_relo_check_dt_needed_order_1.so
+  void* handle = nullptr;
+  auto guard = make_scope_guard([&]() {
+    dlclose(handle);
+  });
+
+  handle = dlopen("libtest_relo_check_dt_needed_order.so", RTLD_NOW);
+  ASSERT_TRUE(handle != nullptr) << dlerror();
+
+  typedef int (*fn_t) (void);
+  fn_t fn = reinterpret_cast<fn_t>(dlsym(handle, "relo_test_get_answer"));
+  ASSERT_TRUE(fn != nullptr) << dlerror();
+  ASSERT_EQ(1, fn());
+}
+
+TEST(dlfcn, dlopen_check_order) {
+  // Here is how the test library and its dt_needed
+  // libraries are arranged
+  //
+  //  libtest_check_order.so
+  //  |
+  //  +-> libtest_check_order_1_left.so
+  //  |   |
+  //  |   +-> libtest_check_order_a.so
+  //  |   |
+  //  |   +-> libtest_check_order_b.so
+  //  |
+  //  +-> libtest_check_order_2_right.so
+  //  |   |
+  //  |   +-> libtest_check_order_d.so
+  //  |       |
+  //  |       +-> libtest_check_order_b.so
+  //  |
+  //  +-> libtest_check_order_3_c.so
+  //
+  //  load order should be (1, 2, 3, a, b, d)
+  //
+  // get_answer() is defined in (2, 3, a, b, c)
+  // get_answer2() is defined in (b, d)
+  void* sym = dlsym(RTLD_DEFAULT, "dlopen_test_get_answer");
+  ASSERT_TRUE(sym == nullptr);
+  void* handle = dlopen("libtest_check_order.so", RTLD_NOW | RTLD_GLOBAL);
+  ASSERT_TRUE(handle != nullptr);
+  typedef int (*fn_t) (void);
+  fn_t fn, fn2;
+  fn = reinterpret_cast<fn_t>(dlsym(RTLD_DEFAULT, "dlopen_test_get_answer"));
+  ASSERT_TRUE(fn != NULL) << dlerror();
+  fn2 = reinterpret_cast<fn_t>(dlsym(RTLD_DEFAULT, "dlopen_test_get_answer2"));
+  ASSERT_TRUE(fn2 != NULL) << dlerror();
+
+  ASSERT_EQ(42, fn());
+  ASSERT_EQ(43, fn2());
+  dlclose(handle);
+}
+
+// libtest_with_dependency_loop.so -> libtest_with_dependency_loop_a.so ->
+// libtest_with_dependency_loop_b.so -> libtest_with_dependency_loop_c.so ->
+// libtest_with_dependency_loop_a.so
+TEST(dlfcn, dlopen_check_loop) {
+  void* handle = dlopen("libtest_with_dependency_loop.so", RTLD_NOW);
+#if defined(__BIONIC__)
+  ASSERT_TRUE(handle == nullptr);
+  ASSERT_STREQ("dlopen failed: recursive link to \"libtest_with_dependency_loop_a.so\"", dlerror());
+  // This symbol should never be exposed
+  void* f = dlsym(RTLD_DEFAULT, "dlopen_test_invalid_function");
+  ASSERT_TRUE(f == nullptr);
+  ASSERT_SUBSTR("undefined symbol: dlopen_test_invalid_function", dlerror());
+
+  // dlopen second time to make sure that the library wasn't loaded even though dlopen returned null.
+  // This may happen if during cleanup the root library or one of the depended libs were not removed
+  // from soinfo list.
+  handle = dlopen("libtest_with_dependency_loop.so", RTLD_NOW | RTLD_NOLOAD);
+  ASSERT_TRUE(handle == nullptr);
+  ASSERT_STREQ("dlopen failed: library \"libtest_with_dependency_loop.so\" wasn't loaded and RTLD_NOLOAD prevented it", dlerror());
+#else // glibc allows recursive links
+  ASSERT_TRUE(handle != nullptr);
+  dlclose(handle);
+#endif
 }
 
 TEST(dlfcn, dlopen_failure) {

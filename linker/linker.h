@@ -30,6 +30,7 @@
 #define _LINKER_H_
 
 #include <elf.h>
+#include <inttypes.h>
 #include <link.h>
 #include <unistd.h>
 #include <android/dlext.h>
@@ -88,6 +89,8 @@
 #define FLAG_LINKER     0x00000010 // The linker itself
 #define FLAG_NEW_SOINFO 0x40000000 // new soinfo format
 
+#define SOINFO_VERSION 0
+
 #define SOINFO_NAME_LEN 128
 
 typedef void (*linker_function_t)();
@@ -133,7 +136,9 @@ struct soinfo {
   soinfo* next;
   unsigned flags;
 
+ private:
   const char* strtab;
+ public:
   ElfW(Sym)* symtab;
 
   size_t nbucket;
@@ -195,29 +200,47 @@ struct soinfo {
   bool has_text_relocations;
 #endif
   bool has_DT_SYMBOLIC;
+
+  soinfo(const char* name, const struct stat* file_stat, off64_t file_offset);
+
   void CallConstructors();
   void CallDestructors();
   void CallPreInitConstructors();
+  bool PrelinkImage();
+  bool LinkImage(const android_dlextinfo* extinfo);
 
   void add_child(soinfo* child);
   void remove_all_links();
 
-  void set_st_dev(dev_t st_dev);
-  void set_st_ino(ino_t st_ino);
   ino_t get_st_ino();
   dev_t get_st_dev();
+  off64_t get_file_offset();
 
   soinfo_list_t& get_children();
+  soinfo_list_t& get_parents();
 
+  ElfW(Addr) resolve_symbol_address(ElfW(Sym)* s);
+
+  const char* get_string(ElfW(Word) index) const;
+
+  bool inline has_min_version(uint32_t min_version) const {
+    return (flags & FLAG_NEW_SOINFO) != 0 && version >= min_version;
+  }
  private:
   void CallArray(const char* array_name, linker_function_t* functions, size_t count, bool reverse);
   void CallFunction(const char* function_name, linker_function_t function);
+#if defined(USE_RELA)
+  int Relocate(ElfW(Rela)* rela, unsigned count);
+#else
+  int Relocate(ElfW(Rel)* rel, unsigned count);
+#endif
 
  private:
   // This part of the structure is only available
   // when FLAG_NEW_SOINFO is set in this->flags.
-  unsigned int version;
+  uint32_t version;
 
+  // version >= 0
   dev_t st_dev;
   ino_t st_ino;
 
@@ -225,6 +248,12 @@ struct soinfo {
   soinfo_list_t children;
   soinfo_list_t parents;
 
+  // version >= 1
+  off64_t file_offset;
+  int rtld_flags;
+  size_t strtab_size;
+
+  friend soinfo* get_libdl_info();
 };
 
 extern soinfo* get_libdl_info();
