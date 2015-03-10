@@ -37,7 +37,6 @@ libc_freebsd_src_files_arm += \
     upstream-freebsd/lib/libc/string/wcsrchr.c \
     upstream-freebsd/lib/libc/string/wmemcmp.c \
     upstream-freebsd/lib/libc/string/wmemmove.c \
-    upstream-openbsd/lib/libc/string/stpcpy.c \
 
 libc_openbsd_src_files_arm += \
     upstream-openbsd/lib/libc/string/stpncpy.c \
