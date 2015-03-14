@@ -42,7 +42,4 @@ ENTRY(sqrtf)
     bx          lr
 END(sqrtf)
 
-#if (__LDBL_MANT_DIG__ == 53)
-.weak sqrtl
-.equ  sqrtl, sqrt
-#endif
+ALIAS_SYMBOL(sqrtl, sqrt);
