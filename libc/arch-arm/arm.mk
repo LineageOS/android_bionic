@@ -71,8 +71,10 @@ endif
 ifneq ($(strip $(TARGET_$(my_2nd_arch_prefix)CPU_VARIANT)),krait)
 ifneq ($(strip $(TARGET_$(my_2nd_arch_prefix)CPU_VARIANT)),scorpion)
 ifneq ($(strip $(TARGET_$(my_2nd_arch_prefix)CPU_VARIANT)),cortex-a53)
+ifneq ($(strip $(TARGET_$(my_2nd_arch_prefix)CPU_VARIANT)),cortex-a57)
 libc_bionic_src_files_arm += \
     upstream-openbsd/lib/libc/string/bcopy.c
+endif
 endif
 endif
 endif
