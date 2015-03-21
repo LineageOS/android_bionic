@@ -8,6 +8,7 @@ libc_bionic_src_files_arm += \
 libc_bionic_src_files_arm += \
     arch-arm/cortex-a15/bionic/memchr.S \
     arch-arm/cortex-a15/bionic/memcpy.S \
+    arch-arm/cortex-a15/bionic/stpcpy.S \
     arch-arm/cortex-a15/bionic/strcat.S \
     arch-arm/cortex-a15/bionic/strcpy.S \
     arch-arm/cortex-a15/bionic/strlen.S \
