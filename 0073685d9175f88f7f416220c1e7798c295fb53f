@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ac665da_0d1123ad",
+        "filename": "libc/arch-arm/krait/bionic/memcpy_base.S",
+        "patchSetId": 2
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1063
+      },
+      "writtenOn": "2015-03-27T20:45:26Z",
+      "side": 1,
+      "message": "Steve, why this change from PS1 to PS2? The label seems to be unused, and the symbol hiding seems to be intended by AOSP.",
+      "revId": "0073685d9175f88f7f416220c1e7798c295fb53f",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
