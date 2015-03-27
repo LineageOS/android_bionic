@@ -16,6 +16,24 @@
       "revId": "bb30d43073b95eee0553bddd816198a1c468a6a7",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ac665da_c22fdaf4",
+        "filename": "libc/arch-arm/arm.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1063
+      },
+      "writtenOn": "2015-03-27T08:01:38Z",
+      "side": 1,
+      "message": "stpcpy was defined twice before. It\u0027s listed in both the generic and the krait make file.",
+      "parentUuid": "5ac665da_c2bebad3",
+      "revId": "bb30d43073b95eee0553bddd816198a1c468a6a7",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }
