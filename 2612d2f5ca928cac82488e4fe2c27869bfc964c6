@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ac665da_bd3e33b6",
+        "filename": "libc/arch-arm/arm.mk",
+        "patchSetId": 3
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2015-04-02T16:59:06Z",
+      "side": 1,
+      "message": "I was thinking of splitting the two up and making it opt-in like the following:\n\nifneq ($(filter cortex-a9 cortex-a15 ...,$(strip $(TARGET_$(my_2nd_arch_prefix)CPU_VARIANT)),)\nlibc_bionic_src_files_arm +\u003d stpcpy.c\nendif\n\nifneq ($(filter cortex-a9 cortex-a15 ...,$(strip $(TARGET_$(my_2nd_arch_prefix)CPU_VARIANT)),)\nlibc_bionic_src_files_arm +\u003d bcopy.c\nendif",
+      "revId": "2612d2f5ca928cac82488e4fe2c27869bfc964c6",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
