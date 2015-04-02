@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ac665da_cfe7f510",
+        "filename": "libc/arch-arm/arm.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 7231
+      },
+      "writtenOn": "2015-04-02T05:43:53Z",
+      "side": 1,
+      "message": "We need bcopy.c",
+      "revId": "9ff06734f7a2100d99017de256e0ebfe4d16625d",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
