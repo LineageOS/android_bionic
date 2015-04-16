@@ -54,7 +54,7 @@
 //
 
 int mbsinit(const mbstate_t* ps) {
-  return (ps == NULL || (*(reinterpret_cast<const uint32_t*>(ps->__seq)) == 0));
+  return (ps == NULL || ps->__seq32 == 0);
 }
 
 size_t mbrtowc(wchar_t* pwc, const char* s, size_t n, mbstate_t* ps) {

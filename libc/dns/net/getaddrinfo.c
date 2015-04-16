@@ -1544,7 +1544,7 @@ _get_scope(const struct sockaddr *addr)
 
 /* RFC 4380, section 2.6 */
 #define IN6_IS_ADDR_TEREDO(a)	 \
-	((*(const uint32_t *)(const void *)(&(a)->s6_addr[0]) == ntohl(0x20010000)))
+	(((a)->s6_addr32[0]) == ntohl(0x20010000))
 
 /* RFC 3056, section 2. */
 #define IN6_IS_ADDR_6TO4(a)	 \

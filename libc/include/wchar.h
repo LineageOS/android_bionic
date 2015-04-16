@@ -41,7 +41,10 @@ __BEGIN_DECLS
 
 typedef __WINT_TYPE__  wint_t;
 typedef struct {
-  uint8_t __seq[4];
+  union {
+    uint8_t __seq[4];
+    uint32_t __seq32;
+  };
 #ifdef __LP64__
   char __reserved[4];
 #endif
