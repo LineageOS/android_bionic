@@ -14,6 +14,7 @@ libc_bionic_src_files_arm += \
     arch-arm/cortex-a15/bionic/strlen.S \
 
 libc_bionic_src_files_arm += \
+    arch-arm/generic/bionic/memchr.S \
     arch-arm/generic/bionic/memcmp.S \
 
 libc_bionic_src_files_arm += \
