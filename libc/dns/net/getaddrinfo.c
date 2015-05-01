@@ -112,6 +112,8 @@
 #include <sys/system_properties.h>
 #endif /* ANDROID_CHANGES */
 
+#define LFHFF_IDENTIFIER "#LFHFFv1\n"
+
 typedef union sockaddr_union {
     struct sockaddr     generic;
     struct sockaddr_in  in;
@@ -2042,6 +2044,8 @@ _gethtent(FILE **hostf, const char *name, const struct addrinfo *pai)
 	const char *addr;
 	char hostbuf[8*1024];
 
+	int check_order = 1, is_ordered = 0, omax = 0, omin = 0, opivot = 0, ocmp = 0, opivot_down = -1;
+
 //	fprintf(stderr, "_gethtent() name = '%s'\n", name);
 	assert(name != NULL);
 	assert(pai != NULL);
@@ -2049,8 +2053,41 @@ _gethtent(FILE **hostf, const char *name, const struct addrinfo *pai)
 	if (!*hostf && !(*hostf = fopen(_PATH_HOSTS, "r" )))
 		return (NULL);
  again:
+	if (is_ordered) {
+		int look_behind = 255;
+		int diff;
+		while (1) {
+			diff = opivot > look_behind ? look_behind : opivot;
+			int eol;
+			fseek(*hostf, opivot - diff, SEEK_SET);
+			fread(hostbuf, diff, 1, *hostf);
+			for(p = &hostbuf[diff]; *p != '\n' && p != hostbuf; p--);
+			if(p != hostbuf || diff == opivot || look_behind >= 2040)
+				break;
+			look_behind *= 2;
+			continue;
+		}
+		p++;
+		if(opivot_down < 0)
+			opivot_down = opivot - diff + (p - hostbuf);
+		if(!fgets(hostbuf + diff, sizeof(hostbuf) - diff, *hostf))
+			return (NULL);
+		opivot = ftell(*hostf);
+	}
+	else
 	if (!(p = fgets(hostbuf, sizeof hostbuf, *hostf)))
 		return (NULL);
+	if (check_order) {
+		is_ordered = (strcmp(p, LFHFF_IDENTIFIER) == 0);
+		check_order = 0;
+		if (is_ordered) {
+			fseek(*hostf, 0L, SEEK_END);
+			omax = ftell(*hostf);
+			omin = sizeof(LFHFF_IDENTIFIER);
+			opivot = (omax + omin) / 2;
+			goto again;
+		}
+	}
 	if (*p == '#')
 		goto again;
 	if (!(cp = strpbrk(p, "#\n")))
@@ -2073,8 +2110,22 @@ _gethtent(FILE **hostf, const char *name, const struct addrinfo *pai)
 		if ((cp = strpbrk(cp, " \t")) != NULL)
 			*cp++ = '\0';
 //		fprintf(stderr, "\ttname = '%s'", tname);
-		if (strcasecmp(name, tname) == 0)
+		if ((ocmp = strcasecmp(name, tname)) == 0)
 			goto found;
+	}
+	if (is_ordered) {
+//		fprintf(stderr, "omin = %d, omax = %d, opivot = %d, opivot_down: %d: %s\n", omin, omax, opivot, opivot_down, tname);
+		if (opivot_down == omax)
+			return (NULL);
+		if (omax == omin)
+			return (NULL);
+		if (ocmp < 0) {
+			omax = opivot_down;
+		}
+		else
+			omin = opivot;
+		opivot = (omax + omin) / 2;
+		opivot_down = -1;
 	}
 	goto again;
 
