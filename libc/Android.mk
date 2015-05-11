@@ -821,11 +821,6 @@ LOCAL_SRC_FILES := $(libc_bionic_src_files)
 LOCAL_CFLAGS := $(libc_common_cflags) \
     -Wframe-larger-than=2048 \
 
-ifeq ($(TARGET_ARCH),x86_64)
-  # Clang assembler has problem with ssse3-strcmp-slm.S, http://b/17302991
-  LOCAL_CLANG_ASFLAGS += -no-integrated-as
-endif
-
 LOCAL_CONLYFLAGS := $(libc_common_conlyflags)
 LOCAL_CPPFLAGS := $(libc_common_cppflags)
 LOCAL_C_INCLUDES := $(libc_common_c_includes)
