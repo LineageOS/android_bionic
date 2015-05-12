@@ -76,7 +76,7 @@ libc_bionic_src_files_arm += \
     upstream-openbsd/lib/libc/string/stpcpy.c
 endif
 
-ifeq ($(filter cortex-a53 denver krait scorpion, $(strip $(TARGET_$(my_2nd_arch_prefix)CPU_VARIANT))),)
+ifeq ($(filter cortex-a53 krait scorpion, $(strip $(TARGET_$(my_2nd_arch_prefix)CPU_VARIANT))),)
 libc_bionic_src_files_arm += \
     upstream-openbsd/lib/libc/string/bcopy.c
 endif
