@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a89bdaa_3e1249b5",
+        "filename": "libc/dns/net/getaddrinfo.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 13028
+      },
+      "writtenOn": "2015-05-23T02:16:34Z",
+      "side": 1,
+      "message": "should break too long lines",
+      "revId": "86714d2bd02d0f97e7738e4baf582d8cc1fd9579",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a89bdaa_3e2b29ed",
+        "filename": "libc/dns/net/hosts_cache.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 13028
+      },
+      "writtenOn": "2015-05-23T02:16:34Z",
+      "side": 1,
+      "message": "Should break too long lines into more",
+      "revId": "86714d2bd02d0f97e7738e4baf582d8cc1fd9579",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a89bdaa_5e30ed56",
+        "filename": "libc/dns/net/hosts_cache.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 13028
+      },
+      "writtenOn": "2015-05-23T02:16:34Z",
+      "side": 1,
+      "message": "and here",
+      "revId": "86714d2bd02d0f97e7738e4baf582d8cc1fd9579",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a89bdaa_7e35b144",
+        "filename": "libc/dns/net/hosts_cache.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 13028
+      },
+      "writtenOn": "2015-05-23T02:16:34Z",
+      "side": 1,
+      "message": "and here",
+      "revId": "86714d2bd02d0f97e7738e4baf582d8cc1fd9579",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a89bdaa_9e3a7535",
+        "filename": "libc/dns/net/hosts_cache.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 13028
+      },
+      "writtenOn": "2015-05-23T02:16:34Z",
+      "side": 1,
+      "message": "and here",
+      "revId": "86714d2bd02d0f97e7738e4baf582d8cc1fd9579",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a89bdaa_be3f3924",
+        "filename": "libc/dns/net/hosts_cache.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 13028
+      },
+      "writtenOn": "2015-05-23T02:16:34Z",
+      "side": 1,
+      "message": "and here",
+      "revId": "86714d2bd02d0f97e7738e4baf582d8cc1fd9579",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a89bdaa_de3cfd31",
+        "filename": "libc/dns/net/hosts_cache.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 13028
+      },
+      "writtenOn": "2015-05-23T02:16:34Z",
+      "side": 1,
+      "message": "and here",
+      "revId": "86714d2bd02d0f97e7738e4baf582d8cc1fd9579",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a89bdaa_fe49c1d1",
+        "filename": "libc/dns/net/hosts_cache.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 13028
+      },
+      "writtenOn": "2015-05-23T02:16:34Z",
+      "side": 1,
+      "message": "and here",
+      "revId": "86714d2bd02d0f97e7738e4baf582d8cc1fd9579",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
