@@ -375,12 +375,10 @@ libm_x86_arch_files += \
     upstream-freebsd/lib/msun/src/s_fminf.c \
     upstream-freebsd/lib/msun/src/s_llrint.c \
     upstream-freebsd/lib/msun/src/s_llrintf.c \
-    upstream-freebsd/lib/msun/src/s_lrint.c \
-    upstream-freebsd/lib/msun/src/s_lrintf.c \
+    x86/lrint.S \
+    x86/lrintf.S \
     upstream-freebsd/lib/msun/src/s_lround.c \
     upstream-freebsd/lib/msun/src/s_lroundf.c \
-    upstream-freebsd/lib/msun/src/s_rint.c \
-    upstream-freebsd/lib/msun/src/s_rintf.c \
     upstream-freebsd/lib/msun/src/s_round.c \
     upstream-freebsd/lib/msun/src/s_roundf.c \
     upstream-freebsd/lib/msun/src/s_sin.c \
@@ -414,6 +412,8 @@ LOCAL_SRC_FILES_x86 += \
     x86/ceilf.S \
     x86/floor.S \
     x86/floorf.S \
+    x86/rint.S \
+    x86/rintf.S \
     x86/trunc.S \
     x86/truncf.S \
 
@@ -423,6 +423,8 @@ LOCAL_SRC_FILES_x86 += \
     upstream-freebsd/lib/msun/src/s_ceilf.c \
     upstream-freebsd/lib/msun/src/s_floor.c \
     upstream-freebsd/lib/msun/src/s_floorf.c \
+    upstream-freebsd/lib/msun/src/s_rint.c \
+    upstream-freebsd/lib/msun/src/s_rintf.c \
     upstream-freebsd/lib/msun/src/s_trunc.c \
     upstream-freebsd/lib/msun/src/s_truncf.c \
 
@@ -439,14 +441,10 @@ libm_x86_64_arch_files += \
     upstream-freebsd/lib/msun/src/s_fmaxf.c \
     upstream-freebsd/lib/msun/src/s_fmin.c \
     upstream-freebsd/lib/msun/src/s_fminf.c \
-    upstream-freebsd/lib/msun/src/s_llrint.c \
-    upstream-freebsd/lib/msun/src/s_llrintf.c \
-    upstream-freebsd/lib/msun/src/s_lrint.c \
-    upstream-freebsd/lib/msun/src/s_lrintf.c \
+    x86_64/lrint.S \
+    x86_64/lrintf.S \
     upstream-freebsd/lib/msun/src/s_lround.c \
     upstream-freebsd/lib/msun/src/s_lroundf.c \
-    upstream-freebsd/lib/msun/src/s_rint.c \
-    upstream-freebsd/lib/msun/src/s_rintf.c \
     upstream-freebsd/lib/msun/src/s_round.c \
     upstream-freebsd/lib/msun/src/s_roundf.c \
     upstream-freebsd/lib/msun/src/s_sin.c \
@@ -477,6 +475,8 @@ LOCAL_SRC_FILES_x86_64 += \
     x86_64/ceilf.S \
     x86_64/floor.S \
     x86_64/floorf.S \
+    x86_64/rint.S \
+    x86_64/rintf.S \
     x86_64/trunc.S \
     x86_64/truncf.S \
 
@@ -486,6 +486,8 @@ LOCAL_SRC_FILES_x86_64 += \
     upstream-freebsd/lib/msun/src/s_ceilf.c \
     upstream-freebsd/lib/msun/src/s_floor.c \
     upstream-freebsd/lib/msun/src/s_floorf.c \
+    upstream-freebsd/lib/msun/src/s_rint.c \
+    upstream-freebsd/lib/msun/src/s_rintf.c \
     upstream-freebsd/lib/msun/src/s_trunc.c \
     upstream-freebsd/lib/msun/src/s_truncf.c \
 
