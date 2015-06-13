@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a57fde8_b2085e93",
+        "filename": "libc/dns/net/getaddrinfo.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2015-06-13T12:58:38Z",
+      "side": 1,
+      "message": "Is there a reason you made this an extern here?",
+      "revId": "558ed97c36dba3247e27901b06c46e06ae9f4995",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a461143_8f25f9af",
+        "filename": "libc/dns/net/hosts_cache.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2015-06-13T12:58:38Z",
+      "side": 1,
+      "message": "Why return 2?",
+      "revId": "558ed97c36dba3247e27901b06c46e06ae9f4995",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a461143_af2ab57c",
+        "filename": "libc/dns/net/hosts_cache.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2015-06-13T12:58:38Z",
+      "side": 1,
+      "message": "Can delete the commented out line",
+      "revId": "558ed97c36dba3247e27901b06c46e06ae9f4995",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
