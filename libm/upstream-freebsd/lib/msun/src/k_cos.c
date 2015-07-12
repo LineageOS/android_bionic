@@ -68,7 +68,7 @@ C6  = -1.13596475577881948265e-11; /* 0xBDA8FAE9, 0xBE8838D4 */
 double
 __kernel_cos(double x, double y)
 {
-#if defined(KRAIT_NEON_OPTIMIZATION) || defined(QCOM_NEON_OPTIMIZATION)
+#if defined(QCOM_NEON_OPTIMIZATION)
 	double hz,z,zz,r,w,k;
 
 	z  = x*x;
