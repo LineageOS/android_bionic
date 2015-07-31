@@ -51,7 +51,6 @@ libm_common_src_files += \
     upstream-freebsd/lib/msun/src/e_powf.c \
     upstream-freebsd/lib/msun/src/e_remainder.c \
     upstream-freebsd/lib/msun/src/e_remainderf.c \
-    upstream-freebsd/lib/msun/src/e_rem_pio2.c \
     upstream-freebsd/lib/msun/src/e_rem_pio2f.c \
     upstream-freebsd/lib/msun/src/e_scalb.c \
     upstream-freebsd/lib/msun/src/e_scalbf.c \
@@ -276,9 +275,8 @@ endif
 # arm64
 # -----------------------------------------------------------------------------
 libm_arm64_arch_files += \
-    upstream-freebsd/lib/msun/src/s_cos.c \
-    upstream-freebsd/lib/msun/src/s_sin.c \
     arm64/ceil.S \
+    arm64/cos.c \
     arm64/fma.S \
     arm64/fmax.S \
     arm64/fmin.S \
@@ -287,6 +285,7 @@ libm_arm64_arch_files += \
     arm64/lround.S \
     arm64/rint.S \
     arm64/round.S \
+    arm64/sin.c \
     arm64/sqrt.S \
     arm64/trunc.S \
     upstream-freebsd/lib/msun/src/e_acos.c \
