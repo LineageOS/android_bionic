@@ -127,6 +127,30 @@ static void BM_math_isinf_ZERO(int iters) {
 }
 BENCHMARK(BM_math_isinf_ZERO);
 
+static void BM_math_cos_big(int iters) {
+  StartBenchmarkTiming();
+
+  d = 1.647099e7;
+  for (int i = 0; i < iters; ++i) {
+    d += cos(d);
+  }
+
+  StopBenchmarkTiming();
+}
+BENCHMARK(BM_math_cos_big);
+
+static void BM_math_sin_big(int iters) {
+  StartBenchmarkTiming();
+
+  d = 1.647099e7;
+  for (int i = 0; i < iters; ++i) {
+    d += sin(d);
+  }
+
+  StopBenchmarkTiming();
+}
+BENCHMARK(BM_math_sin_big);
+
 static void BM_math_sin_fast(int iters) {
   StartBenchmarkTiming();
 
