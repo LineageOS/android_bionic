@@ -9,7 +9,6 @@ libc_bionic_src_files_arm64 += \
     bionic/__strcpy_chk.cpp \
     bionic/__strcat_chk.cpp \
     bionic/memrchr.c \
-    bionic/strrchr.cpp \
 
 libc_freebsd_src_files_arm64 += \
     upstream-freebsd/lib/libc/string/wcscat.c \
