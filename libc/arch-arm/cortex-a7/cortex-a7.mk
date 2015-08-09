@@ -12,7 +12,7 @@ libc_bionic_src_files_arm += \
     arch-arm/cortex-a15/bionic/strlen.S \
 
 libc_bionic_src_files_arm += \
-    arch-arm/generic/bionic/memcmp.S \
+    arch-arm/bionic/memcmp.S \
 
 libc_bionic_src_files_arm += \
     arch-arm/denver/bionic/memmove.S \
