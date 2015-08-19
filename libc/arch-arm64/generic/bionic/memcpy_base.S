@@ -186,6 +186,7 @@ L(copy_long):
 	ldp	C_l, C_h, [src, 48]
 	stp	D_l, D_h, [dst, 64]!
 	ldp	D_l, D_h, [src, 64]!
+	PRFM PLDL1KEEP, [src,   #528]
 	subs	count, count, 64
 	b.hi	1b
 
