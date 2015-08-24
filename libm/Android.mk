@@ -104,8 +104,6 @@ libm_common_src_files += \
     upstream-freebsd/lib/msun/src/s_exp2.c \
     upstream-freebsd/lib/msun/src/s_exp2f.c \
     upstream-freebsd/lib/msun/src/s_expm1f.c \
-    upstream-freebsd/lib/msun/src/s_fabs.c \
-    upstream-freebsd/lib/msun/src/s_fabsf.c \
     upstream-freebsd/lib/msun/src/s_fdim.c \
     upstream-freebsd/lib/msun/src/s_finite.c \
     upstream-freebsd/lib/msun/src/s_finitef.c \
@@ -163,7 +161,6 @@ libm_ld128_src_files = \
     upstream-freebsd/lib/msun/src/s_copysignl.c \
     upstream-freebsd/lib/msun/src/e_coshl.c \
     upstream-freebsd/lib/msun/src/s_cosl.c \
-    upstream-freebsd/lib/msun/src/s_fabsl.c \
     upstream-freebsd/lib/msun/src/s_floorl.c \
     upstream-freebsd/lib/msun/src/s_fmal.c \
     upstream-freebsd/lib/msun/src/s_fmaxl.c \
@@ -199,6 +196,10 @@ libm_ld128_src_files += \
     upstream-freebsd/lib/msun/ld128/s_expl.c \
     upstream-freebsd/lib/msun/ld128/s_logl.c \
     upstream-freebsd/lib/msun/ld128/s_nanl.c \
+
+# Home-grown stuff.
+LOCAL_SRC_FILES += \
+    fabs.cpp \
 
 # Arch specific optimizations.
 
@@ -492,6 +493,7 @@ endif
 # TODO: re-enable i387/e_sqrtf.S for x86, and maybe others.
 
 libm_common_cflags := \
+    -D__BIONIC_NO_MATH_INLINES \
     -DFLT_EVAL_METHOD=0 \
     -std=c99 \
     -O3 \

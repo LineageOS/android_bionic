@@ -209,3 +209,29 @@ static void BM_math_fpclassify_ZERO(int iters) {
   StopBenchmarkTiming();
 }
 BENCHMARK(BM_math_fpclassify_ZERO);
+
+BENCHMARK(BM_math_fabs_macro);
+static void BM_math_fabs_macro::Run(int iters, double value) {
+  StartBenchmarkTiming();
+
+  d = 0.0;
+  v = value;
+  for (int i = 0; i < iters; ++i) {
+    d += fabs(v);
+  }
+
+  StopBenchmarkTiming();
+}
+
+BENCHMARK(BM_math_fabs);
+static void BM_math_fabs::Run(int iters, double value) {
+  StartBenchmarkTiming();
+
+  d = 0.0;
+  v = value;
+  for (int i = 0; i < iters; ++i) {
+    d += (fabs)(v);
+  }
+
+  StopBenchmarkTiming();
+}
