@@ -262,11 +262,10 @@ libm_arm_arch_files += \
 
 else
 libm_arm_arch_files += \
-    arm/s_cos.S \
-    arm/s_sin.S \
-    arm/e_sqrt.S \
-    arm/e_sqrtf.S \
-    arm/s_floor.S \
+    arm/cos.S \
+    arm/sin.S \
+    arm/sqrt.S \
+    arm/floor.S \
 
 libm_arm_arch_cflags += -DQCOM_NEON_OPTIMIZATION -fno-if-conversion
 endif
