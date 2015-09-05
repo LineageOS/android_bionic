@@ -35,6 +35,13 @@ ENTRY(sqrt)
     bx          lr
 END(sqrt)
 
+ENTRY(sqrtf)
+    vmov.f32    s0, r0
+    vsqrt.f32   s0, s0
+    vmov.f32    r0, s0
+    bx          lr
+END(sqrtf)
+
 #if (__LDBL_MANT_DIG__ == 53)
 .weak sqrtl
 .equ  sqrtl, sqrt
