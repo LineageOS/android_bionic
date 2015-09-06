@@ -223,7 +223,6 @@ libm_arm_arch_files += \
     upstream-freebsd/lib/msun/src/s_cbrt.c \
     upstream-freebsd/lib/msun/src/s_ceil.c \
     upstream-freebsd/lib/msun/src/s_ceilf.c \
-    upstream-freebsd/lib/msun/src/s_cos.c \
     upstream-freebsd/lib/msun/src/s_floorf.c \
     upstream-freebsd/lib/msun/src/s_fma.c \
     upstream-freebsd/lib/msun/src/s_fmaf.c \
@@ -243,7 +242,6 @@ libm_arm_arch_files += \
     upstream-freebsd/lib/msun/src/s_rintf.c \
     upstream-freebsd/lib/msun/src/s_round.c \
     upstream-freebsd/lib/msun/src/s_roundf.c \
-    upstream-freebsd/lib/msun/src/s_sin.c \
     upstream-freebsd/lib/msun/src/s_tan.c \
     upstream-freebsd/lib/msun/src/s_tanh.c \
     upstream-freebsd/lib/msun/src/s_trunc.c \
@@ -533,22 +531,22 @@ LOCAL_ASFLAGS := \
 # arch-specific settings
 LOCAL_CFLAGS_arm := $(libm_arm_arch_cflags)
 LOCAL_C_INCLUDES_arm := $(LOCAL_PATH)/arm $(libm_arm_arch_includes)
-LOCAL_SRC_FILES_arm := arm/fenv.c $(libm_arm_arch_files)
+LOCAL_SRC_FILES_arm := $(libm_arm_arch_files)
 
 LOCAL_CFLAGS_arm64 := $(libm_arm64_arch_cflags)
 LOCAL_C_INCLUDES_arm64 := $(libm_ld_includes) $(libm_arm64_arch_includes)
-LOCAL_SRC_FILES_arm64 := arm64/fenv.c $(libm_ld128_src_files) $(libm_arm64_arch_files)
+LOCAL_SRC_FILES_arm64 := $(libm_ld128_src_files) $(libm_arm64_arch_files)
 
 LOCAL_C_INCLUDES_x86 := $(LOCAL_PATH)/i387
-LOCAL_SRC_FILES_x86 := i387/fenv.c $(libm_x86_arch_files)
+LOCAL_SRC_FILES_x86 := $(libm_x86_arch_files)
 
 LOCAL_C_INCLUDES_x86_64 := $(libm_ld_includes)
-LOCAL_SRC_FILES_x86_64 := amd64/fenv.c $(libm_ld128_src_files) $(libm_x86_64_arch_files)
+LOCAL_SRC_FILES_x86_64 := $(libm_ld128_src_files) $(libm_x86_64_arch_files)
 
-LOCAL_SRC_FILES_mips += mips/fenv.c $(libm_mips_arch_files)
+LOCAL_SRC_FILES_mips += $(libm_mips_arch_files)
 
 LOCAL_C_INCLUDES_mips64 := $(libm_ld_includes)
-LOCAL_SRC_FILES_mips64 := mips/fenv.c $(libm_ld128_src_files)
+LOCAL_SRC_FILES_mips64 := $(libm_ld128_src_files)
 LOCAL_SRC_FILES_mips64 += $(libm_mips_arch_files)
 
 include $(BUILD_STATIC_LIBRARY)
