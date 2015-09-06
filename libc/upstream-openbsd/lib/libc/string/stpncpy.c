@@ -37,20 +37,10 @@
 char *
 stpncpy(char *dst, const char *src, size_t n)
 {
-	if (n != 0) {
-		char *d = dst;
-		const char *s = src;
-
-		dst = &dst[n];
-		do {
-			if ((*d++ = *s++) == 0) {
-				dst = d - 1;
-				/* NUL pad the remaining n-1 bytes */
-				while (--n != 0)
-					*d++ = 0;
-				break;
-			}
-		} while (--n != 0);
-	}
-	return (dst);
+  size_t size = __strnlen (src, n);
+  memcpy (dst, src, size);
+  dst += size;
+  if (size == n)
+    return dst;
+  return memset (dst, '\0', n - size);
 }
