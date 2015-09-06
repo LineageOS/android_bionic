@@ -40,18 +40,15 @@
 char *
 strncat(char *dst, const char *src, size_t n)
 {
-	if (n != 0) {
-		char *d = dst;
-		const char *s = src;
+  char *d = dst;
 
-		while (*d != 0)
-			d++;
-		do {
-			if ((*d = *s++) == 0)
-				break;
-			d++;
-		} while (--n != 0);
-		*d = 0;
-	}
-	return (dst);
+  /* Find the end of dst.  */
+  dst += strlen (dst);
+
+  size_t ss = strnlen (src, n);
+
+  dst[ss] = '\0';
+  memcpy (dst, src, ss);
+
+  return d;
 }
