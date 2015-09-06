@@ -41,18 +41,8 @@
 char *
 strncpy(char *dst, const char *src, size_t n)
 {
-	if (n != 0) {
-		char *d = dst;
-		const char *s = src;
-
-		do {
-			if ((*d++ = *s++) == 0) {
-				/* NUL pad the remaining n-1 bytes */
-				while (--n != 0)
-					*d++ = 0;
-				break;
-			}
-		} while (--n != 0);
-	}
-	return (dst);
+  size_t size = strnlen (src, n);
+  if (size != n)
+    memset (dst + size, '\0', n - size);
+  return memcpy (dst, src, size);
 }
