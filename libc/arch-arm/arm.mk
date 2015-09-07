@@ -70,7 +70,7 @@ ifeq ($(strip $(TARGET_$(my_2nd_arch_prefix)CPU_VARIANT)),)
   $(warning TARGET_$(my_2nd_arch_prefix)ARCH is arm, but TARGET_$(my_2nd_arch_prefix)CPU_VARIANT is not defined)
 endif
 
-ifeq ($(filter cortex-a9 cortex-a53 denver krait scorpion, $(strip $(TARGET_$(my_2nd_arch_prefix)CPU_VARIANT))),)
+ifeq ($(filter cortex-a7 cortex-a9 cortex-a53 denver krait scorpion, $(strip $(TARGET_$(my_2nd_arch_prefix)CPU_VARIANT))),)
 libc_bionic_src_files_arm += \
     upstream-openbsd/lib/libc/string/stpcpy.c
 endif
