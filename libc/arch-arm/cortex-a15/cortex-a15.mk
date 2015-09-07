@@ -8,7 +8,7 @@ libc_bionic_src_files_arm += \
     arch-arm/cortex-a15/bionic/strcpy.S \
     arch-arm/cortex-a15/bionic/__strcpy_chk.S \
     arch-arm/cortex-a15/bionic/strlen.S \
-    bionic/memmove.c \
+    arch-arm/denver/bionic/memmove.S \
 
 # Optimization not required for some targets
 ifeq ($(TARGET_CPU_MEMCPY_OPT_DISABLE),true)
