@@ -1077,6 +1077,10 @@ LOCAL_SRC_FILES_arm += \
     arch-arm/bionic/atexit_legacy.c \
     arch-common/bionic/crtend_so.S
 
+ifeq ($(BOARD_PROVIDES_DEVICE_DYNAMIC_SYMBOLS),true)
+    LOCAL_WHOLE_STATIC_LIBRARIES += libc_device_global_symbols
+endif
+
 include $(BUILD_SHARED_LIBRARY)
 
 
