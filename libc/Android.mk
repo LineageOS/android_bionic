@@ -1072,6 +1072,9 @@ LOCAL_SRC_FILES_arm += \
     arch-arm/bionic/atexit_legacy.c \
     arch-common/bionic/crtend_so.S
 
+# Allow devices to provide additional symbols
+LOCAL_WHOLE_STATIC_LIBRARIES += $(BOARD_PROVIDES_ADDITIONAL_BIONIC_STATIC_LIBS)
+
 include $(BUILD_SHARED_LIBRARY)
 
 
