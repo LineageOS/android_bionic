@@ -270,7 +270,7 @@ libm_arm_arch_files += \
     arm/sqrt.S \
     arm/floor.S \
 
-libm_arm_arch_cflags += -DQCOM_NEON_OPTIMIZATION -fno-if-conversion
+libm_arm_arch_cflags += -fno-if-conversion
 endif
 
 # -----------------------------------------------------------------------------
@@ -308,8 +308,6 @@ libm_arm64_arch_files += \
     upstream-freebsd/lib/msun/src/s_sin.c \
     upstream-freebsd/lib/msun/src/s_tan.c \
     upstream-freebsd/lib/msun/src/s_tanh.c \
-
-libm_arm64_arch_cflags += -DQCOM_NEON_OPTIMIZATION
 
 # -----------------------------------------------------------------------------
 # mips
