@@ -49,6 +49,19 @@ static void BM_math_log10(int iters) {
 }
 BENCHMARK(BM_math_log10);
 
+static void BM_math_log(int iters) {
+  StartBenchmarkTiming();
+
+  d = 0.0;
+  v = 1234.0;
+  for (int i = 0; i < iters; ++i) {
+    d += log(v);
+  }
+
+  StopBenchmarkTiming();
+}
+BENCHMARK(BM_math_log);
+
 static void BM_math_logb(int iters) {
   StartBenchmarkTiming();
 
