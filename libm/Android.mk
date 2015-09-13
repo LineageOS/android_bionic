@@ -212,7 +212,6 @@ libm_arm_arch_files += \
     upstream-freebsd/lib/msun/src/e_asin.c \
     upstream-freebsd/lib/msun/src/e_atan2.c \
     upstream-freebsd/lib/msun/src/e_cosh.c \
-    upstream-freebsd/lib/msun/src/e_exp.c \
     upstream-freebsd/lib/msun/src/e_hypot.c \
     upstream-freebsd/lib/msun/src/e_log.c \
     upstream-freebsd/lib/msun/src/e_log10.c \
@@ -265,6 +264,7 @@ libm_arm_arch_files += \
 else
 libm_arm_arch_files += \
     arm/cos.S \
+    arm/exp.S \
     arm/sin.S \
     arm/sqrt.S \
     arm/floor.S \
