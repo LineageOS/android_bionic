@@ -209,3 +209,15 @@ static void BM_math_fpclassify_ZERO(int iters) {
   StopBenchmarkTiming();
 }
 BENCHMARK(BM_math_fpclassify_ZERO);
+
+static void BM_math_exp(int iters) {
+  StartBenchmarkTiming();
+
+  d = 1234.0;
+  for (int i = 0; i < iters; ++i) {
+    d += exp(d);
+  }
+
+  StopBenchmarkTiming();
+}
+BENCHMARK(BM_math_exp);
