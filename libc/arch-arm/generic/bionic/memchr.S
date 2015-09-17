@@ -1,4 +1,4 @@
-/* Copyright (c) 2010-2011, Linaro Limited
+/* Copyright (c) 2010-2015, Linaro Limited
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,6 @@
 
 /*
    Written by Dave Gilbert <david.gilbert@linaro.org>
-   Adapted to work inside Bionic by Bernhard Rosenkränzer <bero@linaro.org>
 
    This memchr routine is optimised on a Cortex-A9 and should work on
    all ARMv7 processors.   It has a fast past for short sizes, and has
@@ -40,10 +39,14 @@
 
  */
 
-// Prototype: void *memchr(const void *s, int c, size_t n);
-
 #include <private/bionic_asm.h>
-#include "private/libc_events.h"
+
+@ 2011-02-07 david.gilbert@linaro.org
+@    Extracted from local git a5b438d861
+@ 2011-07-14 david.gilbert@linaro.org
+@    Import endianness fix from local git ea786f1b
+@ 2011-12-07 david.gilbert@linaro.org
+@    Removed unneeded cbz from align loop
 
 	.syntax unified
 	.arch armv7-a
@@ -58,9 +61,8 @@
 	.thumb
 
 @ ---------------------------------------------------------------------------
-ENTRY(memchr)
 	.thumb_func
-	.align 2
+ENTRY(memchr)
 	.p2align 4,,15
 	@ r0 = start of memory to scan
 	@ r1 = character to look for
@@ -69,7 +71,7 @@ ENTRY(memchr)
 	and	r1,r1,#0xff	@ Don't think we can trust the caller to actually pass a char
 
 	cmp	r2,#16		@ If it's short don't bother with anything clever
-	blt	20f 
+	blt	20f
 
 	tst	r0, #7		@ If it's already aligned skip the next bit
 	beq	10f
@@ -82,7 +84,7 @@ ENTRY(memchr)
 	beq	50f		@ If it matches exit found
 	tst	r0, #7
 	bne	5b		@ If not aligned yet then do next byte
-	
+
 10:
 	@ At this point, we are aligned, we know we have at least 8 bytes to work with
 	push	{r4,r5,r6,r7}
@@ -91,9 +93,9 @@ ENTRY(memchr)
 	bic	r4, r2, #7	@ Number of double words to work with
 	mvns	r7, #0		@ all F's
 	movs	r3, #0
-	
+
 15:
-	ldmia	r0!,{r5,r6}
+	ldrd    r5,r6,[r0],#8
 	subs	r4, r4, #8
 	eor	r5,r5, r1	@ Get it so that r5,r6 have 00's where the bytes match the target
 	eor	r6,r6, r1
@@ -107,7 +109,7 @@ ENTRY(memchr)
 	pop	{r4,r5,r6,r7}
 	and	r1,r1,#0xff	@ Get r1 back to a single character from the expansion above
 	and	r2,r2,#7	@ Leave the count remaining as the number after the double words have been done
- 
+
 20:
 	cbz	r2, 40f		@ 0 length or hit the end already then not found
 

@@ -1,5 +1,6 @@
 # Use krait versions of memset/strcmp/memmove
 libc_bionic_src_files_arm += \
+    arch-arm/generic/bionic/memchr.S \
     arch-arm/generic/bionic/memcmp.S \
     arch-arm/krait/bionic/memset.S \
     arch-arm/krait/bionic/strcmp.S \
@@ -7,7 +8,6 @@ libc_bionic_src_files_arm += \
 
 # Use cortex-a15 versions of memcpy/strcat/strcpy/strlen
 libc_bionic_src_files_arm += \
-    arch-arm/cortex-a15/bionic/memchr.S \
     arch-arm/cortex-a15/bionic/memcpy.S \
     arch-arm/cortex-a15/bionic/stpcpy.S \
     arch-arm/cortex-a15/bionic/strcat.S \

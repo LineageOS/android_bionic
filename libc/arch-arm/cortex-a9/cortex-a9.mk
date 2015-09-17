@@ -1,6 +1,6 @@
 libc_bionic_src_files_arm += \
     arch-arm/generic/bionic/memcmp.S \
-    bionic/memchr.c \
+    arch-arm/generic/bionic/memchr.S \
     arch-arm/cortex-a9/bionic/memcpy.S \
     arch-arm/cortex-a9/bionic/memset.S \
     arch-arm/cortex-a9/bionic/stpcpy.S \

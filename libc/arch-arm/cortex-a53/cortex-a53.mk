@@ -16,4 +16,4 @@ libc_bionic_src_files_arm += \
     arch-arm/krait/bionic/memmove.S
 
 libc_bionic_src_files_arm += \
-    arch-arm/cortex-a15/bionic/memchr.S
+    arch-arm/generic/bionic/memchr.S

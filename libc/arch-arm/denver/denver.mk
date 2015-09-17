@@ -1,4 +1,5 @@
 libc_bionic_src_files_arm += \
+    arch-arm/generic/bionic/memchr.S \
     arch-arm/generic/bionic/memcmp.S \
     arch-arm/denver/bionic/memcpy.S \
     arch-arm/denver/bionic/memmove.S \
@@ -8,7 +9,6 @@ libc_bionic_src_files_arm += \
 
 # Use cortex-a15 versions of memchr/strcat/strcpy/strlen.
 libc_bionic_src_files_arm += \
-    arch-arm/cortex-a15/bionic/memchr.S \
     arch-arm/cortex-a15/bionic/stpcpy.S \
     arch-arm/cortex-a15/bionic/strcat.S \
     arch-arm/cortex-a15/bionic/strcmp.S \
