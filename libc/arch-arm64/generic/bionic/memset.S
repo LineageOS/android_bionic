@@ -45,11 +45,7 @@
    values rather than re-reading them each call.  */
 
 #define dstin		x0
-#ifdef BZERO
-#define count		x1
-#else
 #define count		x2
-#endif
 #define val		w1
 #define tmp1		x3
 #define tmp1w		w3
@@ -64,16 +60,9 @@
 #define dst		x8
 #define tmp3w		w9
 
-#ifdef BZERO
-ENTRY(bzero)
-#else
 ENTRY(memset)
-#endif
 
 	mov	dst, dstin		/* Preserve return value.  */
-#ifdef BZERO
-	b	.Lzero_mem
-#endif
 	ands	A_lw, val, #255
 	b.eq	.Lzero_mem
 	orr	A_lw, A_lw, A_lw, lsl #8
@@ -233,11 +222,7 @@ ENTRY(memset)
 	ands	count, count, zva_bits_x
 	b.ne	.Ltail_maybe_long
 	ret
-#ifdef BZERO
-END(bzero)
-#else
 END(memset)
-#endif
 
 #ifdef MAYBE_VIRT
 	.bss
