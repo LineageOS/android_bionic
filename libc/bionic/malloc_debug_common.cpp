@@ -387,6 +387,9 @@ static void malloc_init_impl() {
     case 10:
       so_name = "libc_malloc_debug_leak.so";
       break;
+    case 15:
+      so_name = "libefence.so";
+      break;
     case 20:
       // Quick check: debug level 20 can only be handled in emulator.
       if (!qemu_running) {
@@ -437,6 +440,7 @@ static void malloc_init_impl() {
     dlclose(malloc_impl_handle);
     return;
   }
+
   if (!malloc_debug_initialize(&g_hash_table, &__libc_malloc_default_dispatch)) {
     dlclose(malloc_impl_handle);
     return;
@@ -472,6 +476,9 @@ static void malloc_init_impl() {
       break;
     case 10:
       InitMalloc(malloc_impl_handle, &malloc_dispatch_table, "chk");
+      break;
+    case 15:
+      InitMalloc(malloc_impl_handle, &malloc_dispatch_table, "efence");
       break;
     case 20:
       InitMalloc(malloc_impl_handle, &malloc_dispatch_table, "qemu_instrumented");
