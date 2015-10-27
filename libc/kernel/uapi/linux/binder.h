@@ -186,5 +186,6 @@ enum binder_driver_command_protocol {
  BC_CLEAR_DEATH_NOTIFICATION = _IOW('c', 15, struct binder_handle_cookie),
  BC_DEAD_BINDER_DONE = _IOW('c', 16, binder_uintptr_t),
 /* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
+ BC_DIE_BINDER = _IOW('c', 17, void *),
 };
 #endif
