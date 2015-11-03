@@ -882,6 +882,60 @@ typedef linked_list_t<soinfo> SoinfoLinkedList;
 typedef linked_list_t<const char> StringLinkedList;
 typedef linked_list_t<LoadTask> LoadTaskList;
 
+static soinfo* find_library(const char* name, int rtld_flags, const android_dlextinfo* extinfo);
+
+// g_ld_all_shim_libs maintains the references to memory as it used
+// in the soinfo structures and in the g_active_shim_libs list.
+
+static std::vector<std::string> g_ld_all_shim_libs;
+
+// g_active_shim_libs are all shim libs that are still eligible
+// to be loaded.  We must remove a shim lib from the list before
+// we load the library to avoid recursive loops (load shim libA
+// for libB where libA also links against libB).
+
+static linked_list_t<const std::string> g_active_shim_libs;
+
+static void parse_LD_SHIM_LIBS(const char* path) {
+  parse_path(path, " :", &g_ld_all_shim_libs);
+  for (const auto& pair : g_ld_all_shim_libs) {
+    g_active_shim_libs.push_back(&pair);
+  }
+}
+
+static bool shim_lib_matches(const char *shim_lib, const char *realpath) {
+  const char *sep = strchr(shim_lib, '|');
+  return sep != nullptr && strncmp(realpath, shim_lib, sep - shim_lib) == 0;
+}
+
+template<typename F>
+static bool shim_libs_for_each(const char *const path, F action) {
+  if (path == nullptr) return true;
+  INFO("finding shim libs for \"%s\"\n", path);
+  std::vector<const std::string *> matched;
+
+  g_active_shim_libs.for_each([&](const std::string *a_pair) {
+    const char *pair = a_pair->c_str();
+    if (shim_lib_matches(pair, path)) {
+      matched.push_back(a_pair);
+    }
+  });
+
+  g_active_shim_libs.remove_if([&](const std::string *a_pair) {
+    const char *pair = a_pair->c_str();
+    return shim_lib_matches(pair, path);
+  });
+
+  for (const auto& one_pair : matched) {
+    const char* const pair = one_pair->c_str();
+    const char* sep = strchr(pair, '|');
+    INFO("found shim lib \"%s\"\n", sep+1);
+    soinfo *child = find_library(sep+1, RTLD_GLOBAL, nullptr);
+    if (! child) return false;
+    action(child);
+  }
+  return true;
+}
 
 // This function walks down the tree of soinfo dependencies
 // in breadth-first order and
@@ -914,6 +968,12 @@ static bool walk_dependencies_tree(soinfo* root_soinfos[], size_t root_soinfos_s
     si->get_children().for_each([&](soinfo* child) {
       visit_list.push_back(child);
     });
+
+    if (!shim_libs_for_each(si->get_realpath(), [&](soinfo* child) {
+        visit_list.push_back(child);
+      })) {
+      return false;
+    }
   }
 
   return true;
@@ -3154,9 +3214,11 @@ static ElfW(Addr) __linker_init_post_relocation(KernelArgumentBlock& args, ElfW(
   // doesn't cost us anything.
   const char* ldpath_env = nullptr;
   const char* ldpreload_env = nullptr;
+  const char* ldshim_libs_env = nullptr;
   if (!getauxval(AT_SECURE)) {
     ldpath_env = getenv("LD_LIBRARY_PATH");
     ldpreload_env = getenv("LD_PRELOAD");
+    ldshim_libs_env = getenv("LD_SHIM_LIBS");
   }
 
   INFO("[ android linker & debugger ]");
@@ -3210,6 +3272,7 @@ static ElfW(Addr) __linker_init_post_relocation(KernelArgumentBlock& args, ElfW(
   // Use LD_LIBRARY_PATH and LD_PRELOAD (but only if we aren't setuid/setgid).
   parse_LD_LIBRARY_PATH(ldpath_env);
   parse_LD_PRELOAD(ldpreload_env);
+  parse_LD_SHIM_LIBS(ldshim_libs_env);
 
   somain = si;
 
