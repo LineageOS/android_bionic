@@ -33,6 +33,7 @@
 #define	_PATHS_H_
 
 #define	_PATH_BSHELL	"/system/bin/sh"
+#define	_PATH_BSHELL2	"/sbin/sh"
 #define	_PATH_CONSOLE	"/dev/console"
 #define	_PATH_DEFPATH	"/sbin:/vendor/bin:/system/sbin:/system/bin:/system/xbin"
 #define	_PATH_DEV	"/dev/"
