@@ -62,6 +62,8 @@ system(const char *command)
 	case 0:				/* child */
 		sigprocmask(SIG_SETMASK, &omask, NULL);
 		execve(_PATH_BSHELL, argp, environ);
+		if (errno == ENOENT)
+			execve(_PATH_BSHELL2, argp, environ);
 		_exit(127);
 	}
 
