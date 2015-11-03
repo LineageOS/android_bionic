@@ -1230,6 +1230,67 @@ typedef linked_list_t<soinfo> SoinfoLinkedList;
 typedef linked_list_t<const char> StringLinkedList;
 typedef std::vector<LoadTask*> LoadTaskList;
 
+static soinfo* find_library(android_namespace_t* ns,
+                           const char* name, int rtld_flags,
+                           const android_dlextinfo* extinfo,
+                           soinfo* needed_by);
+
+// g_ld_all_shim_libs maintains the references to memory as it used
+// in the soinfo structures and in the g_active_shim_libs list.
+
+typedef std::pair<std::string, std::string> ShimDescriptor;
+static std::vector<ShimDescriptor> g_ld_all_shim_libs;
+
+// g_active_shim_libs are all shim libs that are still eligible
+// to be loaded.  We must remove a shim lib from the list before
+// we load the library to avoid recursive loops (load shim libA
+// for libB where libA also links against libB).
+
+static linked_list_t<const ShimDescriptor> g_active_shim_libs;
+
+static void reset_g_active_shim_libs(void) {
+  g_active_shim_libs.clear();
+  for (const auto& pair : g_ld_all_shim_libs) {
+    g_active_shim_libs.push_back(&pair);
+  }
+}
+
+static void parse_LD_SHIM_LIBS(const char* path) {
+  g_ld_all_shim_libs.clear();
+  if (path != nullptr) {
+    // We have historically supported ':' as well as ' ' in LD_SHIM_LIBS.
+    for (const auto& pair : android::base::Split(path, " :")) {
+      size_t pos = pair.find('|');
+      if (pos > 0 && pos < pair.length() - 1) {
+        auto desc = std::pair<std::string, std::string>(pair.substr(0, pos), pair.substr(pos + 1));
+        g_ld_all_shim_libs.push_back(desc);
+      }
+    }
+  }
+  reset_g_active_shim_libs();
+}
+
+template<typename F>
+static void for_each_matching_shim(const char *const path, F action) {
+  if (path == nullptr) return;
+  INFO("Finding shim libs for \"%s\"\n", path);
+  std::vector<const ShimDescriptor *> matched;
+
+  g_active_shim_libs.for_each([&](const ShimDescriptor *a_pair) {
+    if (a_pair->first == path) {
+      matched.push_back(a_pair);
+    }
+  });
+
+  g_active_shim_libs.remove_if([&](const ShimDescriptor *a_pair) {
+    return a_pair->first == path;
+  });
+
+  for (const auto& one_pair : matched) {
+    INFO("Injecting shim lib \"%s\" as needed for %s", one_pair->second.c_str(), path);
+    action(one_pair->second.c_str());
+  }
+}
 
 // This function walks down the tree of soinfo dependencies
 // in breadth-first order and
@@ -1668,6 +1729,7 @@ static const char* fix_dt_needed(const char* dt_needed, const char* sopath __unu
 
 template<typename F>
 static void for_each_dt_needed(const soinfo* si, F action) {
+  for_each_matching_shim(si->get_realpath(), action);
   for (const ElfW(Dyn)* d = si->dynamic; d->d_tag != DT_NULL; ++d) {
     if (d->d_tag == DT_NEEDED) {
       action(fix_dt_needed(si->get_string(d->d_un.d_val), si->get_realpath()));
@@ -1677,6 +1739,7 @@ static void for_each_dt_needed(const soinfo* si, F action) {
 
 template<typename F>
 static void for_each_dt_needed(const ElfReader& elf_reader, F action) {
+  for_each_matching_shim(elf_reader.name(), action);
   for (const ElfW(Dyn)* d = elf_reader.dynamic(); d->d_tag != DT_NULL; ++d) {
     if (d->d_tag == DT_NEEDED) {
       action(fix_dt_needed(elf_reader.get_string(d->d_un.d_val), elf_reader.name()));
@@ -2397,6 +2460,7 @@ void* do_dlopen(const char* name, int flags, const android_dlextinfo* extinfo,
   }
 
   ProtectedDataGuard guard;
+  reset_g_active_shim_libs();
   soinfo* si = find_library(ns, translated_name, flags, extinfo, caller);
   if (si != nullptr) {
     si->call_constructors();
@@ -4217,6 +4281,7 @@ static ElfW(Addr) __linker_init_post_relocation(KernelArgumentBlock& args, ElfW(
   // doesn't cost us anything.
   const char* ldpath_env = nullptr;
   const char* ldpreload_env = nullptr;
+  const char* ldshim_libs_env = nullptr;
   if (!getauxval(AT_SECURE)) {
     ldpath_env = getenv("LD_LIBRARY_PATH");
     if (ldpath_env != nullptr) {
@@ -4226,6 +4291,7 @@ static ElfW(Addr) __linker_init_post_relocation(KernelArgumentBlock& args, ElfW(
     if (ldpreload_env != nullptr) {
       INFO("[ LD_PRELOAD set to \"%s\" ]", ldpreload_env);
     }
+    ldshim_libs_env = getenv("LD_SHIM_LIBS");
   }
 
   struct stat file_stat;
@@ -4284,6 +4350,7 @@ static ElfW(Addr) __linker_init_post_relocation(KernelArgumentBlock& args, ElfW(
   // Use LD_LIBRARY_PATH and LD_PRELOAD (but only if we aren't setuid/setgid).
   parse_LD_LIBRARY_PATH(ldpath_env);
   parse_LD_PRELOAD(ldpreload_env);
+  parse_LD_SHIM_LIBS(ldshim_libs_env);
 
   somain = si;
 
