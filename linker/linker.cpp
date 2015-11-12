@@ -2992,6 +2992,7 @@ bool soinfo::link_image(const soinfo_list_t& global_group, const soinfo_list_t& 
 
 #if !defined(__LP64__)
   if (has_text_relocations) {
+#ifndef ENABLE_TEXT_RELOCS_SUPPORT
     // Fail if app is targeting sdk version > 22
     // TODO (dimitry): remove != __ANDROID_API__ check once http://b/20020312 is fixed
     if (get_application_target_sdk_version() != __ANDROID_API__
@@ -2999,6 +3000,7 @@ bool soinfo::link_image(const soinfo_list_t& global_group, const soinfo_list_t& 
       DL_ERR("%s: has text relocations", get_realpath());
       return false;
     }
+#endif
     // Make segments writable to allow text relocations to work properly. We will later call
     // phdr_table_protect_segments() after all of them are applied and all constructors are run.
     DL_WARN("%s has text relocations. This is wasting memory and prevents "
