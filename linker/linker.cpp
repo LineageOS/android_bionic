@@ -932,6 +932,7 @@ static bool shim_libs_for_each(const char *const path, F action) {
     INFO("found shim lib \"%s\"\n", sep+1);
     soinfo *child = find_library(sep+1, RTLD_GLOBAL, nullptr);
     if (! child) return false;
+    child->call_constructors();
     action(child);
   }
   return true;
