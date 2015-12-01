@@ -959,7 +959,7 @@ static bool walk_dependencies_tree(soinfo* root_soinfos[], size_t root_soinfos_s
       continue;
     }
 
-    if (!action(si)) {
+    if (!action(si, visited)) {
       return false;
     }
 
@@ -968,13 +968,6 @@ static bool walk_dependencies_tree(soinfo* root_soinfos[], size_t root_soinfos_s
     si->get_children().for_each([&](soinfo* child) {
       visit_list.push_back(child);
     });
-
-    if (!shim_libs_for_each(si->get_realpath(), [&](soinfo* child) {
-        si->add_child(child);
-        visit_list.push_back(child);
-      })) {
-      return false;
-    }
   }
 
   return true;
@@ -986,7 +979,7 @@ static const ElfW(Sym)* dlsym_handle_lookup(soinfo* root, soinfo* skip_until,
   const ElfW(Sym)* result = nullptr;
   bool skip_lookup = skip_until != nullptr;
 
-  walk_dependencies_tree(&root, 1, [&](soinfo* current_soinfo) {
+  walk_dependencies_tree(&root, 1, [&](soinfo* current_soinfo, SoinfoLinkedList &) {
     if (skip_lookup) {
       skip_lookup = current_soinfo != skip_until;
       return true;
@@ -1565,8 +1558,15 @@ static bool find_libraries(soinfo* start_with, const char* const library_names[]
   walk_dependencies_tree(
       start_with == nullptr ? soinfos : &start_with,
       start_with == nullptr ? soinfos_count : 1,
-      [&] (soinfo* si) {
+      [&] (soinfo* si, SoinfoLinkedList &visit_list) {
     local_group.push_back(si);
+
+    if (!shim_libs_for_each(si->get_realpath(), [&](soinfo* child) {
+        si->add_child(child);
+        visit_list.push_back(child);
+      })) {
+      return false;
+    }
     return true;
   });
 
