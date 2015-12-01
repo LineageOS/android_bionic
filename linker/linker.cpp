@@ -896,11 +896,16 @@ static std::vector<std::string> g_ld_all_shim_libs;
 
 static linked_list_t<const std::string> g_active_shim_libs;
 
-static void parse_LD_SHIM_LIBS(const char* path) {
-  parse_path(path, " :", &g_ld_all_shim_libs);
+static void reset_g_active_shim_libs(void) {
+  g_active_shim_libs.clear();
   for (const auto& pair : g_ld_all_shim_libs) {
     g_active_shim_libs.push_back(&pair);
   }
+}
+
+static void parse_LD_SHIM_LIBS(const char* path) {
+  parse_path(path, " :", &g_ld_all_shim_libs);
+  reset_g_active_shim_libs();
 }
 
 static bool shim_lib_matches(const char *shim_lib, const char *realpath) {
@@ -1744,6 +1749,7 @@ soinfo* do_dlopen(const char* name, int flags, const android_dlextinfo* extinfo)
   }
 
   ProtectedDataGuard guard;
+  reset_g_active_shim_libs();
   soinfo* si = find_library(name, flags, extinfo);
   if (si != nullptr) {
     si->call_constructors();
