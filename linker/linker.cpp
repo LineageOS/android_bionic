@@ -945,7 +945,7 @@ static bool shim_libs_for_each(const char *const path, F action) {
 // walk_dependencies_tree returns false if walk was terminated
 // by the action and true otherwise.
 template<typename F>
-static bool walk_dependencies_tree(soinfo* root_soinfos[], size_t root_soinfos_size, F action) {
+static bool walk_dependencies_tree(soinfo* root_soinfos[], size_t root_soinfos_size, bool do_shims, F action) {
   SoinfoLinkedList visit_list;
   SoinfoLinkedList visited;
 
@@ -969,7 +969,7 @@ static bool walk_dependencies_tree(soinfo* root_soinfos[], size_t root_soinfos_s
       visit_list.push_back(child);
     });
 
-    if (!shim_libs_for_each(si->get_realpath(), [&](soinfo* child) {
+    if (do_shims && !shim_libs_for_each(si->get_realpath(), [&](soinfo* child) {
         si->add_child(child);
         visit_list.push_back(child);
       })) {
@@ -986,7 +986,7 @@ static const ElfW(Sym)* dlsym_handle_lookup(soinfo* root, soinfo* skip_until,
   const ElfW(Sym)* result = nullptr;
   bool skip_lookup = skip_until != nullptr;
 
-  walk_dependencies_tree(&root, 1, [&](soinfo* current_soinfo) {
+  walk_dependencies_tree(&root, 1, false, [&](soinfo* current_soinfo) {
     if (skip_lookup) {
       skip_lookup = current_soinfo != skip_until;
       return true;
@@ -1565,6 +1565,7 @@ static bool find_libraries(soinfo* start_with, const char* const library_names[]
   walk_dependencies_tree(
       start_with == nullptr ? soinfos : &start_with,
       start_with == nullptr ? soinfos_count : 1,
+      true,
       [&] (soinfo* si) {
     local_group.push_back(si);
     return true;
