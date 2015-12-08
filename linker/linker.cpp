@@ -37,6 +37,7 @@
 #include <string.h>
 #include <sys/mman.h>
 #include <sys/param.h>
+#include <sys/prctl.h>
 #include <unistd.h>
 
 #include <new>
@@ -317,6 +318,13 @@ static void parse_LD_PRELOAD(const char* path) {
 static bool realpath_fd(int fd, std::string* realpath) {
   std::vector<char> buf(PATH_MAX), proc_self_fd(PATH_MAX);
   snprintf(&proc_self_fd[0], proc_self_fd.size(), "/proc/self/fd/%d", fd);
+  // set DUMPABLE to 1 to access /proc/self/fd
+  int dumpable = prctl(PR_GET_DUMPABLE, 0, 0, 0, 0);
+  prctl(PR_SET_DUMPABLE, 1, 0, 0, 0);
+  auto guard = make_scope_guard([&]() {
+    // restore dumpable
+    prctl(PR_SET_DUMPABLE, dumpable, 0, 0, 0);
+  });
   if (readlink(&proc_self_fd[0], &buf[0], buf.size()) == -1) {
     PRINT("readlink('%s') failed: %s [fd=%d]", &proc_self_fd[0], strerror(errno), fd);
     return false;
@@ -1534,12 +1542,13 @@ static bool find_libraries(soinfo* start_with, const char* const library_names[]
   // Step 1: load and pre-link all DT_NEEDED libraries in breadth first order.
   for (LoadTask::unique_ptr task(load_tasks.pop_front());
       task.get() != nullptr; task.reset(load_tasks.pop_front())) {
-    soinfo* si = find_library_internal(load_tasks, task->get_name(), rtld_flags, extinfo);
+    soinfo* needed_by = task->get_needed_by();
+
+    soinfo* si = find_library_internal(load_tasks, task->get_name(),
+                                       rtld_flags, needed_by == nullptr ? extinfo : nullptr);
     if (si == nullptr) {
       return false;
     }
-
-    soinfo* needed_by = task->get_needed_by();
 
     if (needed_by != nullptr) {
       needed_by->add_child(si);
@@ -3004,6 +3013,7 @@ bool soinfo::link_image(const soinfo_list_t& global_group, const soinfo_list_t& 
     // TODO (dimitry): remove != __ANDROID_API__ check once http://b/20020312 is fixed
     if (get_application_target_sdk_version() != __ANDROID_API__
         && get_application_target_sdk_version() > 22) {
+      PRINT("%s: has text relocations", get_realpath());
       DL_ERR("%s: has text relocations", get_realpath());
       return false;
     }
