@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_dc49cd32",
+        "filename": "linker/linker.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 947,
+      "author": {
+        "id": 4550
+      },
+      "writtenOn": "2015-12-11T21:47:53Z",
+      "side": 1,
+      "message": "Indentation should be 2 spaces in bionic",
+      "revId": "c1ef29f9213f59ba09d18942b519740b58a0db5d",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
