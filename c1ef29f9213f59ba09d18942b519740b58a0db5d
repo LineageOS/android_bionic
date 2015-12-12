@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "3fa0c359_7c675927",
+        "filename": "linker/linker.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 925,
+      "author": {
+        "id": 4567
+      },
+      "writtenOn": "2015-12-12T02:30:38Z",
+      "side": 1,
+      "message": "OHai... the invocation\u0027s down there... not on a wild goose chase somewhere else.\n\nThat is one narrow scrollbar...\n\ndisregard my previous objection.",
+      "parentUuid": "3fa0c359_1cff3568",
+      "range": {
+        "startLine": 925,
+        "startChar": 7,
+        "endLine": 925,
+        "endChar": 11
+      },
+      "revId": "c1ef29f9213f59ba09d18942b519740b58a0db5d",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa0c359_dc49cd32",
         "filename": "linker/linker.cpp",
         "patchSetId": 1
