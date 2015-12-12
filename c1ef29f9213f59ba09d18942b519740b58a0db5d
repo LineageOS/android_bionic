@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "3fa0c359_1cff3568",
+        "filename": "linker/linker.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 925,
+      "author": {
+        "id": 6351
+      },
+      "writtenOn": "2015-12-12T01:11:20Z",
+      "side": 1,
+      "message": "I disagree.\n\nI specifically verified that Danny had made the change to a void function and was pleased (but not really surprised) to see he had taken the trouble to simplify the code appropriately.",
+      "parentUuid": "3fa0c359_1c83b506",
+      "range": {
+        "startLine": 925,
+        "startChar": 7,
+        "endLine": 925,
+        "endChar": 11
+      },
+      "revId": "c1ef29f9213f59ba09d18942b519740b58a0db5d",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa0c359_dc49cd32",
         "filename": "linker/linker.cpp",
         "patchSetId": 1
