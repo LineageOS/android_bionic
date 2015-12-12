@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "3fa0c359_1c83b506",
+        "filename": "linker/linker.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 925,
+      "author": {
+        "id": 4567
+      },
+      "writtenOn": "2015-12-12T00:34:42Z",
+      "side": 1,
+      "message": "Leaving the original prototype and returning true irrespective of child being null seems like a better bet.\n\nA void return would entail the same edits to fix in calling locations as would be needed to have this commit\u0027s effect without these lines changing.",
+      "range": {
+        "startLine": 925,
+        "startChar": 7,
+        "endLine": 925,
+        "endChar": 11
+      },
+      "revId": "c1ef29f9213f59ba09d18942b519740b58a0db5d",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa0c359_dc49cd32",
         "filename": "linker/linker.cpp",
         "patchSetId": 1
