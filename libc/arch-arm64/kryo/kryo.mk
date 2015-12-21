@@ -2,7 +2,7 @@ libc_bionic_src_files_arm64 += \
     arch-arm64/generic/bionic/memchr.S \
     arch-arm64/generic/bionic/memcmp.S \
     arch-arm64/kryo/bionic/memcpy.S \
-    arch-arm64/generic/bionic/memmove.S \
+    arch-arm64/kryo/bionic/memmove.S \
     arch-arm64/generic/bionic/memset.S \
     arch-arm64/generic/bionic/stpcpy.S \
     arch-arm64/generic/bionic/strchr.S \
