@@ -667,6 +667,9 @@ int __system_property_get(const char *name, char *value)
 
 int __system_property_set(const char *key, const char *value)
 {
+#ifdef KK_QCOM_4412_RIL
+    if(strcmp(key,"ril.ks.status") != 0){
+#endif
     if (key == 0) return -1;
     if (value == 0) value = "";
     if (strlen(key) >= PROP_NAME_MAX) return -1;
@@ -682,6 +685,9 @@ int __system_property_set(const char *key, const char *value)
     if (err < 0) {
         return err;
     }
+#ifdef KK_QCOM_4412_RIL
+    }
+#endif
 
     return 0;
 }
