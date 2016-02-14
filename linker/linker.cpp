@@ -980,16 +980,16 @@ static bool walk_dependencies_tree(soinfo* root_soinfos[], size_t root_soinfos_s
 
     visited.push_back(si);
 
-    si->get_children().for_each([&](soinfo* child) {
-      visit_list.push_back(child);
-    });
-
     if (do_shims) {
       shim_libs_for_each(si->get_realpath(), [&](soinfo* child) {
         si->add_child(child);
         visit_list.push_back(child);
       });
     }
+
+    si->get_children().for_each([&](soinfo* child) {
+      visit_list.push_back(child);
+    });
   }
 
   return true;
