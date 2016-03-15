@@ -54,6 +54,8 @@ fn(type x)			\
 	return (ret);		\
 }
 
+#ifndef __aarch64__
 DECL(double, nearbyint, rint)
 DECL(float, nearbyintf, rintf)
+#endif
 DECL(long double, nearbyintl, rintl)
