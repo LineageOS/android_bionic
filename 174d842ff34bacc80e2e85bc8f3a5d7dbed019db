@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_f86c8f09",
+        "filename": "libc/upstream-openbsd/lib/libc/gen/fnmatch.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2016-04-04T18:53:20Z",
+      "side": 1,
+      "message": "Wouldn\u0027t this only work for 1 and 2 byte characters?",
+      "revId": "174d842ff34bacc80e2e85bc8f3a5d7dbed019db",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
