@@ -34,6 +34,23 @@
       "revId": "174d842ff34bacc80e2e85bc8f3a5d7dbed019db",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_5e658bb4",
+        "filename": "libc/upstream-openbsd/lib/libc/gen/fnmatch.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 5503
+      },
+      "writtenOn": "2016-04-05T14:14:48Z",
+      "side": 1,
+      "message": "Probably don\u0027t need utf8_inc here since **pattern is known to be an ascii backslash.",
+      "revId": "174d842ff34bacc80e2e85bc8f3a5d7dbed019db",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }
