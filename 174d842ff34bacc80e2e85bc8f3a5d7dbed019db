@@ -16,6 +16,24 @@
       "revId": "174d842ff34bacc80e2e85bc8f3a5d7dbed019db",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_9e8ea376",
+        "filename": "libc/upstream-openbsd/lib/libc/gen/fnmatch.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5503
+      },
+      "writtenOn": "2016-04-05T13:48:57Z",
+      "side": 1,
+      "message": "It looks functional to me.  The UTF-8 spec says that the first octet starts with the number of one bits equal to the number of octets in the character and then a zero bit.  Each subsequent octet begins with the top bits being 10.  Here we mask off 0xc0 to ensure there are at least two octets.  Then we shift by one for the first octet and continue shifting, verifying the octet starts with bit pattern 10.",
+      "parentUuid": "7faddb67_f86c8f09",
+      "revId": "174d842ff34bacc80e2e85bc8f3a5d7dbed019db",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }
