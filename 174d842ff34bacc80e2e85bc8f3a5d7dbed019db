@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_7e6de796",
+        "filename": "libc/upstream-openbsd/lib/libc/gen/fnmatch.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2016-04-05T14:28:18Z",
+      "side": 1,
+      "message": "Oh, no you\u0027re right. For some reason I kept thinking this check would catch 0xd/0xe/0xf.",
+      "parentUuid": "7faddb67_9e8ea376",
+      "revId": "174d842ff34bacc80e2e85bc8f3a5d7dbed019db",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_5e658bb4",
         "filename": "libc/upstream-openbsd/lib/libc/gen/fnmatch.c",
         "patchSetId": 2
