@@ -32,6 +32,7 @@
 #include <sys/types.h>
 #include <linux/socket.h>
 
+#include <asm/fcntl.h>
 #include <asm/socket.h>
 #include <linux/sockios.h>
 #include <linux/uio.h>
@@ -60,6 +61,9 @@ typedef int socklen_t;
 #define SOCK_SEQPACKET   5
 #define SOCK_PACKET      10
 #endif
+
+#define SOCK_CLOEXEC O_CLOEXEC
+#define SOCK_NONBLOCK O_NONBLOCK
 
 /* BIONIC: second argument to shutdown() */
 enum {

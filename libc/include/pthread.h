@@ -138,6 +138,8 @@ int pthread_attr_getguardsize(pthread_attr_t const * attr, size_t * guard_size);
 int pthread_attr_setscope(pthread_attr_t *attr, int  scope);
 int pthread_attr_getscope(pthread_attr_t const *attr);
 
+int pthread_condattr_setclock(pthread_condattr_t *, clockid_t);
+
 int pthread_getattr_np(pthread_t thid, pthread_attr_t * attr);
 
 int pthread_create(pthread_t *thread, pthread_attr_t const * attr,
