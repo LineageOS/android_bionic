@@ -31,18 +31,23 @@
 #include <grp.h>
 #include <pwd.h>
 
+#define __GROUP_MEMBERS_MAX 2
+#define __LOGIN_NAME_MAX 32
+#define __DIR_NAME_MAX 32
+#define __INTERPRETER_MAX 32
+
 struct group_state_t {
   group group_;
-  char* group_members_[2];
-  char group_name_buffer_[32];
+  char* group_members_[__GROUP_MEMBERS_MAX];
+  char group_name_buffer_[__LOGIN_NAME_MAX];
   // Must be last so init_group_state can run a simple memset for the above
   ssize_t getgrent_idx;
 };
 
 struct passwd_state_t {
   passwd passwd_;
-  char name_buffer_[32];
-  char dir_buffer_[32];
-  char sh_buffer_[32];
+  char name_buffer_[__LOGIN_NAME_MAX];
+  char dir_buffer_[__DIR_NAME_MAX];
+  char sh_buffer_[__INTERPRETER_MAX];
   ssize_t getpwent_idx;
 };
