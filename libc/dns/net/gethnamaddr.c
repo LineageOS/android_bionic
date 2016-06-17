@@ -90,6 +90,8 @@
 
 #include "hostent.h"
 
+#include "hosts_cache.h"
+
 #define maybe_ok(res, nm, ok) (((res)->options & RES_NOCHECKNAME) != 0U || \
                                (ok)(nm) != 0)
 #define maybe_hnok(res, hn) maybe_ok((res), (hn), res_hnok)
@@ -819,7 +821,14 @@ gethostbyname_internal(const char *name, int af, res_state res, struct hostent *
 {
 	FILE* proxy = android_open_proxy();
 	if (proxy == NULL) {
+		int rc;
 		// Either we're not supposed to be using the proxy or the proxy is unavailable.
+		rc = hc_gethostbyname(name, af, hp, hbuf, hbuflen);
+		if (rc != NETDB_INTERNAL) {
+			*errorp = rc;
+			return (rc == 0 ? hp : NULL);
+		}
+
 		res_setnetid(res, netid);
 		res_setmark(res, mark);
 		return gethostbyname_internal_real(name, af, res, hp, hbuf, hbuflen, errorp);
