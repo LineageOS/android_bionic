@@ -108,6 +108,8 @@
 #include <stdarg.h>
 #include "nsswitch.h"
 
+#include "hosts_cache.h"
+
 #ifdef ANDROID_CHANGES
 #include <sys/system_properties.h>
 #endif /* ANDROID_CHANGES */
@@ -727,6 +729,10 @@ android_getaddrinfofornetcontext(const char *hostname, const char *servname,
 #if defined(__ANDROID__)
 	int gai_error = android_getaddrinfo_proxy(
 		hostname, servname, hints, res, netcontext->app_netid);
+	if (gai_error != EAI_SYSTEM) {
+		return gai_error;
+	}
+	gai_error = hc_getaddrinfo(hostname, servname, hints, res);
 	if (gai_error != EAI_SYSTEM) {
 		return gai_error;
 	}
