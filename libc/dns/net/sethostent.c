@@ -55,6 +55,8 @@ __RCSID("$NetBSD: sethostent.c,v 1.20 2014/03/17 13:24:23 christos Exp $");
 #include "hostent.h"
 #include "resolv_private.h"
 
+#include "hosts_cache.h"
+
 #define ALIGNBYTES (sizeof(uintptr_t) - 1)
 #define ALIGN(p) (((uintptr_t)(p) + ALIGNBYTES) &~ ALIGNBYTES)
 
@@ -98,6 +100,11 @@ _hf_gethtbyname(void *rv, void *cb_data, va_list ap)
 	name = va_arg(ap, char *);
 	/* NOSTRICT skip string len */(void)va_arg(ap, int);
 	af = va_arg(ap, int);
+
+	int rc = hc_gethtbyname(name, af, info);
+	if (rc != NETDB_INTERNAL) {
+		return (rc == NETDB_SUCCESS ? NS_SUCCESS : NS_NOTFOUND);
+	}
 
 #if 0
 	{
