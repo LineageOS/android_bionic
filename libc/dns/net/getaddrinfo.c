@@ -109,6 +109,8 @@
 #include "nsswitch.h"
 #include "private/bionic_defs.h"
 
+#include "hosts_cache.h"
+
 typedef union sockaddr_union {
     struct sockaddr     generic;
     struct sockaddr_in  in;
@@ -2124,6 +2126,14 @@ _files_getaddrinfo(void *rv, void *cb_data, va_list ap)
 
 	name = va_arg(ap, char *);
 	pai = va_arg(ap, struct addrinfo *);
+
+	memset(&sentinel, 0, sizeof(sentinel));
+	cur = &sentinel;
+	int gai_error = hc_getaddrinfo(name, NULL, pai, &cur);
+	if (gai_error != EAI_SYSTEM) {
+		*((struct addrinfo **)rv) = sentinel.ai_next;
+		return (gai_error == 0 ? NS_SUCCESS : NS_NOTFOUND);
+	}
 
 //	fprintf(stderr, "_files_getaddrinfo() name = '%s'\n", name);
 	memset(&sentinel, 0, sizeof(sentinel));
