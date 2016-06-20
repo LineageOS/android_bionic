@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5faad753_bb9c4dc0",
+        "filename": "libc/dns/net/hosts_cache.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 14090
+      },
+      "writtenOn": "2016-06-20T21:22:30Z",
+      "side": 1,
+      "message": "Clearer if you do:\n\nstrncmp(a, b, alen \u003c blen ? alen : blen);\n\nOr just use min(alen, blen) if possible.",
+      "range": {
+        "startLine": 81,
+        "startChar": 11,
+        "endLine": 81,
+        "endChar": 68
+      },
+      "revId": "b0542d31b1621c2b85b36ab8f333cd79c3b80512",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5faad753_bb068dcd",
+        "filename": "libc/dns/net/hosts_cache.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 14090
+      },
+      "writtenOn": "2016-06-20T21:22:30Z",
+      "side": 1,
+      "message": "should be strictly \u003c",
+      "range": {
+        "startLine": 244,
+        "startChar": 16,
+        "endLine": 244,
+        "endChar": 18
+      },
+      "revId": "b0542d31b1621c2b85b36ab8f333cd79c3b80512",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5faad753_bbbd2dd9",
+        "filename": "libc/dns/net/hosts_cache.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 14090
+      },
+      "writtenOn": "2016-06-20T21:22:30Z",
+      "side": 1,
+      "message": "multiply c_alloc by a constant factor or this won\u0027t scale well for large files...",
+      "range": {
+        "startLine": 245,
+        "startChar": 5,
+        "endLine": 245,
+        "endChar": 20
+      },
+      "revId": "b0542d31b1621c2b85b36ab8f333cd79c3b80512",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5faad753_9bb871e5",
+        "filename": "libc/dns/net/hosts_cache.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 14090
+      },
+      "writtenOn": "2016-06-20T21:22:30Z",
+      "side": 1,
+      "message": "Isn\u0027t it better to stick with the bionic convention? Code already running on bionic expecting this behavior will fail unexpectedly.",
+      "range": {
+        "startLine": 276,
+        "startChar": 3,
+        "endLine": 276,
+        "endChar": 28
+      },
+      "revId": "b0542d31b1621c2b85b36ab8f333cd79c3b80512",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
