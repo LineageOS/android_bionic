@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5faad753_01e4103b",
+        "filename": "libc/dns/net/hosts_cache.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5503
+      },
+      "writtenOn": "2016-06-21T14:24:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5faad753_5ba19993",
+      "revId": "b0542d31b1621c2b85b36ab8f333cd79c3b80512",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5faad753_bb9c4dc0",
         "filename": "libc/dns/net/hosts_cache.c",
         "patchSetId": 1
@@ -30,6 +48,30 @@
       "writtenOn": "2016-06-20T21:22:30Z",
       "side": 1,
       "message": "Clearer if you do:\n\nstrncmp(a, b, alen \u003c blen ? alen : blen);\n\nOr just use min(alen, blen) if possible.",
+      "range": {
+        "startLine": 81,
+        "startChar": 11,
+        "endLine": 81,
+        "endChar": 68
+      },
+      "revId": "b0542d31b1621c2b85b36ab8f333cd79c3b80512",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5faad753_61db847b",
+        "filename": "libc/dns/net/hosts_cache.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5503
+      },
+      "writtenOn": "2016-06-21T14:24:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5faad753_bb9c4dc0",
       "range": {
         "startLine": 81,
         "startChar": 11,
@@ -65,6 +107,30 @@
     },
     {
       "key": {
+        "uuid": "5faad753_e1ef741b",
+        "filename": "libc/dns/net/hosts_cache.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 5503
+      },
+      "writtenOn": "2016-06-21T14:24:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5faad753_bb068dcd",
+      "range": {
+        "startLine": 244,
+        "startChar": 16,
+        "endLine": 244,
+        "endChar": 18
+      },
+      "revId": "b0542d31b1621c2b85b36ab8f333cd79c3b80512",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5faad753_bbbd2dd9",
         "filename": "libc/dns/net/hosts_cache.c",
         "patchSetId": 1
@@ -88,6 +154,30 @@
     },
     {
       "key": {
+        "uuid": "5faad753_41de886d",
+        "filename": "libc/dns/net/hosts_cache.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 5503
+      },
+      "writtenOn": "2016-06-21T14:24:06Z",
+      "side": 1,
+      "message": "Perhaps an initial estimate based on the file size would be the best approach.  I\u0027m seeing an average of about 29 bytes per line in my file.",
+      "parentUuid": "5faad753_bbbd2dd9",
+      "range": {
+        "startLine": 245,
+        "startChar": 5,
+        "endLine": 245,
+        "endChar": 20
+      },
+      "revId": "b0542d31b1621c2b85b36ab8f333cd79c3b80512",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5faad753_9bb871e5",
         "filename": "libc/dns/net/hosts_cache.c",
         "patchSetId": 1
@@ -99,6 +189,30 @@
       "writtenOn": "2016-06-20T21:22:30Z",
       "side": 1,
       "message": "Isn\u0027t it better to stick with the bionic convention? Code already running on bionic expecting this behavior will fail unexpectedly.",
+      "range": {
+        "startLine": 276,
+        "startChar": 3,
+        "endLine": 276,
+        "endChar": 28
+      },
+      "revId": "b0542d31b1621c2b85b36ab8f333cd79c3b80512",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5faad753_21e10c2b",
+        "filename": "libc/dns/net/hosts_cache.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 5503
+      },
+      "writtenOn": "2016-06-21T14:24:06Z",
+      "side": 1,
+      "message": "I could be convinced either way.  Since both the spec and glibc say only the first ai_canonname is populated, I figured only code that has ever been run on *BSD would expect the bionic behavior.\n\nNote that getaddrinfo can return a fair number of results, so the bionic behavior can cause quite a few needless allocs/frees.",
+      "parentUuid": "5faad753_9bb871e5",
       "range": {
         "startLine": 276,
         "startChar": 3,
