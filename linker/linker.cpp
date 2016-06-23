@@ -1910,6 +1910,12 @@ static ElfW(Addr) get_addend(ElfW(Rel)* rel, ElfW(Addr) reloc_addr) {
 template<typename ElfRelIteratorT>
 bool soinfo::relocate(const VersionTracker& version_tracker, ElfRelIteratorT&& rel_iterator,
                       const soinfo_list_t& global_group, const soinfo_list_t& local_group) {
+  /* XXX
+   * This function provokes a SIGBUS when loading certain libs, apparently
+   * due to a code generation bug in clang.  'd' and its references exist to
+   * coax clang into generating better code.
+   */
+  bool d = (g_ld_debug_verbosity > 0);
   for (size_t idx = 0; rel_iterator.has_next(); ++idx) {
     const auto rel = rel_iterator.next();
     if (rel == nullptr) {
@@ -1917,7 +1923,11 @@ bool soinfo::relocate(const VersionTracker& version_tracker, ElfRelIteratorT&& r
     }
 
     ElfW(Word) type = ELFW(R_TYPE)(rel->r_info);
+    if (d)
+      PRINT("type=%u", static_cast<unsigned int>(type));
     ElfW(Word) sym = ELFW(R_SYM)(rel->r_info);
+    if (d)
+      PRINT("sym=%u", static_cast<unsigned int>(sym));
 
     ElfW(Addr) reloc = static_cast<ElfW(Addr)>(rel->r_offset + load_bias);
     ElfW(Addr) sym_addr = 0;
