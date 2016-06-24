@@ -68,6 +68,7 @@ LOCAL_MODULE := linker
 LOCAL_MODULE_STEM_32 := linker
 LOCAL_MODULE_STEM_64 := linker64
 LOCAL_MULTILIB := both
+LOCAL_CLANG := false
 
 # Leave the symbols in the shared library so that stack unwinders can produce
 # meaningful name resolution.
