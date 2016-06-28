@@ -16,6 +16,57 @@
       "revId": "9dbb9d0a9f21c902ff114321a9c76b3a2ee3ad92",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_7888c970",
+        "filename": "libc/dns/net/hosts_cache.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 12931
+      },
+      "writtenOn": "2016-06-28T15:36:43Z",
+      "side": 1,
+      "message": "It\u0027s probably okay if this fails, but c_alloc should then be reset to 0.",
+      "revId": "9dbb9d0a9f21c902ff114321a9c76b3a2ee3ad92",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_b8b40137",
+        "filename": "libc/dns/net/hosts_cache.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 12931
+      },
+      "writtenOn": "2016-06-28T15:36:43Z",
+      "side": 1,
+      "message": "Valgrind complains because of this line. If I replace it with `(c_alloc \u003c\u003d hcfile.c_len)`, the out-of-bound writes are gone.",
+      "revId": "9dbb9d0a9f21c902ff114321a9c76b3a2ee3ad92",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_58838d57",
+        "filename": "libc/dns/net/hosts_cache.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 12931
+      },
+      "writtenOn": "2016-06-28T15:36:43Z",
+      "side": 1,
+      "message": "This should check for NULL as well.",
+      "revId": "9dbb9d0a9f21c902ff114321a9c76b3a2ee3ad92",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }
