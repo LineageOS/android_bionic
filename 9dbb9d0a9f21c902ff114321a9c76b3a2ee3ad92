@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_2d3f75d7",
+        "filename": "libc/dns/net/hosts_cache.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 12931
+      },
+      "writtenOn": "2016-06-28T13:57:58Z",
+      "side": 1,
+      "message": "This malloc might fail. You should add `if(!dest) return NULL;`.",
+      "revId": "9dbb9d0a9f21c902ff114321a9c76b3a2ee3ad92",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
