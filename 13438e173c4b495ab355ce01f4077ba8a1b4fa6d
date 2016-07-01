@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_64fedf06",
+        "filename": "libc/dns/net/hosts_cache.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 376,
+      "author": {
+        "id": 12931
+      },
+      "writtenOn": "2016-07-01T18:29:33Z",
+      "side": 1,
+      "message": "This is an out-of-bounds read if cur already is the last entry.",
+      "revId": "13438e173c4b495ab355ce01f4077ba8a1b4fa6d",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_8403db0d",
+        "filename": "libc/dns/net/hosts_cache.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 481,
+      "author": {
+        "id": 12931
+      },
+      "writtenOn": "2016-07-01T18:29:33Z",
+      "side": 1,
+      "message": "This is an out-of-bounds read if cur already is the last entry.",
+      "revId": "13438e173c4b495ab355ce01f4077ba8a1b4fa6d",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
