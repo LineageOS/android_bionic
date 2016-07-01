@@ -170,8 +170,8 @@ kryo_bb_prime_pump:
 	add	x10, x1, #(PLDOFFS*PLDSIZE)
 	bic	x10, x10, #0x7F
 	sub	x12, x12, #PLDOFFS
-	prfm	PLDL1KEEP, [x10, #(-1*PLDSIZE)]
-	prfm	PLDL1KEEP, [x10, #(-1*PLDSIZE+64)]
+	prfm	PLDL1KEEP, [x10, #((PLDOFFS-1)*PLDSIZE)]
+	prfm	PLDL1KEEP, [x10, #((PLDOFFS-1)*PLDSIZE)+64]
 	cmp	x12, #(448*1024/128)
 	bhi	kryo_bb_copy_128_loop_ddr
 
