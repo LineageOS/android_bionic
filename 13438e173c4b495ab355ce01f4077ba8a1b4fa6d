@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "3fa7e38b_c4a7934f",
+        "filename": "libc/dns/net/hosts_cache.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 12931
+      },
+      "writtenOn": "2016-07-02T08:01:22Z",
+      "side": 1,
+      "message": "if len \u003d\u003d 0, this is an infinite loop.\n\nlen \u003d\u003d 0 happens, e.g. for this (invalid) hosts file:\n\n127.0.0.1 #\n\nAdding if(len \u003d\u003d 0) break; mitigates this issue.",
+      "revId": "13438e173c4b495ab355ce01f4077ba8a1b4fa6d",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_64fedf06",
         "filename": "libc/dns/net/hosts_cache.c",
         "patchSetId": 5
