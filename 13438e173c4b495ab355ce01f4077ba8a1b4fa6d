@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "3fa7e38b_5c27f365",
+        "filename": "libc/dns/net/hosts_cache.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 10094
+      },
+      "writtenOn": "2016-07-06T03:42:50Z",
+      "side": 1,
+      "message": "or \u0027#\u0027",
+      "range": {
+        "startLine": 52,
+        "startChar": 41,
+        "endLine": 52,
+        "endChar": 68
+      },
+      "revId": "13438e173c4b495ab355ce01f4077ba8a1b4fa6d",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_c4a7934f",
         "filename": "libc/dns/net/hosts_cache.c",
         "patchSetId": 5
