@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_5021ebfa",
+        "filename": "libc/dns/net/hosts_cache.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 384,
+      "author": {
+        "id": 5503
+      },
+      "writtenOn": "2016-07-23T21:49:29Z",
+      "side": 1,
+      "message": "The \"*result \u003d NULL\" stmt in PS6 was removed, so this can\u0027t be hit anymore.",
+      "revId": "2bc2ffab571975b7a1a75bc06e1bb731b2cc7691",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
