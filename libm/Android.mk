@@ -21,6 +21,7 @@ LOCAL_SRC_FILES := \
     upstream-freebsd/lib/msun/bsdsrc/b_tgamma.c \
     upstream-freebsd/lib/msun/src/catrig.c \
     upstream-freebsd/lib/msun/src/catrigf.c \
+    upstream-freebsd/lib/msun/src/dunder.c \
     upstream-freebsd/lib/msun/src/e_acosf.c \
     upstream-freebsd/lib/msun/src/e_acosh.c \
     upstream-freebsd/lib/msun/src/e_acoshf.c \
@@ -59,6 +60,7 @@ LOCAL_SRC_FILES := \
     upstream-freebsd/lib/msun/src/e_scalb.c \
     upstream-freebsd/lib/msun/src/e_scalbf.c \
     upstream-freebsd/lib/msun/src/e_sinhf.c \
+    upstream-freebsd/lib/msun/src/funder.c \
     upstream-freebsd/lib/msun/src/imprecise.c \
     upstream-freebsd/lib/msun/src/k_cos.c \
     upstream-freebsd/lib/msun/src/k_cosf.c \

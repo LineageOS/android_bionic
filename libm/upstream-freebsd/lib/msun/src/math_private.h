@@ -19,6 +19,7 @@
 
 #include <sys/types.h>
 #include <machine/endian.h>
+#include <errno.h>
 
 /*
  * The original fdlibm code used statements like:
@@ -772,5 +773,105 @@ float complex __ldexp_cexpf(float complex,int);
 long double __kernel_sinl(long double, long double, int);
 long double __kernel_cosl(long double, long double);
 long double __kernel_tanl(long double, long double, int);
+
+#define __FP_IEEE
+#define __FP_FENV_EXCEPTIONS
+#define __FP_FENV_ROUNDING
+#define __FP_INEXACT_EXCEPTION
+
+#define __set_errno(val) (errno = (val))
+
+#define __FLT(x) (*(unsigned *)&(x))
+#if defined(__ARM_BIG_ENDIAN) || defined(__BIG_ENDIAN)
+#  define __LO(x) (*(1 + (unsigned *)&(x)))
+#  define __HI(x) (*(unsigned *)&(x))
+#else /* !defined(__ARM_BIG_ENDIAN) && !defined(__BIG_ENDIAN) */
+#  define __HI(x) (*(1 + (unsigned *)&(x)))
+#  define __LO(x) (*(unsigned *)&(x))
+#endif /* !defined(__ARM_BIG_ENDIAN) && !defined(__BIG_ENDIAN) */
+
+// FIXME: Implement these without type punning.
+static __inline unsigned int fai(float f) { return __FLT(f); }
+static __inline float fhex(unsigned int n) { float f; __FLT(f) = n; return f; }
+
+#define CLEARBOTTOMHALF(x) fhex((fai(x) + 0x00000800) & 0xFFFFF000)
+
+#define FE_IEEE_OVERFLOW           (0x00000004)
+#define FE_IEEE_UNDERFLOW          (0x00000008)
+#define FE_IEEE_FLUSHZERO          (0x01000000)
+#define FE_IEEE_ROUND_TONEAREST    (0x00000000)
+#define FE_IEEE_ROUND_UPWARD       (0x00400000)
+#define FE_IEEE_ROUND_DOWNWARD     (0x00800000)
+#define FE_IEEE_ROUND_TOWARDZERO   (0x00C00000)
+#define FE_IEEE_ROUND_MASK         (0x00C00000)
+#define FE_IEEE_MASK_INVALID       (0x00000100)
+#define FE_IEEE_MASK_DIVBYZERO     (0x00000200)
+#define FE_IEEE_MASK_OVERFLOW      (0x00000400)
+#define FE_IEEE_MASK_UNDERFLOW     (0x00000800)
+#define FE_IEEE_MASK_INEXACT       (0x00001000)
+#define FE_IEEE_MASK_INPUTDENORMAL (0x00008000)
+#define FE_IEEE_MASK_ALL_EXCEPT    (0x00009F00)
+#define FE_IEEE_INVALID            (0x00000001)
+#define FE_IEEE_DIVBYZERO          (0x00000002)
+#define FE_IEEE_INEXACT            (0x00000010)
+#define FE_IEEE_INPUTDENORMAL      (0x00000080)
+#define FE_IEEE_ALL_EXCEPT         (0x0000009F)
+
+extern double _dbl_overflow(void);
+extern float _flt_overflow(void);
+extern double _dbl_underflow(void);
+extern float _flt_underflow(void);
+extern double _dbl_invalid(void);
+extern float _flt_invalid(void);
+extern double _dbl_divzero(void);
+extern float _flt_divzero(void);
+#define DOUBLE_OVERFLOW ( _dbl_overflow() )
+#define FLOAT_OVERFLOW ( _flt_overflow() )
+#define DOUBLE_UNDERFLOW ( _dbl_underflow() )
+#define FLOAT_UNDERFLOW ( _flt_underflow() )
+#define DOUBLE_INVALID ( _dbl_invalid() )
+#define FLOAT_INVALID  ( _flt_invalid() )
+#define DOUBLE_DIVZERO ( _dbl_divzero() )
+#define FLOAT_DIVZERO  ( _flt_divzero() )
+
+extern float  _flt_infnan(float);
+extern float  _flt_infnan2(float, float);
+extern double _dbl_infnan(double);
+extern double _dbl_infnan2(double, double);
+extern unsigned __ieee_status(unsigned, unsigned);
+extern double kernel_tan(double, double, int);
+
+#define FLOAT_INFNAN(x) _flt_infnan(x)
+#define FLOAT_INFNAN2(x,y) _flt_infnan2(x,y)
+#define DOUBLE_INFNAN(x) _dbl_infnan(x)
+#define DOUBLE_INFNAN2(x,y) _dbl_infnan2(x,y)
+
+#define MATHERR_POWF_00(x,y) (__set_errno(EDOM), 1.0f)
+#define MATHERR_POWF_INF0(x,y) (__set_errno(EDOM), 1.0f)
+#define MATHERR_POWF_0NEG(x,y) (__set_errno(ERANGE), FLOAT_DIVZERO)
+#define MATHERR_POWF_NEG0FRAC(x,y) (0.0f)
+#define MATHERR_POWF_0NEGODD(x,y) (__set_errno(ERANGE), -FLOAT_DIVZERO)
+#define MATHERR_POWF_0NEGEVEN(x,y) (__set_errno(ERANGE), FLOAT_DIVZERO)
+#define MATHERR_POWF_NEGFRAC(x,y) (__set_errno(EDOM), FLOAT_INVALID)
+#define MATHERR_POWF_ONEINF(x,y) (1.0f)
+#define MATHERR_POWF_OFL(x,y,z) (__set_errno(ERANGE), copysignf(FLOAT_OVERFLOW,z))
+#define MATHERR_POWF_UFL(x,y,z) (__set_errno(ERANGE), copysignf(FLOAT_UNDERFLOW,z))
+#define MATHERR_POWF_UFL(x,y,z) (__set_errno(ERANGE), copysignf(FLOAT_UNDERFLOW,z))
+
+#define MATHERR_LOGF_0(x) (__set_errno(ERANGE), -FLOAT_DIVZERO)
+#define MATHERR_LOGF_NEG(x) (__set_errno(EDOM), FLOAT_INVALID)
+
+#define MATHERR_SIN_INF(x) (__set_errno(EDOM), DOUBLE_INVALID)
+#define MATHERR_SINF_INF(x) (__set_errno(EDOM), FLOAT_INVALID)
+#define MATHERR_COS_INF(x) (__set_errno(EDOM), DOUBLE_INVALID)
+#define MATHERR_COSF_INF(x) (__set_errno(EDOM), FLOAT_INVALID)
+#define MATHERR_TAN_INF(x) (__set_errno(EDOM), DOUBLE_INVALID)
+#define MATHERR_TANF_INF(x) (__set_errno(EDOM), FLOAT_INVALID)
+
+#define MATHERR_EXPF_UFL(x) (__set_errno(ERANGE), FLOAT_UNDERFLOW)
+#define MATHERR_EXPF_OFL(x) (__set_errno(ERANGE), FLOAT_OVERFLOW)
+
+#define FLOAT_CHECKDENORM(x) ( (fpclassify(x) == FP_SUBNORMAL ? FLOAT_UNDERFLOW : 0), x )
+#define DOUBLE_CHECKDENORM(x) ( (fpclassify(x) == FP_SUBNORMAL ? DOUBLE_UNDERFLOW : 0), x )
 
 #endif /* !_MATH_PRIVATE_H_ */
