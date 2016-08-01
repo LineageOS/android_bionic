@@ -1,98 +1,132 @@
-/* e_expf.c -- float version of e_exp.c.
- * Conversion to float by Ian Lance Taylor, Cygnus Support, ian@cygnus.com.
+/*
+ *  e_expf.c - single-precision exp function
+ *
+ *  Copyright (C) 2009-2015, ARM Limited, All Rights Reserved
+ *  SPDx-License-Identifier: Apache-2.0
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may
+ *  not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *  This file is part of the Optimized Routines project
  */
 
 /*
- * ====================================================
- * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
- *
- * Developed at SunPro, a Sun Microsystems, Inc. business.
- * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice
- * is preserved.
- * ====================================================
+ * Algorithm was once taken from Cody & Waite, but has been munged
+ * out of all recognition by SGT.
  */
-
-#include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
-
-#include <float.h>
 
 #include "math.h"
 #include "math_private.h"
-
-static const float
-one	= 1.0,
-halF[2]	= {0.5,-0.5,},
-o_threshold=  8.8721679688e+01,  /* 0x42b17180 */
-u_threshold= -1.0397208405e+02,  /* 0xc2cff1b5 */
-ln2HI[2]   ={ 6.9314575195e-01,		/* 0x3f317200 */
-	     -6.9314575195e-01,},	/* 0xbf317200 */
-ln2LO[2]   ={ 1.4286067653e-06,  	/* 0x35bfbe8e */
-	     -1.4286067653e-06,},	/* 0xb5bfbe8e */
-invln2 =  1.4426950216e+00, 		/* 0x3fb8aa3b */
-/*
- * Domain [-0.34568, 0.34568], range ~[-4.278e-9, 4.447e-9]:
- * |x*(exp(x)+1)/(exp(x)-1) - p(x)| < 2**-27.74
- */
-P1 =  1.6666625440e-1,		/*  0xaaaa8f.0p-26 */
-P2 = -2.7667332906e-3;		/* -0xb55215.0p-32 */
-
-static volatile float
-huge	= 1.0e+30,
-twom100 = 7.8886090522e-31;      /* 2**-100=0x0d800000 */
+#include <math.h>
+#include <errno.h>
 
 float
 __ieee754_expf(float x)
 {
-	float y,hi=0.0,lo=0.0,c,t,twopk;
-	int32_t k=0,xsb;
-	u_int32_t hx;
+  int N; float xn, g, Rg, Result;
+  unsigned ix = fai(x), edgecaseflag = 0;
 
-	GET_FLOAT_WORD(hx,x);
-	xsb = (hx>>31)&1;		/* sign bit of x */
-	hx &= 0x7fffffff;		/* high word of |x| */
+  /*
+   * Handle infinities, NaNs and big numbers.
+   */
+  if (__builtin_expect((ix << 1) - 0x67000000 > 0x85500000 - 0x67000000, 0)) {
+    if (!(0x7f800000 & ~ix)) {
+      if (ix == 0xff800000)
+        return 0.0f;
+      else
+        return FLOAT_INFNAN(x);/* do the right thing with both kinds of NaN and with +inf */
+    } else if ((ix << 1) < 0x67000000) {
+      return 1.0f;               /* magnitude so small the answer can't be distinguished from 1 */
+    } else if ((ix << 1) > 0x85a00000) {
+      __set_errno(ERANGE);
+      if (ix & 0x80000000) {
+        return FLOAT_UNDERFLOW;
+      } else {
+        return FLOAT_OVERFLOW;
+      }
+    } else {
+      edgecaseflag = 1;
+    }
+  }
 
-    /* filter out non-finite argument */
-	if(hx >= 0x42b17218) {			/* if |x|>=88.721... */
-	    if(hx>0x7f800000)
-		 return x+x;	 		/* NaN */
-            if(hx==0x7f800000)
-		return (xsb==0)? x:0.0;		/* exp(+-inf)={inf,0} */
-	    if(x > o_threshold) return huge*huge; /* overflow */
-	    if(x < u_threshold) return twom100*twom100; /* underflow */
-	}
+  /*
+   * Split the input into an integer multiple of log(2)/4, and a
+   * fractional part.
+   */
+  xn = x * (4.0f*1.4426950408889634074f);
+#ifdef __TARGET_FPU_SOFTVFP
+  xn = _frnd(xn);
+  N = (int)xn;
+#else
+  N = (int)(xn + (ix & 0x80000000 ? -0.5f : 0.5f));
+  xn = N;
+#endif
+  g = (x - xn * 0x1.62ep-3F) - xn * 0x1.0bfbe8p-17F;  /* prec-and-a-half representation of log(2)/4 */
 
-    /* argument reduction */
-	if(hx > 0x3eb17218) {		/* if  |x| > 0.5 ln2 */
-	    if(hx < 0x3F851592) {	/* and |x| < 1.5 ln2 */
-		hi = x-ln2HI[xsb]; lo=ln2LO[xsb]; k = 1-xsb-xsb;
-	    } else {
-		k  = invln2*x+halF[xsb];
-		t  = k;
-		hi = x - t*ln2HI[0];	/* t*ln2HI is exact here */
-		lo = t*ln2LO[0];
-	    }
-	    STRICT_ASSIGN(float, x, hi - lo);
-	}
-	else if(hx < 0x39000000)  {	/* when |x|<2**-14 */
-	    if(huge+x>one) return one+x;/* trigger inexact */
-	}
-	else k = 0;
+  /*
+   * Now we compute exp(x) in, conceptually, three parts:
+   *  - a pure power of two which we get from N>>2
+   *  - exp(g) for g in [-log(2)/8,+log(2)/8], which we compute
+   *    using a Remez-generated polynomial approximation
+   *  - exp(k*log(2)/4) (aka 2^(k/4)) for k in [0..3], which we
+   *    get from a lookup table in precision-and-a-half and
+   *    multiply by g.
+   *
+   * We gain a bit of extra precision by the fact that actually
+   * our polynomial approximation gives us exp(g)-1, and we add
+   * the 1 back on by tweaking the prec-and-a-half multiplication
+   * step.
+   *
+   * Coefficients generated by the command
 
-    /* x is now in primary range */
-	t  = x*x;
-	if(k >= -125)
-	    SET_FLOAT_WORD(twopk,0x3f800000+(k<<23));
-	else
-	    SET_FLOAT_WORD(twopk,0x3f800000+((k+100)<<23));
-	c  = x - t*(P1+t*P2);
-	if(k==0) 	return one-((x*c)/(c-(float)2.0)-x);
-	else 		y = one-((lo-(x*c)/((float)2.0-c))-hi);
-	if(k >= -125) {
-	    if(k==128) return y*2.0F*0x1p127F;
-	    return y*twopk;
-	} else {
-	    return y*twopk*twom100;
-	}
+./auxiliary/remez.jl --variable=g --suffix=f -- '-log(BigFloat(2))/8' '+log(BigFloat(2))/8' 3 0 '(expm1(x))/x'
+
+  */
+  Rg = g * (
+            9.999999412829185331953781321128516523408059996430919985217971370689774264850229e-01f+g*(4.999999608551332693833317084753864837160947932961832943901913087652889900683833e-01f+g*(1.667292360203016574303631953046104769969440903672618034272397630620346717392378e-01f+g*(4.168230895653321517750133783431970715648192153539929404872173693978116154823859e-02f)))
+            );
+
+  /*
+   * Do the table lookup and combine it with Rg, to get our final
+   * answer apart from the exponent.
+   */
+  {
+    static const float twotokover4top[4] = { 0x1p+0F, 0x1.306p+0F, 0x1.6ap+0F, 0x1.ae8p+0F };
+    static const float twotokover4bot[4] = { 0x0p+0F, 0x1.fc1464p-13F, 0x1.3cccfep-13F, 0x1.3f32b6p-13F };
+    static const float twotokover4all[4] = { 0x1p+0F, 0x1.306fep+0F, 0x1.6a09e6p+0F, 0x1.ae89fap+0F };
+    int index = (N & 3);
+    Rg = twotokover4top[index] + (twotokover4bot[index] + twotokover4all[index]*Rg);
+    N >>= 2;
+  }
+
+  /*
+   * Combine the output exponent and mantissa, and return.
+   */
+  if (__builtin_expect(edgecaseflag, 0)) {
+    Result = fhex(((N/2) << 23) + 0x3f800000);
+    Result *= Rg;
+    Result *= fhex(((N-N/2) << 23) + 0x3f800000);
+    /*
+     * Step not mentioned in C&W: set errno reliably.
+     */
+    if (fai(Result) == 0)
+      return MATHERR_EXPF_UFL(Result);
+    if (fai(Result) == 0x7f800000)
+      return MATHERR_EXPF_OFL(Result);
+    return FLOAT_CHECKDENORM(Result);
+  } else {
+    Result = fhex(N * 8388608.0f + (float)0x3f800000);
+    Result *= Rg;
+  }
+
+  return Result;
 }
