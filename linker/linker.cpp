@@ -1258,7 +1258,7 @@ static bool shim_lib_matches(const char *shim_lib, const char *realpath) {
 }
 
 template<typename F>
-static void shim_libs_for_each(const char *const path, F action) {
+static void shim_libs_for_each(android_namespace_t* ns, const char *const path, F action) {
   if (path == nullptr) return;
   INFO("Finding shim libs for \"%s\"\n", path);
   std::vector<const std::string *> matched;
@@ -1278,7 +1278,7 @@ static void shim_libs_for_each(const char *const path, F action) {
   for (const auto& one_pair : matched) {
     const char* const pair = one_pair->c_str();
     const char* sep = strchr(pair, '|');
-    soinfo *child = find_library(&g_default_namespace, sep+1, RTLD_GLOBAL, nullptr, nullptr);
+    soinfo *child = find_library(ns, sep+1, RTLD_GLOBAL, nullptr, nullptr);
     if (child) {
       INFO("Using shim lib \"%s\"\n", sep+1);
       action(child);
@@ -1296,7 +1296,7 @@ static void shim_libs_for_each(const char *const path, F action) {
 // walk_dependencies_tree returns false if walk was terminated
 // by the action and true otherwise.
 template<typename F>
-static bool walk_dependencies_tree(soinfo* root_soinfos[], size_t root_soinfos_size, bool do_shims, F action) {
+static bool walk_dependencies_tree(android_namespace_t* ns, soinfo* root_soinfos[], size_t root_soinfos_size, bool do_shims, F action) {
   SoinfoLinkedList visit_list;
   SoinfoLinkedList visited;
 
@@ -1317,7 +1317,7 @@ static bool walk_dependencies_tree(soinfo* root_soinfos[], size_t root_soinfos_s
     visited.push_back(si);
 
     if (do_shims) {
-      shim_libs_for_each(si->get_realpath(), [&](soinfo* child) {
+      shim_libs_for_each(ns, si->get_realpath(), [&](soinfo* child) {
         si->add_child(child);
         visit_list.push_back(child);
       });
@@ -1338,7 +1338,7 @@ static const ElfW(Sym)* dlsym_handle_lookup(soinfo* root, soinfo* skip_until,
   const ElfW(Sym)* result = nullptr;
   bool skip_lookup = skip_until != nullptr;
 
-  walk_dependencies_tree(&root, 1, false, [&](soinfo* current_soinfo) {
+  walk_dependencies_tree(&g_default_namespace, &root, 1, false, [&](soinfo* current_soinfo) {
     if (skip_lookup) {
       skip_lookup = current_soinfo != skip_until;
       return true;
@@ -2189,6 +2189,7 @@ static bool find_libraries(android_namespace_t* ns,
   // Step 5: link libraries.
   soinfo::soinfo_list_t local_group;
   walk_dependencies_tree(
+      ns,
       (start_with != nullptr && add_as_children) ? &start_with : soinfos,
       (start_with != nullptr && add_as_children) ? 1 : soinfos_count,
       true,
