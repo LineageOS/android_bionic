@@ -64,6 +64,8 @@
 #include "android-base/strings.h"
 #include "ziparchive/zip_archive.h"
 
+#define SHIM_DEBUG_LIB "/system/lib/hw/camera.vendor.qcom.so"
+
 extern void __libc_init_globals(KernelArgumentBlock&);
 extern void __libc_init_AT_SECURE(KernelArgumentBlock&);
 
@@ -1306,13 +1308,22 @@ template<typename F>
 static bool walk_dependencies_tree(soinfo* root_soinfos[], size_t root_soinfos_size, bool do_shims, F action) {
   SoinfoLinkedList visit_list;
   SoinfoLinkedList visited;
+  bool watch_log = false;
 
   for (size_t i = 0; i < root_soinfos_size; ++i) {
+    if (strcmp(root_soinfos[i]->get_realpath(), SHIM_DEBUG_LIB) == 0) {
+      DL_WARN("walk_dependencies_tree:  \"%s\"\n", root_soinfos[i]->get_realpath());
+      watch_log = true;
+    }
     visit_list.push_back(root_soinfos[i]);
   }
 
   soinfo* si;
   while ((si = visit_list.pop_front()) != nullptr) {
+    if (watch_log) {
+      DL_WARN("visit_list: \"%s\"\n", si->get_realpath());
+    }
+
     if (visited.contains(si)) {
       continue;
     }
@@ -2081,8 +2092,14 @@ static bool find_libraries(android_namespace_t* ns,
   LoadTaskList load_tasks;
   std::unordered_map<const soinfo*, ElfReader> readers_map;
 
+  bool watch_log = false;
+
   for (size_t i = 0; i < library_names_count; ++i) {
     const char* name = library_names[i];
+    if (strcmp(name, SHIM_DEBUG_LIB) == 0) {
+      DL_WARN("find_libraries:  \"%s\"\n", name);
+      watch_log = true;
+    }
     load_tasks.push_back(LoadTask::create(name, start_with, &readers_map));
   }
 
@@ -2133,6 +2150,11 @@ static bool find_libraries(android_namespace_t* ns,
     }
 
     soinfo* si = task->get_soinfo();
+    if (watch_log) {
+      DL_WARN("task soinfo: \"%s\"\n", si->get_realpath());
+      DL_WARN("is_dt_needed %d.\n", is_dt_needed);
+      DL_WARN("is_linked %d.\n", si->is_linked());
+    }
 
     if (is_dt_needed) {
       needed_by->add_child(si);
@@ -2148,12 +2170,19 @@ static bool find_libraries(android_namespace_t* ns,
       ld_preloads->push_back(si);
     }
 
+    if (watch_log) {
+      DL_WARN("soinfos_count %d library_names_count %d.\n", soinfos_count, library_names_count);
+    }
+
     if (soinfos_count < library_names_count) {
       soinfos[soinfos_count++] = si;
     }
   }
 
   // Step 2: Load libraries in random order (see b/24047022)
+  if (watch_log) {
+    DL_WARN("Step 2.\n");
+  }
   LoadTaskList load_list;
   for (auto&& task : load_tasks) {
     soinfo* si = task->get_soinfo();
@@ -2175,6 +2204,9 @@ static bool find_libraries(android_namespace_t* ns,
   }
 
   // Step 3: pre-link all DT_NEEDED libraries in breadth first order.
+  if (watch_log) {
+    DL_WARN("Step 3.\n");
+  }
   for (auto&& task : load_tasks) {
     soinfo* si = task->get_soinfo();
     if (!si->is_linked() && !si->prelink_image()) {
@@ -2186,6 +2218,9 @@ static bool find_libraries(android_namespace_t* ns,
   // future runs. There is no need to explicitly add them to
   // the global group for this run because they are going to
   // appear in the local group in the correct order.
+  if (watch_log) {
+    DL_WARN("Step 4.\n");
+  }
   if (ld_preloads != nullptr) {
     for (auto&& si : *ld_preloads) {
       si->set_dt_flags_1(si->get_dt_flags_1() | DF_1_GLOBAL);
@@ -2194,15 +2229,26 @@ static bool find_libraries(android_namespace_t* ns,
 
 
   // Step 5: link libraries.
+  if (watch_log) {
+    DL_WARN("Step 5.\n");
+  }
   soinfo::soinfo_list_t local_group;
   walk_dependencies_tree(
       (start_with != nullptr && add_as_children) ? &start_with : soinfos,
       (start_with != nullptr && add_as_children) ? 1 : soinfos_count,
       true,
       [&] (soinfo* si) {
+
+    if (watch_log) {
+      DL_WARN("walk_dependencies_tree success %s soinfos_count %d.\n", si->get_realpath(), soinfos_count);
+    }
     local_group.push_back(si);
     return true;
   });
+
+  if (watch_log) {
+    DL_WARN("Step 5 done.\n");
+  }
 
   // We need to increment ref_count in case
   // the root of the local group was not linked.
