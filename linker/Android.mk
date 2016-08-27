@@ -58,6 +58,10 @@ ifneq ($(filter msm7x27a msm7x30 msm8660 msm8960,$(TARGET_BOARD_PLATFORM)),)
 LOCAL_CPPFLAGS += -DUSE_LEGACY_BLOBS
 endif
 
+ifeq ($(TARGET_NEEDS_TEXT_RELOCATIONS),true)
+LOCAL_CPPFLAGS += -DTARGET_NEEDS_TEXT_RELOCATIONS
+endif
+
 # We need to access Bionic private headers in the linker.
 LOCAL_CFLAGS += -I$(LOCAL_PATH)/../libc/
 
