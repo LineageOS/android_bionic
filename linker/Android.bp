@@ -99,6 +99,14 @@ cc_binary {
         "-Werror",
     ],
 
+    product_variables: {
+        lineage: {
+            needs_text_relocations: {
+                cppflags: ["-DTARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS"],
+            },
+        }
+    },
+
     cppflags: ["-Wold-style-cast"],
 
     // we are going to link libc++_static manually because
