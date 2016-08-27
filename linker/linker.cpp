@@ -4005,7 +4005,12 @@ bool soinfo::link_image(const soinfo_list_t& global_group, const soinfo_list_t& 
   if (has_text_relocations) {
     // Fail if app is targeting sdk version > 22
 #if !defined(__i386__) // ffmpeg says that they require text relocations on x86
+#if defined(TARGET_NEEDS_TEXT_RELOCATIONS)
+    if (get_application_target_sdk_version() != __ANDROID_API__
+        && get_application_target_sdk_version() > 22) {
+#else
     if (get_application_target_sdk_version() > 22) {
+#endif
       PRINT("%s: has text relocations", get_realpath());
       DL_ERR("%s: has text relocations", get_realpath());
       return false;
@@ -4013,8 +4018,15 @@ bool soinfo::link_image(const soinfo_list_t& global_group, const soinfo_list_t& 
 #endif
     // Make segments writable to allow text relocations to work properly. We will later call
     // phdr_table_protect_segments() after all of them are applied.
+#if !defined(TARGET_NEEDS_TEXT_RELOCATIONS)
+    // Silence the warning for targets that need
+    // text relocations since it can't really be helped
+    DEBUG("%s has text relocations. This is wasting memory and prevents "
+            "security hardening. Please fix.", get_realpath());
+#else
     DL_WARN("%s has text relocations. This is wasting memory and prevents "
             "security hardening. Please fix.", get_realpath());
+#endif
     add_dlwarning(get_realpath(), "text relocations");
     if (phdr_table_unprotect_segments(phdr, phnum, load_bias) < 0) {
       DL_ERR("can't unprotect loadable segments for \"%s\": %s",
