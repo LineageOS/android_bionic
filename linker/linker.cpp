@@ -1248,7 +1248,14 @@ static void reset_g_active_shim_libs(void) {
 }
 
 static void parse_LD_SHIM_LIBS(const char* path) {
-  parse_path(path, " :", &g_ld_all_shim_libs);
+  g_ld_all_shim_libs.clear();
+  if (path != nullptr) {
+    // We have historically supported ':' as well as ' ' in LD_SHIM_LIBS.
+    g_ld_all_shim_libs = android::base::Split(path, " :");
+    std::remove_if(g_ld_all_shim_libs.begin(),
+                   g_ld_all_shim_libs.end(),
+                   [] (const std::string& s) { return s.empty(); });
+  }
   reset_g_active_shim_libs();
 }
 
