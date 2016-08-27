@@ -4015,7 +4015,12 @@ bool soinfo::link_image(const soinfo_list_t& global_group, const soinfo_list_t& 
   if (has_text_relocations) {
     // Fail if app is targeting sdk version > 22
 #if !defined(__i386__) // ffmpeg says that they require text relocations on x86
+#if defined(TARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS)
+    if (get_application_target_sdk_version() != __ANDROID_API__
+        && get_application_target_sdk_version() > 22) {
+#else
     if (get_application_target_sdk_version() > 22) {
+#endif
       PRINT("%s: has text relocations", get_realpath());
       DL_ERR("%s: has text relocations", get_realpath());
       return false;
