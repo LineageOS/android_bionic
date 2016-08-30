@@ -2,26 +2,23 @@
 
 #include <private/bionic_asm.h>
 
-ENTRY(writev)
+ENTRY(__sendto)
     pushl   %ebx
     .cfi_def_cfa_offset 8
     .cfi_rel_offset ebx, 0
     pushl   %ecx
     .cfi_adjust_cfa_offset 4
     .cfi_rel_offset ecx, 0
-    pushl   %edx
-    .cfi_adjust_cfa_offset 4
-    .cfi_rel_offset edx, 0
 
     call    __kernel_syscall
     pushl   %eax
     .cfi_adjust_cfa_offset 4
     .cfi_rel_offset eax, 0
 
-    mov     20(%esp), %ebx
-    mov     24(%esp), %ecx
-    mov     28(%esp), %edx
-    movl    $__NR_writev, %eax
+    mov     $11, %ebx
+    mov     %esp, %ecx
+    addl    $16, %ecx
+    movl    $__NR_socketcall, %eax
     call    *(%esp)
     addl    $4, %esp
 
@@ -32,8 +29,7 @@ ENTRY(writev)
     call    __set_errno_internal
     addl    $4, %esp
 1:
-    popl    %edx
     popl    %ecx
     popl    %ebx
     ret
-END(writev)
+END(__sendto)

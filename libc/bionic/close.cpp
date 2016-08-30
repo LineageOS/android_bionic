@@ -31,8 +31,21 @@
 
 extern "C" int ___close(int);
 
+#ifdef USE_WRAPPER
+#include "codeaurora/PropClientDispatch.h"
+#endif
+
 int close(int fd) {
-  int rc = ___close(fd);
+  int rc;
+#ifndef USE_WRAPPER
+  rc = ___close(fd);
+#else
+  if ( __propClientDispatch.propClose ) {
+      rc = __propClientDispatch.propClose(fd);
+  } else {
+      rc = ___close(fd);
+  }
+#endif
   if (rc == -1 && errno == EINTR) {
     // POSIX says that if close returns with EINTR, the fd must not be closed.
     // Linus disagrees: http://lkml.indiana.edu/hypermail/linux/kernel/0509.1/0877.html

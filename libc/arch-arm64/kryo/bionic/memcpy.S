@@ -25,31 +25,41 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#ifndef _NETINET_UDP_H
-#define _NETINET_UDP_H
 
-/*
- * We would include linux/udp.h, but it brings in too much other stuff
- */
+// Prototype: void *memcpy (void *dst, const void *src, size_t count).
 
-#ifdef __FAVOR_BSD
+#include <private/bionic_asm.h>
+#include <private/libc_events.h>
 
-struct udphdr {
-    u_int16_t uh_sport;	/* source port */
-    u_int16_t uh_dport;	/* destination port */
-    u_int16_t uh_ulen;	/* udp length */
-    u_int16_t uh_sum;	/* udp checksum */
-};
+ENTRY(__memcpy_chk)
+  cmp   x2, x3
+  b.hi  __memcpy_chk_fail
 
-#else
+  // Fall through to memcpy...
+  b memcpy
+END(__memcpy_chk)
 
-struct udphdr {
-    __u16  source;
-    __u16  dest;
-    __u16  len;
-    __u16  check;
-};
+        .align  6
+ENTRY(memcpy)
+  #include "memcpy_base.S"
+END(memcpy)
 
-#endif /* __FAVOR_BSD */
+ENTRY_PRIVATE(__memcpy_chk_fail)
+  // Preserve for accurate backtrace.
+  stp  x29, x30, [sp, -16]!
+  .cfi_def_cfa_offset 16
+  .cfi_rel_offset x29, 0
+  .cfi_rel_offset x30, 8
 
-#endif /* _NETINET_UDP_H */
+  adrp  x0, error_string
+  add   x0, x0, :lo12:error_string
+  ldr   x1, error_code
+  bl    __fortify_chk_fail
+error_code:
+  .word   BIONIC_EVENT_MEMCPY_BUFFER_OVERFLOW
+END(__memcpy_chk_fail)
+
+  .data
+  .align 2
+error_string:
+  .string "memcpy: prevented write past end of buffer"

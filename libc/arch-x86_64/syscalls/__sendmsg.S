@@ -2,8 +2,8 @@
 
 #include <private/bionic_asm.h>
 
-ENTRY(writev)
-    movl    $__NR_writev, %eax
+ENTRY(__sendmsg)
+    movl    $__NR_sendmsg, %eax
     syscall
     cmpq    $-MAX_ERRNO, %rax
     jb      1f
@@ -12,4 +12,5 @@ ENTRY(writev)
     call    __set_errno_internal
 1:
     ret
-END(writev)
+END(__sendmsg)
+.hidden __sendmsg

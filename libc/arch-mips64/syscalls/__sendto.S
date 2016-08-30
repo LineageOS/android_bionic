@@ -2,10 +2,10 @@
 
 #include <private/bionic_asm.h>
 
-ENTRY(sendmsg)
+ENTRY(__sendto)
     .set push
     .set noreorder
-    li v0, __NR_sendmsg
+    li v0, __NR_sendto
     syscall
     bnez a3, 1f
     move a0, v0
@@ -22,4 +22,5 @@ ENTRY(sendmsg)
     j t9
     move ra, t0
     .set pop
-END(sendmsg)
+END(__sendto)
+.hidden __sendto

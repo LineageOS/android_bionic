@@ -2,8 +2,8 @@
 
 #include <private/bionic_asm.h>
 
-ENTRY(sendmsg)
-    mov     x8, __NR_sendmsg
+ENTRY(__sendto)
+    mov     x8, __NR_sendto
     svc     #0
 
     cmn     x0, #(MAX_ERRNO + 1)
@@ -11,4 +11,5 @@ ENTRY(sendmsg)
     b.hi    __set_errno_internal
 
     ret
-END(sendmsg)
+END(__sendto)
+.hidden __sendto
