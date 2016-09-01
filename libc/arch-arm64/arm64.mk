@@ -3,7 +3,6 @@
 #
 # Generic arm64 optimizations, may be overriden by CPU variants.
 #
-ifeq ($(TARGET_CPU_VARIANT),generic)
 libc_bionic_src_files_arm64 += \
     arch-arm64/generic/bionic/memchr.S \
     arch-arm64/generic/bionic/memcmp.S \
@@ -18,8 +17,6 @@ libc_bionic_src_files_arm64 += \
     arch-arm64/generic/bionic/strncmp.S \
     arch-arm64/generic/bionic/strnlen.S \
     arch-arm64/generic/bionic/wmemmove.S \
-
-endif
 
 libc_bionic_src_files_exclude_arm64 += \
     bionic/__memcpy_chk.cpp \
