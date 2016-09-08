@@ -3988,7 +3988,10 @@ bool soinfo::link_image(const soinfo_list_t& global_group, const soinfo_list_t& 
 #if !defined(__LP64__)
   if (has_text_relocations) {
     // Fail if app is targeting sdk version > 22
-#if !defined(__i386__) // ffmpeg says that they require text relocations on x86
+    // unless the target is x86 or simply uses legacy blobs.
+    // FFmpeg requires text relocations on x86,
+    // while many legacy blobs use text relocations
+#if !defined(__i386__) && !defined(USE_LEGACY_BLOBS)
     if (get_application_target_sdk_version() > 22) {
       PRINT("%s: has text relocations", get_realpath());
       DL_ERR("%s: has text relocations", get_realpath());
