@@ -54,10 +54,6 @@ ifeq ($(TARGET_IS_64_BIT),true)
 LOCAL_CPPFLAGS += -DTARGET_IS_64_BIT
 endif
 
-ifneq ($(filter msm7x27a msm7x30 msm8660 msm8960,$(TARGET_BOARD_PLATFORM)),)
-LOCAL_CPPFLAGS += -DUSE_LEGACY_BLOBS
-endif
-
 # We need to access Bionic private headers in the linker.
 LOCAL_CFLAGS += -I$(LOCAL_PATH)/../libc/
 
