@@ -16,6 +16,24 @@
       "revId": "0a6a298f5c68c39994adb98024de45e0bff8a38a",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_f2456416",
+        "filename": "linker/Android.mk",
+        "patchSetId": 4
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 7880
+      },
+      "writtenOn": "2016-09-10T02:23:43Z",
+      "side": 1,
+      "message": "To clarify, I mean to remove the ifeq right above this, and to replace any usage of USE_LEGACY_BLOBS in linker.cpp with TARGET_NEEDS_TEXT_RELOCATIONS.",
+      "parentUuid": "1fa4df85_529b18c8",
+      "revId": "0a6a298f5c68c39994adb98024de45e0bff8a38a",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }
