@@ -1097,7 +1097,11 @@ LOCAL_CONLYFLAGS := $(libc_common_conlyflags)
 LOCAL_CPPFLAGS := $(libc_common_cppflags) -Wold-style-cast
 LOCAL_C_INCLUDES := $(libc_common_c_includes)
 LOCAL_MODULE := libc_pthread
+ifeq ($(BOARD_NEEDS_GCC_PTHREADS),true)
+LOCAL_CLANG := false
+else
 LOCAL_CLANG := $(use_clang)
+endif
 LOCAL_ADDITIONAL_DEPENDENCIES := $(libc_common_additional_dependencies)
 LOCAL_CXX_STL := none
 LOCAL_SYSTEM_SHARED_LIBRARIES :=
