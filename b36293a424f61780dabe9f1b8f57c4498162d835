@@ -46,6 +46,24 @@
       "revId": "b36293a424f61780dabe9f1b8f57c4498162d835",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_83f13ad0",
+        "filename": "libc/Android.mk",
+        "patchSetId": 2
+      },
+      "lineNbr": 1103,
+      "author": {
+        "id": 7880
+      },
+      "writtenOn": "2016-09-13T23:58:01Z",
+      "side": 1,
+      "message": "use_clang is being used by all the modules in this makefile, but the libc_pthread module is the only one having issues on flo/mako iirc.\n\nI\u0027m not sure whether we would want to disable clang for all the modules here?",
+      "parentUuid": "1fa4df85_7808692b",
+      "revId": "b36293a424f61780dabe9f1b8f57c4498162d835",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }
