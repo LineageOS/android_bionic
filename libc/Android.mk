@@ -628,6 +628,10 @@ ifeq ($(TARGET_ARCH),$(filter $(TARGET_ARCH),mips mips64))
   use_clang := false
 endif
 
+ifeq ($(TARGET_NEEDS_GCC_LIBC),true)
+  use_clang := false
+endif
+
 ifeq ($(use_clang),)
   use_clang := true
 endif
