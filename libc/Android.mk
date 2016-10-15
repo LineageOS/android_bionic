@@ -1484,9 +1484,6 @@ LOCAL_SRC_FILES_arm += \
 LOCAL_SANITIZE := never
 LOCAL_NATIVE_COVERAGE := $(bionic_coverage)
 
-# Allow devices to provide additional symbols
-LOCAL_WHOLE_STATIC_LIBRARIES += $(BOARD_PROVIDES_ADDITIONAL_BIONIC_STATIC_LIBS)
-
 include $(BUILD_SHARED_LIBRARY)
 
 # ========================================================
