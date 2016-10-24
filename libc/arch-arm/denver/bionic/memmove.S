@@ -34,7 +34,7 @@
         .syntax unified
         .fpu    neon
 
-#define CACHE_LINE_SIZE         (64)
+#define CACHE_LINE_SIZE         (128)
 #define MEMCPY_BLOCK_SIZE_SMALL (32768)
 #define MEMCPY_BLOCK_SIZE_MID   (1048576)
 #define PREFETCH_DISTANCE_NEAR  (CACHE_LINE_SIZE*4)
