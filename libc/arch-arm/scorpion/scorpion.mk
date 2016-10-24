@@ -25,7 +25,4 @@ libc_bionic_src_files_arm += \
 libc_bionic_src_files_arm += \
     arch-arm/krait/bionic/memset.S \
     arch-arm/krait/bionic/strcmp.S \
-
-# Use Denver version of memmove
-libc_bionic_src_files_arm += \
-    arch-arm/denver/bionic/memmove.S
+    arch-arm/scorpion/bionic/memmove.S
