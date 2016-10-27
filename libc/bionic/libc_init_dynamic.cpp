@@ -57,11 +57,6 @@
 
 extern "C" {
   extern void netdClientInit(void);
-
-#ifdef USE_WRAPPER
-  extern void propClientInit(void);
-#endif
-
   extern int __cxa_atexit(void (*)(void *), void *, void *);
 };
 
@@ -84,11 +79,6 @@ __attribute__((constructor)) static void __libc_preinit() {
 
   // Hooks for various libraries to let them know that we're starting up.
   __libc_globals.mutate(__libc_init_malloc);
-
-#ifdef USE_WRAPPER
-  propClientInit();
-#endif
-
   netdClientInit();
 }
 
