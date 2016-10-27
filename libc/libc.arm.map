@@ -119,8 +119,6 @@ LIBC {
     __pread64_chk;
     __pread_chk;
     __progname;
-    __propClientDispatch; #arm arm64 nobrillo
-    __propClientDispatchWrite; #arm arm64 nobrillo
     __pselect6; # arm x86 mips
     __pthread_cleanup_pop;
     __pthread_cleanup_push;

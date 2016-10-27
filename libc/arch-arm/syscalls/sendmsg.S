@@ -2,7 +2,7 @@
 
 #include <private/bionic_asm.h>
 
-ENTRY(__sendmsg)
+ENTRY(sendmsg)
     mov     ip, r7
     .cfi_register r7, ip
     ldr     r7, =__NR_sendmsg
@@ -13,4 +13,4 @@ ENTRY(__sendmsg)
     bxls    lr
     neg     r0, r0
     b       __set_errno_internal
-END(__sendmsg)
+END(sendmsg)
