@@ -2,7 +2,7 @@
 
 #include <private/bionic_asm.h>
 
-ENTRY(__writev)
+ENTRY(writev)
     mov     x8, __NR_writev
     svc     #0
 
@@ -11,5 +11,4 @@ ENTRY(__writev)
     b.hi    __set_errno_internal
 
     ret
-END(__writev)
-.hidden __writev
+END(writev)

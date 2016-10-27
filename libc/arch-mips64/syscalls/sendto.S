@@ -2,9 +2,9 @@
 
 #include <private/bionic_asm.h>
 
-ENTRY(__sendto)
+ENTRY(sendto)
+    .set push
     .set noreorder
-    .cpload t9
     li v0, __NR_sendto
     syscall
     bnez a3, 1f
@@ -12,8 +12,14 @@ ENTRY(__sendto)
     j ra
     nop
 1:
-    la t9,__set_errno_internal
-    j t9
+    move t0, ra
+    bal     2f
     nop
-    .set reorder
-END(__sendto)
+2:
+    .cpsetup ra, t1, 2b
+    LA t9,__set_errno_internal
+    .cpreturn
+    j t9
+    move ra, t0
+    .set pop
+END(sendto)

@@ -2,10 +2,10 @@
 
 #include <private/bionic_asm.h>
 
-ENTRY(__writev)
+ENTRY(sendmsg)
     .set noreorder
     .cpload t9
-    li v0, __NR_writev
+    li v0, __NR_sendmsg
     syscall
     bnez a3, 1f
     move a0, v0
@@ -16,4 +16,4 @@ ENTRY(__writev)
     j t9
     nop
     .set reorder
-END(__writev)
+END(sendmsg)

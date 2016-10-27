@@ -2,7 +2,7 @@
 
 #include <private/bionic_asm.h>
 
-ENTRY(__sendmsg)
+ENTRY(sendto)
     pushl   %ebx
     .cfi_def_cfa_offset 8
     .cfi_rel_offset ebx, 0
@@ -15,7 +15,7 @@ ENTRY(__sendmsg)
     .cfi_adjust_cfa_offset 4
     .cfi_rel_offset eax, 0
 
-    mov     $16, %ebx
+    mov     $11, %ebx
     mov     %esp, %ecx
     addl    $16, %ecx
     movl    $__NR_socketcall, %eax
@@ -32,4 +32,4 @@ ENTRY(__sendmsg)
     popl    %ecx
     popl    %ebx
     ret
-END(__sendmsg)
+END(sendto)
