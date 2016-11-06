@@ -118,25 +118,8 @@ TEST(semaphore, sem_timedwait) {
   ts.tv_nsec = -1;
   ASSERT_EQ(-1, sem_timedwait(&s, &ts));
   ASSERT_EQ(EINVAL, errno);
-  errno = 0;
-  ts.tv_nsec = NS_PER_S;
-  ASSERT_EQ(-1, sem_timedwait(&s, &ts));
-  ASSERT_EQ(EINVAL, errno);
-
-  errno = 0;
-  ts.tv_nsec = NS_PER_S - 1;
-  ts.tv_sec = -1;
-  ASSERT_EQ(-1, sem_timedwait(&s, &ts));
-  ASSERT_EQ(ETIMEDOUT, errno);
 
   ASSERT_EQ(0, sem_destroy(&s));
-}
-
-TEST(semaphore_DeathTest, sem_timedwait_null_timeout) {
-  sem_t s;
-  ASSERT_EQ(0, sem_init(&s, 0, 0));
-
-  ASSERT_EXIT(sem_timedwait(&s, nullptr), testing::KilledBySignal(SIGSEGV), "");
 }
 
 TEST(semaphore, sem_getvalue) {
