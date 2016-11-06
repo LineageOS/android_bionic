@@ -221,7 +221,7 @@ int sem_wait(sem_t* sem) {
       return 0;
     }
 
-    int result = __futex_wait_ex(sem_count_ptr, shared, shared | SEMCOUNT_MINUS_ONE, false, nullptr);
+    int result = __futex_wait_ex(sem_count_ptr, shared, shared | SEMCOUNT_MINUS_ONE, NULL);
     if (bionic_get_application_target_sdk_version() > 23) {
       if (result ==-EINTR) {
         errno = EINTR;
@@ -242,29 +242,36 @@ int sem_timedwait(sem_t* sem, const timespec* abs_timeout) {
   }
 
   // Check it as per POSIX.
-  int result = check_timespec(abs_timeout, false);
-  if (result != 0) {
-    errno = result;
+  if (abs_timeout == NULL || abs_timeout->tv_sec < 0 || abs_timeout->tv_nsec < 0 || abs_timeout->tv_nsec >= NS_PER_S) {
+    errno = EINVAL;
     return -1;
   }
 
   unsigned int shared = SEM_GET_SHARED(sem_count_ptr);
 
   while (true) {
+    // POSIX mandates CLOCK_REALTIME here.
+    timespec ts;
+    if (!timespec_from_absolute_timespec(ts, *abs_timeout, CLOCK_REALTIME)) {
+      errno = ETIMEDOUT;
+      return -1;
+    }
+
     // Try to grab the semaphore. If the value was 0, this will also change it to -1.
     if (__sem_dec(sem_count_ptr) > 0) {
-      return 0;
+      break;
     }
 
     // Contention detected. Wait for a wakeup event.
-    int result = __futex_wait_ex(sem_count_ptr, shared, shared | SEMCOUNT_MINUS_ONE, true, abs_timeout);
+    int ret = __futex_wait_ex(sem_count_ptr, shared, shared | SEMCOUNT_MINUS_ONE, &ts);
 
     // Return in case of timeout or interrupt.
-    if (result == -ETIMEDOUT || result == -EINTR) {
-      errno = -result;
+    if (ret == -ETIMEDOUT || ret == -EINTR) {
+      errno = -ret;
       return -1;
     }
   }
+  return 0;
 }
 
 int sem_post(sem_t* sem) {

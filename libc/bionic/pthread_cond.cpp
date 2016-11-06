@@ -111,8 +111,8 @@ struct pthread_cond_internal_t {
     return COND_IS_SHARED(atomic_load_explicit(&state, memory_order_relaxed));
   }
 
-  bool use_realtime_clock() {
-    return COND_GET_CLOCK(atomic_load_explicit(&state, memory_order_relaxed)) == CLOCK_REALTIME;
+  int get_clock() {
+    return COND_GET_CLOCK(atomic_load_explicit(&state, memory_order_relaxed));
   }
 
 #if defined(__LP64__)
@@ -170,23 +170,33 @@ static int __pthread_cond_pulse(pthread_cond_internal_t* cond, int thread_count)
   return 0;
 }
 
-static int __pthread_cond_timedwait(pthread_cond_internal_t* cond, pthread_mutex_t* mutex,
-                                    bool use_realtime_clock, const timespec* abs_timeout_or_null) {
-  int result = check_timespec(abs_timeout_or_null, true);
-  if (result != 0) {
-    return result;
-  }
-
+static int __pthread_cond_timedwait_relative(pthread_cond_internal_t* cond, pthread_mutex_t* mutex,
+                                             const timespec* rel_timeout_or_null) {
   unsigned int old_state = atomic_load_explicit(&cond->state, memory_order_relaxed);
+
   pthread_mutex_unlock(mutex);
-  int status = __futex_wait_ex(&cond->state, cond->process_shared(), old_state,
-                               use_realtime_clock, abs_timeout_or_null);
+  int status = __futex_wait_ex(&cond->state, cond->process_shared(), old_state, rel_timeout_or_null);
   pthread_mutex_lock(mutex);
 
   if (status == -ETIMEDOUT) {
     return ETIMEDOUT;
   }
   return 0;
+}
+
+static int __pthread_cond_timedwait(pthread_cond_internal_t* cond, pthread_mutex_t* mutex,
+                                    const timespec* abs_timeout_or_null, clockid_t clock) {
+  timespec ts;
+  timespec* rel_timeout = NULL;
+
+  if (abs_timeout_or_null != NULL) {
+    rel_timeout = &ts;
+    if (!timespec_from_absolute_timespec(*rel_timeout, *abs_timeout_or_null, clock)) {
+      return ETIMEDOUT;
+    }
+  }
+
+  return __pthread_cond_timedwait_relative(cond, mutex, rel_timeout);
 }
 
 int pthread_cond_broadcast(pthread_cond_t* cond_interface) {
@@ -199,14 +209,14 @@ int pthread_cond_signal(pthread_cond_t* cond_interface) {
 
 int pthread_cond_wait(pthread_cond_t* cond_interface, pthread_mutex_t* mutex) {
   pthread_cond_internal_t* cond = __get_internal_cond(cond_interface);
-  return __pthread_cond_timedwait(cond, mutex, false, nullptr);
+  return __pthread_cond_timedwait(cond, mutex, NULL, cond->get_clock());
 }
 
 int pthread_cond_timedwait(pthread_cond_t *cond_interface, pthread_mutex_t * mutex,
                            const timespec *abstime) {
 
   pthread_cond_internal_t* cond = __get_internal_cond(cond_interface);
-  return __pthread_cond_timedwait(cond, mutex, cond->use_realtime_clock(), abstime);
+  return __pthread_cond_timedwait(cond, mutex, abstime, cond->get_clock());
 }
 
 #if !defined(__LP64__)
@@ -215,7 +225,8 @@ extern "C" int pthread_cond_timedwait_monotonic(pthread_cond_t* cond_interface,
                                                 pthread_mutex_t* mutex,
                                                 const timespec* abs_timeout) {
 
-  return __pthread_cond_timedwait(__get_internal_cond(cond_interface), mutex, false, abs_timeout);
+  return __pthread_cond_timedwait(__get_internal_cond(cond_interface), mutex, abs_timeout,
+                                  CLOCK_MONOTONIC);
 }
 
 extern "C" int pthread_cond_timedwait_monotonic_np(pthread_cond_t* cond_interface,
@@ -224,18 +235,11 @@ extern "C" int pthread_cond_timedwait_monotonic_np(pthread_cond_t* cond_interfac
   return pthread_cond_timedwait_monotonic(cond_interface, mutex, abs_timeout);
 }
 
-// Force this function using CLOCK_MONOTONIC because it was always using
-// CLOCK_MONOTONIC in history.
 extern "C" int pthread_cond_timedwait_relative_np(pthread_cond_t* cond_interface,
                                                   pthread_mutex_t* mutex,
                                                   const timespec* rel_timeout) {
-  timespec ts;
-  timespec* abs_timeout = nullptr;
-  if (rel_timeout != nullptr) {
-    absolute_timespec_from_timespec(ts, *rel_timeout, CLOCK_MONOTONIC);
-    abs_timeout = &ts;
-  }
-  return __pthread_cond_timedwait(__get_internal_cond(cond_interface), mutex, false, abs_timeout);
+
+  return __pthread_cond_timedwait_relative(__get_internal_cond(cond_interface), mutex, rel_timeout);
 }
 
 extern "C" int pthread_cond_timeout_np(pthread_cond_t* cond_interface,
