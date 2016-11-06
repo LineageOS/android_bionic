@@ -299,14 +299,10 @@ static inline __always_inline int __pthread_normal_mutex_trylock(pthread_mutex_i
  */
 static inline __always_inline int __pthread_normal_mutex_lock(pthread_mutex_internal_t* mutex,
                                                               uint16_t shared,
-                                                              bool use_realtime_clock,
-                                                              const timespec* abs_timeout_or_null) {
+                                                              const timespec* abs_timeout_or_null,
+                                                              clockid_t clock) {
     if (__predict_true(__pthread_normal_mutex_trylock(mutex, shared) == 0)) {
         return 0;
-    }
-    int result = check_timespec(abs_timeout_or_null, true);
-    if (result != 0) {
-        return result;
     }
 
     ScopedTrace trace("Contending for pthread mutex");
@@ -324,8 +320,15 @@ static inline __always_inline int __pthread_normal_mutex_lock(pthread_mutex_inte
     // made by other threads visible to the current CPU.
     while (atomic_exchange_explicit(&mutex->state, locked_contended,
                                     memory_order_acquire) != unlocked) {
-        if (__futex_wait_ex(&mutex->state, shared, locked_contended, use_realtime_clock,
-                            abs_timeout_or_null) == -ETIMEDOUT) {
+        timespec ts;
+        timespec* rel_timeout = NULL;
+        if (abs_timeout_or_null != NULL) {
+            rel_timeout = &ts;
+            if (!timespec_from_absolute_timespec(*rel_timeout, *abs_timeout_or_null, clock)) {
+                return ETIMEDOUT;
+            }
+        }
+        if (__futex_wait_ex(&mutex->state, shared, locked_contended, rel_timeout) == -ETIMEDOUT) {
             return ETIMEDOUT;
         }
     }
@@ -396,15 +399,14 @@ static inline __always_inline int __recursive_or_errorcheck_mutex_wait(
                                                       pthread_mutex_internal_t* mutex,
                                                       uint16_t shared,
                                                       uint16_t old_state,
-                                                      bool use_realtime_clock,
-                                                      const timespec* abs_timeout) {
+                                                      const timespec* rel_timeout) {
 // __futex_wait always waits on a 32-bit value. But state is 16-bit. For a normal mutex, the owner_tid
 // field in mutex is not used. On 64-bit devices, the __pad field in mutex is not used.
 // But when a recursive or errorcheck mutex is used on 32-bit devices, we need to add the
 // owner_tid value in the value argument for __futex_wait, otherwise we may always get EAGAIN error.
 
 #if defined(__LP64__)
-  return __futex_wait_ex(&mutex->state, shared, old_state, use_realtime_clock, abs_timeout);
+  return __futex_wait_ex(&mutex->state, shared, old_state, rel_timeout);
 
 #else
   // This implementation works only when the layout of pthread_mutex_internal_t matches below expectation.
@@ -413,21 +415,19 @@ static inline __always_inline int __recursive_or_errorcheck_mutex_wait(
   static_assert(offsetof(pthread_mutex_internal_t, owner_tid) == 2, "");
 
   uint32_t owner_tid = atomic_load_explicit(&mutex->owner_tid, memory_order_relaxed);
-  return __futex_wait_ex(&mutex->state, shared, (owner_tid << 16) | old_state,
-                         use_realtime_clock, abs_timeout);
+  return __futex_wait_ex(&mutex->state, shared, (owner_tid << 16) | old_state, rel_timeout);
 #endif
 }
 
 static int __pthread_mutex_lock_with_timeout(pthread_mutex_internal_t* mutex,
-                                             bool use_realtime_clock,
-                                             const timespec* abs_timeout_or_null) {
+                                           const timespec* abs_timeout_or_null, clockid_t clock) {
     uint16_t old_state = atomic_load_explicit(&mutex->state, memory_order_relaxed);
     uint16_t mtype = (old_state & MUTEX_TYPE_MASK);
     uint16_t shared = (old_state & MUTEX_SHARED_MASK);
 
     // Handle common case first.
     if ( __predict_true(mtype == MUTEX_TYPE_BITS_NORMAL) ) {
-        return __pthread_normal_mutex_lock(mutex, shared, use_realtime_clock, abs_timeout_or_null);
+        return __pthread_normal_mutex_lock(mutex, shared, abs_timeout_or_null, clock);
     }
 
     // Do we already own this recursive or error-check mutex?
@@ -487,13 +487,16 @@ static int __pthread_mutex_lock_with_timeout(pthread_mutex_internal_t* mutex,
             old_state = new_state;
         }
 
-        int result = check_timespec(abs_timeout_or_null, true);
-        if (result != 0) {
-            return result;
-        }
         // We are in locked_contended state, sleep until someone wakes us up.
-        if (__recursive_or_errorcheck_mutex_wait(mutex, shared, old_state, use_realtime_clock,
-                                                 abs_timeout_or_null) == -ETIMEDOUT) {
+        timespec ts;
+        timespec* rel_timeout = NULL;
+        if (abs_timeout_or_null != NULL) {
+            rel_timeout = &ts;
+            if (!timespec_from_absolute_timespec(*rel_timeout, *abs_timeout_or_null, clock)) {
+                return ETIMEDOUT;
+            }
+        }
+        if (__recursive_or_errorcheck_mutex_wait(mutex, shared, old_state, rel_timeout) == -ETIMEDOUT) {
             return ETIMEDOUT;
         }
         old_state = atomic_load_explicit(&mutex->state, memory_order_relaxed);
@@ -518,7 +521,7 @@ int pthread_mutex_lock(pthread_mutex_t* mutex_interface) {
         return 0;
       }
     }
-    return __pthread_mutex_lock_with_timeout(mutex, false, nullptr);
+    return __pthread_mutex_lock_with_timeout(mutex, NULL, 0);
 }
 
 int pthread_mutex_unlock(pthread_mutex_t* mutex_interface) {
@@ -613,12 +616,17 @@ int pthread_mutex_trylock(pthread_mutex_t* mutex_interface) {
 
 #if !defined(__LP64__)
 extern "C" int pthread_mutex_lock_timeout_np(pthread_mutex_t* mutex_interface, unsigned ms) {
-    timespec ts;
-    timespec_from_ms(ts, ms);
     timespec abs_timeout;
-    absolute_timespec_from_timespec(abs_timeout, ts, CLOCK_MONOTONIC);
+    clock_gettime(CLOCK_MONOTONIC, &abs_timeout);
+    abs_timeout.tv_sec  += ms / 1000;
+    abs_timeout.tv_nsec += (ms % 1000) * 1000000;
+    if (abs_timeout.tv_nsec >= NS_PER_S) {
+        abs_timeout.tv_sec++;
+        abs_timeout.tv_nsec -= NS_PER_S;
+    }
+
     int error = __pthread_mutex_lock_with_timeout(__get_internal_mutex(mutex_interface),
-                                                  false, &abs_timeout);
+                                                  &abs_timeout, CLOCK_MONOTONIC);
     if (error == ETIMEDOUT) {
         error = EBUSY;
     }
@@ -628,7 +636,7 @@ extern "C" int pthread_mutex_lock_timeout_np(pthread_mutex_t* mutex_interface, u
 
 int pthread_mutex_timedlock(pthread_mutex_t* mutex_interface, const timespec* abs_timeout) {
     return __pthread_mutex_lock_with_timeout(__get_internal_mutex(mutex_interface),
-                                             true, abs_timeout);
+                                             abs_timeout, CLOCK_REALTIME);
 }
 
 int pthread_mutex_destroy(pthread_mutex_t* mutex_interface) {
