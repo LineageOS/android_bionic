@@ -318,6 +318,7 @@ common_bionic-unit-tests_shared_libraries_target := \
 common_bionic-unit-tests_static_libraries_target := \
     libbase \
     libziparchive \
+    liblog \
     libz \
     libutils \
 
