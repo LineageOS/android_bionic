@@ -4298,8 +4298,12 @@ static ElfW(Addr) __linker_init_post_relocation(KernelArgumentBlock& args, ElfW(
     if (ldpreload_env != nullptr) {
       INFO("[ LD_PRELOAD set to \"%s\" ]", ldpreload_env);
     }
-    ldshim_libs_env = getenv("LD_SHIM_LIBS");
   }
+#ifdef LD_SHIM_LIBS
+  ldshim_libs_env = LD_SHIM_LIBS;
+#else
+  ldshim_libs_env = getenv("LD_SHIM_LIBS");
+#endif
 
   struct stat file_stat;
   // Stat "/proc/self/exe" instead of executable_path because

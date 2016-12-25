@@ -62,6 +62,10 @@ LOCAL_CPPFLAGS += -DTARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS
 endif
 endif
 
+ifneq ($(LD_SHIM_LIBS),)
+LOCAL_CPPFLAGS += -DLD_SHIM_LIBS=\"$(LD_SHIM_LIBS)\"
+endif
+
 # We need to access Bionic private headers in the linker.
 LOCAL_CFLAGS += -I$(LOCAL_PATH)/../libc/
 
