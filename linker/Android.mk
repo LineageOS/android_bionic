@@ -55,11 +55,7 @@ LOCAL_CPPFLAGS += -DTARGET_IS_64_BIT
 endif
 
 ifeq ($(TARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS),true)
-ifeq ($(user_variant),user)
-$(error Do not enable text relocations on user builds)
-else
 LOCAL_CPPFLAGS += -DTARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS
-endif
 endif
 
 # We need to access Bionic private headers in the linker.
