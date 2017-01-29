@@ -16,6 +16,24 @@
       "revId": "3cf48f16e00dcc2c971dffdaca17b723816c4eae",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a437d4f_d4586efc",
+        "filename": "linker/linker.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 3149,
+      "author": {
+        "id": 5531
+      },
+      "writtenOn": "2017-01-29T23:18:12Z",
+      "side": 0,
+      "message": "It\u0027s a duplicate of the comment just above (minus the TODO, which is exactly what we\u0027re overriding).",
+      "parentUuid": "9a437d4f_f43c9295",
+      "revId": "3cf48f16e00dcc2c971dffdaca17b723816c4eae",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }

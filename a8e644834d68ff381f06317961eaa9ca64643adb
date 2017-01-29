@@ -22,6 +22,30 @@
       "revId": "a8e644834d68ff381f06317961eaa9ca64643adb",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a437d4f_145f16e7",
+        "filename": "linker/Android.mk",
+        "patchSetId": 2
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5531
+      },
+      "writtenOn": "2017-01-29T23:18:12Z",
+      "side": 1,
+      "message": "I figured this makes it so that one board flag is all that\u0027s needed to enable the feature (header_path) vs. two (needs_non_pie\u003dtrue and header_path).",
+      "parentUuid": "9a437d4f_1438369f",
+      "range": {
+        "startLine": 70,
+        "startChar": 26,
+        "endLine": 70,
+        "endChar": 63
+      },
+      "revId": "a8e644834d68ff381f06317961eaa9ca64643adb",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }
