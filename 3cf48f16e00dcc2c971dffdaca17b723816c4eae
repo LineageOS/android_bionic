@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a437d4f_f43c9295",
+        "filename": "linker/linker.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 3149,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2017-01-29T22:56:59Z",
+      "side": 0,
+      "message": "Why remove the comment?",
+      "revId": "3cf48f16e00dcc2c971dffdaca17b723816c4eae",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}

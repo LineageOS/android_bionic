@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a437d4f_1438369f",
+        "filename": "linker/Android.mk",
+        "patchSetId": 2
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2017-01-29T22:56:59Z",
+      "side": 1,
+      "message": "If you put this into the global include space, I don\u0027t think you necessarily need this, although if you are trying to make it explicitly defined, this is OK.",
+      "range": {
+        "startLine": 70,
+        "startChar": 26,
+        "endLine": 70,
+        "endChar": 63
+      },
+      "revId": "a8e644834d68ff381f06317961eaa9ca64643adb",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
