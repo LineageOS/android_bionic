@@ -114,6 +114,7 @@ LIBC {
     __p_type;
     __p_type_syms;
     __poll_chk;
+    __popcountsi2; # arm x86 mips
     __ppoll; # arm x86 mips
     __ppoll_chk;
     __pread64_chk;
@@ -1393,7 +1394,6 @@ LIBC_PRIVATE {
     __mulsf3; # arm
     __nedf2; # arm
     __popcount_tab; # arm
-    __popcountsi2; # arm x86 mips
     __restore_core_regs; # arm
     __sclose; # arm x86 mips
     __sflags; # arm x86 mips
