@@ -1,3 +1,23 @@
+bootstrap_go_package {
+    name: "soong-forced-shims,
+    pkgPath: "android/soong/forced_shims",
+    deps: [
+        "blueprint",
+        "blueprint-pathtools",
+        "soong",
+        "soong-android",
+        "soong-cc",
+    ],
+    srcs: [
+        "forced-shims.go",
+    ],
+    pluginFor: ["soong_build"],
+}
+
+forced_shims_defaults {
+    name: "forced_shims_defaults",
+}
+
 cc_library_static {
     name: "liblinker_malloc",
     defaults: ["linux_bionic_supported"],
