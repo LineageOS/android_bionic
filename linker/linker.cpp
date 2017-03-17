@@ -715,7 +715,7 @@ static void reset_g_active_shim_libs(void) {
   }
 }
 
-void parse_LD_SHIM_LIBS(const char* path) {
+void parse_shim_libs(const char* path) {
   g_ld_all_shim_libs.clear();
   if (path != nullptr) {
     // We have historically supported ':' as well as ' ' in LD_SHIM_LIBS.
@@ -728,6 +728,14 @@ void parse_LD_SHIM_LIBS(const char* path) {
     }
   }
   reset_g_active_shim_libs();
+}
+
+void parse_LD_SHIM_LIBS(const char* path) {
+  g_ld_all_shim_libs.clear();
+#ifdef FORCED_SHIM_LIBS
+  parse_shim_libs(FORCED_SHIM_LIBS);
+#endif
+  parse_shim_libs(path);
 }
 
 template<typename F>
