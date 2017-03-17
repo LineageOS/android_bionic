@@ -1258,19 +1258,28 @@ static void reset_g_active_shim_libs(void) {
   }
 }
 
-static void parse_LD_SHIM_LIBS(const char* path) {
-  g_ld_all_shim_libs.clear();
+static void parse_shim_libs(const char* path) {
+DL_ERR("parse_shim_libs: %s\n", path);
   if (path != nullptr) {
     // We have historically supported ':' as well as ' ' in LD_SHIM_LIBS.
     for (const auto& pair : android::base::Split(path, " :")) {
       size_t pos = pair.find('|');
       if (pos > 0 && pos < pair.length() - 1) {
+DL_ERR("   shim_libs: %s %s\n", pair.substr(0, pos).c_str(), pair.substr(pos + 1).c_str());
         auto desc = std::pair<std::string, std::string>(pair.substr(0, pos), pair.substr(pos + 1));
         g_ld_all_shim_libs.push_back(desc);
       }
     }
   }
   reset_g_active_shim_libs();
+}
+
+static void parse_LD_SHIM_LIBS(const char* path) {
+  g_ld_all_shim_libs.clear();
+#ifdef FORCED_SHIM_LIBS
+  parse_shim_libs(FORCED_SHIM_LIBS);
+#endif
+  parse_shim_libs(path);
 }
 
 template<typename F>
