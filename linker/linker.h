@@ -104,6 +104,8 @@ soinfo* get_libdl_info(const char* linker_path, const link_map& linker_map);
 
 soinfo* find_containing_library(const void* p);
 
+void parse_LD_SHIM_LIBS(const char* path);
+
 void do_android_get_LD_LIBRARY_PATH(char*, size_t);
 void do_android_update_LD_LIBRARY_PATH(const char* ld_library_path);
 void* do_dlopen(const char* name,
