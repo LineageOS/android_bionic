@@ -252,6 +252,7 @@ static ElfW(Addr) __linker_init_post_relocation(KernelArgumentBlock& args) {
   // doesn't cost us anything.
   const char* ldpath_env = nullptr;
   const char* ldpreload_env = nullptr;
+  const char* ldshim_libs_env = nullptr;
   if (!getauxval(AT_SECURE)) {
     ldpath_env = getenv("LD_LIBRARY_PATH");
     if (ldpath_env != nullptr) {
@@ -261,6 +262,7 @@ static ElfW(Addr) __linker_init_post_relocation(KernelArgumentBlock& args) {
     if (ldpreload_env != nullptr) {
       INFO("[ LD_PRELOAD set to \"%s\" ]", ldpreload_env);
     }
+    ldshim_libs_env = getenv("LD_SHIM_LIBS");
   }
 
   struct stat file_stat;
@@ -330,6 +332,7 @@ static ElfW(Addr) __linker_init_post_relocation(KernelArgumentBlock& args) {
   // Use LD_LIBRARY_PATH and LD_PRELOAD (but only if we aren't setuid/setgid).
   parse_LD_LIBRARY_PATH(ldpath_env);
   parse_LD_PRELOAD(ldpreload_env);
+  parse_LD_SHIM_LIBS(ldshim_libs_env);
 
   somain = si;
 
