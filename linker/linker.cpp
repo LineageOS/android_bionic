@@ -644,6 +644,68 @@ enum walk_action_result_t : uint32_t {
   kWalkSkip = 2
 };
 
+#ifdef LD_SHIM_LIBS
+// g_ld_all_shim_libs maintains the references to memory as it used
+// in the soinfo structures and in the g_active_shim_libs list.
+
+static std::vector<ShimDescriptor> g_ld_all_shim_libs;
+
+// g_active_shim_libs are all shim libs that are still eligible
+// to be loaded.  We must remove a shim lib from the list before
+// we load the library to avoid recursive loops (load shim libA
+// for libB where libA also links against libB).
+static linked_list_t<const ShimDescriptor> g_active_shim_libs;
+
+static void reset_g_active_shim_libs(void) {
+  g_active_shim_libs.clear();
+  for (const auto& pair : g_ld_all_shim_libs) {
+    g_active_shim_libs.push_back(&pair);
+  }
+}
+
+void parse_LD_SHIM_LIBS(const char* path) {
+  g_ld_all_shim_libs.clear();
+  if (path != nullptr) {
+    for (const auto& pair : android::base::Split(path, ":")) {
+      std::vector<std::string> pieces = android::base::Split(pair, "|");
+      if (pieces.size() != 2) continue;
+      // If the path can be resolved, resolve it
+      char buf[PATH_MAX];
+      std::string resolved_path = pieces[0];
+      if (access(pieces[0].c_str(), R_OK) != 0) {
+        if (errno == ENOENT) {
+          // no need to test for non-existing path. skip.
+          continue;
+        }
+        // If not accessible, don't call realpath as it will just cause
+        // SELinux denial spam. Use the path unresolved.
+      } else if (realpath(pieces[0].c_str(), buf) != nullptr) {
+        resolved_path = buf;
+      }
+      auto desc = std::pair<std::string, std::string>(resolved_path, pieces[1]);
+      g_ld_all_shim_libs.push_back(desc);
+    }
+  }
+  reset_g_active_shim_libs();
+}
+
+std::vector<const ShimDescriptor*> shim_matching_pairs(const char* path) {
+  std::vector<const ShimDescriptor*> matched_pairs;
+
+  g_active_shim_libs.for_each([&](const ShimDescriptor* a_pair) {
+    if (a_pair->first == path) {
+      matched_pairs.push_back(a_pair);
+    }
+  });
+
+  g_active_shim_libs.remove_if([&](const ShimDescriptor* a_pair) {
+    return a_pair->first == path;
+  });
+
+  return matched_pairs;
+}
+#endif
+
 // This function walks down the tree of soinfo dependencies
 // in breadth-first order and
 //   * calls action(soinfo* si) for each node, and
@@ -1277,6 +1339,12 @@ static bool load_library(android_namespace_t* ns,
   if (si->get_dt_runpath().empty()) {
     si->set_dt_runpath("$ORIGIN/../lib64:$ORIGIN/lib64");
   }
+#endif
+
+#ifdef LD_SHIM_LIBS
+  for_each_matching_shim(realpath.c_str(), [&](const char* name) {
+    load_tasks->push_back(LoadTask::create(name, si, ns, task->get_readers_map()));
+  });
 #endif
 
   for_each_dt_needed(task->get_elf_reader(), [&](const char* name) {
@@ -2181,6 +2249,9 @@ void* do_dlopen(const char* name, int flags,
   }
 
   ProtectedDataGuard guard;
+#ifdef LD_SHIM_LIBS
+  reset_g_active_shim_libs();
+#endif
   soinfo* si = find_library(ns, translated_name, flags, extinfo, caller);
   loading_trace.End();
 
