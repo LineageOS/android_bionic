@@ -42,6 +42,10 @@
 #include "linker_logger.h"
 #include "linker_soinfo.h"
 
+#ifdef LD_SHIM_LIBS
+#include "linker_debug.h"
+#endif
+
 #include <string>
 #include <vector>
 
@@ -104,6 +108,22 @@ soinfo* get_libdl_info(const char* linker_path, const soinfo& linker_si);
 soinfo* find_containing_library(const void* p);
 
 int open_executable(const char* path, off64_t* file_offset, std::string* realpath);
+
+#ifdef LD_SHIM_LIBS
+typedef std::pair<std::string, std::string> ShimDescriptor;
+void parse_LD_SHIM_LIBS(const char* path);
+std::vector<const ShimDescriptor*> shim_matching_pairs(const char* path);
+
+template<typename F>
+void for_each_matching_shim(const char* path, F action) {
+  if (path == nullptr) return;
+  INFO("Finding shim libs for \"%s\"", path);
+  for (const auto& one_pair : shim_matching_pairs(path)) {
+    INFO("Injecting shim lib \"%s\" as needed for %s", one_pair->second.c_str(), path);
+    action(one_pair->second.c_str());
+  }
+}
+#endif
 
 void do_android_get_LD_LIBRARY_PATH(char*, size_t);
 void do_android_update_LD_LIBRARY_PATH(const char* ld_library_path);
