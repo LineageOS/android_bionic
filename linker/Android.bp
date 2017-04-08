@@ -170,6 +170,9 @@ cc_binary {
             needs_text_relocations: {
                 cppflags: ["-DTARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS"],
             },
+            target_shim_libs: {
+                cppflags: ["-DLD_SHIM_LIBS=\"%s\""],
+            },
         },
     },
 
