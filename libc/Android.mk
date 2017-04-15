@@ -640,8 +640,14 @@ ifeq ($(strip $(DEBUG_BIONIC_LIBC)),true)
   libc_common_cflags += -DDEBUG
 endif
 
-libc_malloc_src := bionic/jemalloc_wrapper.cpp
-libc_common_c_includes += external/jemalloc/include
+ifeq ($(MALLOC_SVELTE),true)
+  libc_common_cflags += -DUSE_DLMALLOC
+  libc_malloc_src := bionic/dlmalloc.c
+else
+  libc_common_cflags += -DUSE_JEMALLOC
+  libc_malloc_src := bionic/jemalloc_wrapper.cpp
+  libc_common_c_includes += external/jemalloc/include
+endif
 
 ifeq ($(BOARD_USES_LEGACY_MMAP),true)
   libc_common_cflags += -DLEGACY_MMAP
@@ -1213,10 +1219,13 @@ LOCAL_WHOLE_STATIC_LIBRARIES := \
     libc_syscalls \
     libc_tzcode \
     libm \
-    libjemalloc \
 
 LOCAL_WHOLE_STATIC_LIBRARIES_arm := libc_aeabi
 LOCAL_CXX_STL := none
+
+ifneq ($(MALLOC_SVELTE),true)
+LOCAL_WHOLE_STATIC_LIBRARIES += libjemalloc
+endif
 
 $(eval $(call patch-up-arch-specific-flags,LOCAL_CFLAGS,libc_common_cflags))
 $(eval $(call patch-up-arch-specific-flags,LOCAL_SRC_FILES,libc_common_src_files))
@@ -1348,7 +1357,11 @@ LOCAL_C_INCLUDES := $(libc_common_c_includes)
 LOCAL_MODULE := libc
 LOCAL_CLANG := $(use_clang)
 LOCAL_ADDITIONAL_DEPENDENCIES := $(libc_common_additional_dependencies)
-LOCAL_WHOLE_STATIC_LIBRARIES := libc_common libc_init_static libjemalloc
+LOCAL_WHOLE_STATIC_LIBRARIES := libc_common libc_init_static
+
+ifneq ($(MALLOC_SVELTE),true)
+LOCAL_WHOLE_STATIC_LIBRARIES += libjemalloc
+endif
 
 LOCAL_CXX_STL := none
 LOCAL_SYSTEM_SHARED_LIBRARIES :=
@@ -1410,7 +1423,11 @@ LOCAL_PACK_MODULE_RELOCATIONS := false
 # you wanted!
 
 LOCAL_SHARED_LIBRARIES := libdl
-LOCAL_WHOLE_STATIC_LIBRARIES := libc_common libjemalloc
+LOCAL_WHOLE_STATIC_LIBRARIES := libc_common
+
+ifneq ($(MALLOC_SVELTE),true)
+LOCAL_WHOLE_STATIC_LIBRARIES += libjemalloc
+endif
 
 LOCAL_CXX_STL := none
 LOCAL_SYSTEM_SHARED_LIBRARIES :=
