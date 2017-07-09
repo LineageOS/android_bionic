@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "b20762a6_8aef09a8",
+        "filename": "linker/linker.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1536,
+      "author": {
+        "id": 16082
+      },
+      "writtenOn": "2017-07-09T19:59:46Z",
+      "side": 1,
+      "message": "I just followed git\u0027s resolution using \"strategy\u003dtheirs\", but it seems like a good idea. I can readd this in the next PS",
+      "parentUuid": "",
+      "revId": "1a1a59d1f65f412745ca926a6362f40203849469",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "53c6dc56_42d2914a",
         "filename": "linker/linker.cpp",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2017-07-09T19:23:50Z",
       "side": 1,
       "message": "find_library has does take three parameters, no namespace and no second pointer.",
+      "revId": "1a1a59d1f65f412745ca926a6362f40203849469",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "134cd699_356cd9be",
+        "filename": "linker/linker.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1709,
+      "author": {
+        "id": 16082
+      },
+      "writtenOn": "2017-07-09T19:59:46Z",
+      "side": 1,
+      "message": "As you mentioned, line 1701 actually excludes this path, but it\u0027s probably a good idea to fix this",
+      "parentUuid": "53c6dc56_42d2914a",
       "revId": "1a1a59d1f65f412745ca926a6362f40203849469",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
