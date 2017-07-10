@@ -69,6 +69,23 @@
       "revId": "1a1a59d1f65f412745ca926a6362f40203849469",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ec3cf169_2f28a12c",
+        "filename": "linker/linker.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1789,
+      "author": {
+        "id": 16082
+      },
+      "writtenOn": "2017-07-10T15:40:40Z",
+      "side": 1,
+      "message": "In N, this takes 5 arguments (see https://github.com/android/platform_bionic/blob/android-7.1.2_r24/linker/linker.cpp#L2166-L2169 ). This is probably causing the mismerge on Line R1709 on this commit. The 4 arguments was added in https://github.com/android/platform_bionic/commit/0cdef7e7f3c6837b56a969120d9098463d1df8d8 , and 5 arguments was introduced by https://github.com/android/platform_bionic/commit/42d5fcb9f494eb45de3b6bf759f4a18076e84728 , so is probably a mismerge in this change. This is the original commit for this change: https://github.com/android/platform_bionic/commit/bee8572ca373f626ebe6cbcdd490808c054feb49",
+      "revId": "1a1a59d1f65f412745ca926a6362f40203849469",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }
