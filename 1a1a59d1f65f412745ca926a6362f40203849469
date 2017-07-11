@@ -37,6 +37,40 @@
     },
     {
       "key": {
+        "uuid": "271ceb36_4efdb788",
+        "filename": "linker/linker.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1663,
+      "author": {
+        "id": 15291
+      },
+      "writtenOn": "2017-07-11T03:56:40Z",
+      "side": 1,
+      "message": "I know why this change fixed the problems in the first place: We removed the problematic lines completely!",
+      "revId": "1a1a59d1f65f412745ca926a6362f40203849469",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6d4d2167_7a11ad97",
+        "filename": "linker/linker.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1695,
+      "author": {
+        "id": 15291
+      },
+      "writtenOn": "2017-07-11T03:56:40Z",
+      "side": 1,
+      "message": "Here the fix is missing from the CVE commit.",
+      "revId": "1a1a59d1f65f412745ca926a6362f40203849469",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "53c6dc56_42d2914a",
         "filename": "linker/linker.cpp",
         "patchSetId": 1
