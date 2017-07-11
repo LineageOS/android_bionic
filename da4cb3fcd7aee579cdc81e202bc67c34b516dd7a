@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "680deddc_db4f7276",
+        "filename": "linker/linker.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 1699,
+      "author": {
+        "id": 6351
+      },
+      "writtenOn": "2017-07-11T08:54:03Z",
+      "side": 1,
+      "message": "indentation is off here (2 spaces too far to the right).",
+      "revId": "da4cb3fcd7aee579cdc81e202bc67c34b516dd7a",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
