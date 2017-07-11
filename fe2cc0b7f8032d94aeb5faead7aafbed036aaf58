@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ab074910_a2591c6d",
+        "filename": "linker/linked_list.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 16082
+      },
+      "writtenOn": "2017-07-11T19:09:12Z",
+      "side": 0,
+      "message": "New line after this, like the upstream patch (see internal discussion), just so we keep in line with AOSP as much as possible",
+      "revId": "fe2cc0b7f8032d94aeb5faead7aafbed036aaf58",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    }
+  ]
+}
