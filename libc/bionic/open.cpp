@@ -44,7 +44,8 @@ static inline int force_O_LARGEFILE(int flags) {
 }
 
 static inline bool needs_mode(int flags) {
-  return ((flags & O_CREAT) == O_CREAT) || ((flags & O_TMPFILE) == O_TMPFILE);
+  /* Ignored: || ((flags & O_TMPFILE) == O_TMPFILE) */
+  return ((flags & O_CREAT) == O_CREAT);
 }
 
 int creat(const char* pathname, mode_t mode) {
