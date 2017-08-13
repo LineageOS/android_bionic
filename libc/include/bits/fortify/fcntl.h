@@ -43,7 +43,8 @@ int __openat_real(int, const char*, int, ...) __RENAME(openat);
 #define __open_too_few_args_error "called with O_CREAT or O_TMPFILE, but missing mode"
 #define __open_useless_modes_warning "has superfluous mode bits; missing O_CREAT?"
 /* O_TMPFILE shares bits with O_DIRECTORY. */
-#define __open_modes_useful(flags) (((flags) & O_CREAT) || ((flags) & O_TMPFILE) == O_TMPFILE)
+/* Ignored: || ((flags & O_TMPFILE) == O_TMPFILE) */
+#define __open_modes_useful(flags) ((flags) & O_CREAT)
 #if defined(__clang__)
 
 #if __ANDROID_API__ >= __ANDROID_API_J_MR1__
