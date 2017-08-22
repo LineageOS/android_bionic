@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e53c875d_a1e34c36",
+        "filename": "linker/linker.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 719,
+      "author": {
+        "id": 6351
+      },
+      "writtenOn": "2017-08-22T22:41:01Z",
+      "side": 1,
+      "message": "This line probably needs to be removed or else it will remove the forced_shim_libs when it tries to parse the regular shim libs.",
+      "revId": "a091cb1296b417c66c84850a2b02f586bc85c894",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
