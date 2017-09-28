@@ -39,7 +39,7 @@
 #endif
 #define	_PATH_BSHELL2	"/sbin/sh"
 #define	_PATH_CONSOLE	"/dev/console"
-#define	_PATH_DEFPATH	"/sbin:/system/sbin:/system/bin:/system/xbin:/vendor/bin:/vendor/xbin"
+#define	_PATH_DEFPATH	"/sbin:/system/sbin:/system/bin:/system/xbin:/odm/bin:/vendor/bin:/vendor/xbin"
 #define	_PATH_DEV	"/dev/"
 #define	_PATH_DEVNULL	"/dev/null"
 #define	_PATH_KLOG	"/proc/kmsg"
