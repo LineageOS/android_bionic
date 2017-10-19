@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e732a678_33a36ba1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 13589
+      },
+      "writtenOn": "2017-10-19T15:57:55Z",
+      "side": 1,
+      "message": "Restored the original Change-Id from the cm-14.0 / cm-14.1_prerebase commit",
+      "revId": "55ed647dc2d15ff17b8fff6ee250f02914e10c57",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2024e12e_79db6a1f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 13589
+      },
+      "writtenOn": "2017-10-19T15:57:55Z",
+      "side": 1,
+      "message": "Moved the changes I did in April for the Master / Oreo port down here, head matches the previous squash iterations.",
+      "revId": "55ed647dc2d15ff17b8fff6ee250f02914e10c57",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
