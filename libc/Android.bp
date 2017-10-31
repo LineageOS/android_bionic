@@ -1091,6 +1091,14 @@ cc_library_static {
                     "arch-arm64/generic/bionic/memmove.S",
                 ],
             },
+            kryo300: {
+                srcs: [
+                    "arch-arm64/kryo300/bionic/memcpy.S",
+                ],
+                exclude_srcs: [
+                    "arch-arm64/generic/bionic/memcpy.S",
+                ],
+            },
         },
 
         mips: {
