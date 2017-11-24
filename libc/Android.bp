@@ -1565,8 +1565,15 @@ cc_library_static {
         "bionic/pthread_sigmask.cpp",
         "bionic/pthread_spinlock.cpp",
     ],
-
+    product_variables: {
+        lineage: {
+	    allows_invalid_pthread: {
+	        cppflags: ["-DALLOWS_INVALID_PTHREAD"],
+	    },
+        },
+    },
     cppflags: ["-Wold-style-cast"],
+
     include_dirs: ["bionic/libstdc++/include"],
     name: "libc_pthread",
 }
