@@ -26,16 +26,11 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _BITS_IN_ADDR_H_
-#define _BITS_IN_ADDR_H_
+#ifndef _INADDR_H_
+#define _INADDR_H_
 
-#include <sys/cdefs.h>
 #include <stdint.h>
 
-#include <inaddr.h>
-
-struct in_addr {
-  in_addr_t s_addr;
-};
+typedef uint32_t in_addr_t;
 
 #endif
