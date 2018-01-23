@@ -26,19 +26,11 @@
  * SUCH DAMAGE.
  */
 
-#pragma once
+#ifndef _INADDR_H_
+#define _INADDR_H_
 
-/**
- * @file bits/in_addr.h
- * @brief IPv4 address types.
- */
-
-#include <sys/cdefs.h>
 #include <stdint.h>
 
-#include <inaddr.h>
+typedef uint32_t in_addr_t;
 
-/** A structure representing an IPv4 address. */
-struct in_addr {
-  in_addr_t s_addr;
-};
+#endif
