@@ -1055,8 +1055,8 @@ static int open_library_in_zipfile(ZipArchiveCache* zip_archive_cache,
   if (realpath_fd(fd, realpath)) {
     *realpath += separator;
   } else {
-    PRINT("warning: unable to get realpath for the library \"%s\". Will use given path.",
-          normalized_path.c_str());
+    //PRINT("warning: unable to get realpath for the library \"%s\". Will use given path.",
+          //normalized_path.c_str());
     *realpath = normalized_path;
   }
 
