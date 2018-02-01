@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "60495eb9_54e28364",
+        "filename": "linker/linker.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 727,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2018-02-01T03:04:23Z",
+      "side": 1,
+      "message": "Is this now an internal function? If so, mark static.",
+      "range": {
+        "startLine": 727,
+        "startChar": 0,
+        "endLine": 727,
+        "endChar": 4
+      },
+      "revId": "7e20c80946faf2f2bdf87bc864b5c34f793850a7",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
