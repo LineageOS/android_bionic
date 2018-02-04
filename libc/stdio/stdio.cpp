@@ -807,7 +807,9 @@ int vsnprintf(char* s, size_t n, const char* fmt, va_list ap) {
   // stdio internals use int rather than size_t.
   static_assert(INT_MAX <= SSIZE_MAX, "SSIZE_MAX too large to fit in int");
 
+#ifndef DISABLE_VSNPRINTF_FORTIFY
   __check_count("vsnprintf", "size", n);
+#endif
 
   // Stdio internals do not deal correctly with zero length buffer.
   char dummy;
