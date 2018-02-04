@@ -295,7 +295,7 @@ LIBC_O {
     ctanl;
 } LIBC;
 
-LIBC_DEPRECATED { # arm mips platform-only
+LIBC_PRIVATE { # arm mips
   global: # arm mips
     ___Unwind_Backtrace; # arm
     ___Unwind_ForcedUnwind; # arm
