@@ -294,7 +294,7 @@ LIBC_O { # introduced=O
     ctanl;
 } LIBC;
 
-LIBC_DEPRECATED { # arm platform-only
+LIBC_PRIVATE { # arm platform-only
   global: # arm
     __aeabi_d2lz; # arm
     __aeabi_d2ulz; # arm
