@@ -699,6 +699,7 @@ enum walk_action_result_t : uint32_t {
   kWalkSkip = 2
 };
 
+#ifdef LD_SHIM_LIBS
 static soinfo* find_library(android_namespace_t* ns,
                            const char* name, int rtld_flags,
                            const android_dlextinfo* extinfo,
@@ -760,6 +761,7 @@ static void for_each_matching_shim(const char *const path, F action) {
     action(one_pair->second.c_str());
   }
 }
+#endif
 
 // This function walks down the tree of soinfo dependencies
 // in breadth-first order and
@@ -1178,7 +1180,9 @@ const char* fix_dt_needed(const char* dt_needed, const char* sopath __unused) {
 
 template<typename F>
 static void for_each_dt_needed(const ElfReader& elf_reader, F action) {
+#ifdef LD_SHIM_LIBS
   for_each_matching_shim(elf_reader.name(), action);
+#endif
   for (const ElfW(Dyn)* d = elf_reader.dynamic(); d->d_tag != DT_NULL; ++d) {
     if (d->d_tag == DT_NEEDED) {
       action(fix_dt_needed(elf_reader.get_string(d->d_un.d_val), elf_reader.name()));
@@ -2073,7 +2077,9 @@ void* do_dlopen(const char* name, int flags,
   }
 
   ProtectedDataGuard guard;
+#ifdef LD_SHIM_LIBS
   reset_g_active_shim_libs();
+#endif
   soinfo* si = find_library(ns, translated_name, flags, extinfo, caller);
   loading_trace.End();
 
