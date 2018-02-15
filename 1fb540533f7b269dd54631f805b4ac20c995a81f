@@ -16,6 +16,24 @@
       "revId": "1fb540533f7b269dd54631f805b4ac20c995a81f",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dda1c2e9_4039538b",
+        "filename": "libc/bionic/libc_init_common.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 11801
+      },
+      "writtenOn": "2018-02-15T22:31:44Z",
+      "side": 0,
+      "message": "Name of the array is \"__is_unsafe_environment_variable\". This is no longer an environment variable.",
+      "parentUuid": "c6bd09f9_24bae61b",
+      "revId": "1fb540533f7b269dd54631f805b4ac20c995a81f",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }
