@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b86c0b8d_5351085c",
+        "filename": "linker/linker_main.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 339,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2018-02-16T03:30:14Z",
+      "side": 1,
+      "message": "I think this is a pretty obvious comment to make",
+      "range": {
+        "startLine": 339,
+        "startChar": 2,
+        "endLine": 339,
+        "endChar": 34
+      },
+      "revId": "a6fb1155c030661d320d895ae39b78211f57a646",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
