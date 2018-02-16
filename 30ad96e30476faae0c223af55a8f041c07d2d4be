@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f71fd99_86c975cb",
+        "filename": "linker/linker.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 708,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2018-02-16T03:33:33Z",
+      "side": 1,
+      "message": "I guess if we want to allow this functionality, we should probably extern this or the function in linker_main.cpp so we aren\u0027t copying it in two places?",
+      "revId": "30ad96e30476faae0c223af55a8f041c07d2d4be",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
