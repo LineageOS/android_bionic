@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf758239_bcd2f4a3",
+        "filename": "linker/linker.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 3389,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2018-02-18T01:43:25Z",
+      "side": 1,
+      "message": "If you never want this check to happen, so just change the block of code being ifdef\u0027ed out.",
+      "revId": "efb8aca9cfb60d78ab22e0623644d81de37fc28d",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
