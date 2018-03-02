@@ -48,6 +48,30 @@
     },
     {
       "key": {
+        "uuid": "2f8e3015_f88afeef",
+        "filename": "libc/bionic/pthread_internal.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2018-03-02T06:28:03Z",
+      "side": 1,
+      "message": "Ah, hm, this basically only returns the current __ANDROID_API__, so anything linking against shared libc gets the current version. It would be great if we could whitelist specific binaries for this check, instead of allowing this across the board.",
+      "parentUuid": "8f0a5b70_74408d67",
+      "range": {
+        "startLine": 117,
+        "startChar": 6,
+        "endLine": 117,
+        "endChar": 47
+      },
+      "revId": "bfe45adae1b4fcc3ae16a96b8074b35e71079e9e",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8b9e5d36_6dfa24e5",
         "filename": "libc/bionic/pthread_internal.cpp",
         "patchSetId": 1
