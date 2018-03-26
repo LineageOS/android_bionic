@@ -829,6 +829,14 @@ cc_library_static {
             srcs: [
                 "arch-arm64/generic/bionic/__memcpy_chk.S",
             ],
+            kryo: {
+                srcs: [
+                    "arch-arm64/kryo/bionic/__memcpy_chk.S",
+                ],
+                exclude_srcs: [
+                    "arch-arm64/generic/bionic/__memcpy_chk.S",
+                ],
+            },
         },
     },
 }
