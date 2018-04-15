@@ -1860,6 +1860,7 @@ cc_library {
     name: "libstdc++",
     static_ndk_lib: true,
     static_libs: ["libasync_safe"],
+    vendor_available: true,
 
     static: {
         system_shared_libs: [],
