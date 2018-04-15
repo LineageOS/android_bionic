@@ -1880,6 +1880,7 @@ cc_library {
     name: "libstdc++",
     system_shared_libs: ["libc"],
 		static_libs: ["libasync_safe"],
+    vendor_available: true,
 
     //TODO (dimitry): This is to work around b/24465209. Remove after root cause is fixed
     arch: {
