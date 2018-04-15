@@ -1929,6 +1929,7 @@ cc_library {
     apex_available: [
         "//apex_available:platform",
     ],
+    vendor_available: true,
 
     static: {
         system_shared_libs: [],
