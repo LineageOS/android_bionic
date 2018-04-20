@@ -108,6 +108,10 @@ soinfo* find_containing_library(const void* p);
 void parse_LD_SHIM_LIBS(const char* path);
 #endif
 
+#ifdef TEXTREL_LIBS
+void parse_TEXTREL_LIBS(const char* path);
+#endif
+
 void do_android_get_LD_LIBRARY_PATH(char*, size_t);
 void do_android_update_LD_LIBRARY_PATH(const char* ld_library_path);
 void* do_dlopen(const char* name,
