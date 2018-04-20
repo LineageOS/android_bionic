@@ -22,6 +22,30 @@
       "revId": "2de89a8d9d552f7bc4cd68f23c1a22b0715fd9c1",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da219107_69c62ce9",
+        "filename": "linker/linker.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 3396,
+      "author": {
+        "id": 11801
+      },
+      "writtenOn": "2018-04-20T02:17:40Z",
+      "side": 0,
+      "message": "That was the check that allowed text relocations in the first place, it\u0027s replaced by the textrels_allowed code.",
+      "parentUuid": "7f9638d9_50368f2d",
+      "range": {
+        "startLine": 3396,
+        "startChar": 8,
+        "endLine": 3396,
+        "endChar": 63
+      },
+      "revId": "2de89a8d9d552f7bc4cd68f23c1a22b0715fd9c1",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }
