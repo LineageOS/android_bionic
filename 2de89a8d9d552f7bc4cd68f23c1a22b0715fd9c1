@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f9638d9_50368f2d",
+        "filename": "linker/linker.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 3396,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2018-04-20T02:14:47Z",
+      "side": 0,
+      "message": "What happened to this check?",
+      "range": {
+        "startLine": 3396,
+        "startChar": 8,
+        "endLine": 3396,
+        "endChar": 63
+      },
+      "revId": "2de89a8d9d552f7bc4cd68f23c1a22b0715fd9c1",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
