@@ -340,6 +340,11 @@ static ElfW(Addr) __linker_init_post_relocation(KernelArgumentBlock& args) {
   parse_LD_SHIM_LIBS(LD_SHIM_LIBS);
 #endif
 
+#ifdef TEXTREL_LIBS
+   // Read from TARGET_TEXTREL_LIBS
+   parse_TEXTREL_LIBS(LD_SHIM_LIBS);
+#endif
+
   somain = si;
 
   std::vector<android_namespace_t*> namespaces = init_default_namespaces(executable_path);

@@ -3371,6 +3371,24 @@ bool soinfo::prelink_image() {
   return true;
 }
 
+#ifdef TEXTREL_LIBS
+static std::vector<std::string> g_textrel_libs;
+
+void parse_TEXTREL_LIBS(const char* path) {
+  g_textrel_libs.clear();
+  if (path != nullptr) {
+    // Paths are delimited by '|'
+    for (const std::string& lib : android::base::Split(path, "|")) {
+      g_textrel_libs.push_back(lib);
+    }
+  }
+}
+
+static bool textrels_allowed(const char* lib) {
+    return std::find(g_textrel_libs.begin(), g_textrel_libs.end(), lib) != g_textrel_libs.end();
+}
+#endif
+
 bool soinfo::link_image(const soinfo_list_t& global_group, const soinfo_list_t& local_group,
                         const android_dlextinfo* extinfo) {
 
@@ -3392,9 +3410,9 @@ bool soinfo::link_image(const soinfo_list_t& global_group, const soinfo_list_t& 
 #if !defined(__LP64__)
   if (has_text_relocations) {
     // Fail if app is targeting M or above.
-#if defined(TARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS)
-    if (get_application_target_sdk_version() != __ANDROID_API__
-        && get_application_target_sdk_version() >= __ANDROID_API_M__) {
+#ifdef TEXTREL_LIBS
+    if (!textrels_allowed(get_realpath() ||
+        get_application_target_sdk_version() >= __ANDROID_API_M__) {
 #else
     if (get_application_target_sdk_version() >= __ANDROID_API_M__) {
 #endif

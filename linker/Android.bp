@@ -106,11 +106,11 @@ cc_binary {
             cppflags: ["-DUSE_LD_CONFIG_FILE"],
         },
         lineage: {
-            needs_text_relocations: {
-                cppflags: ["-DTARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS"],
-            },
             target_shim_libs: {
                 cppflags: ["-DLD_SHIM_LIBS=\"%s\""],
+            },
+            target_textrel_libs: {
+                cppflags: ["-DTEXTREL_LIBS=\"%s\""],
             },
         },
     },
