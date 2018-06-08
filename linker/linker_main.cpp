@@ -183,7 +183,7 @@ static void init_linker_info_for_gdb(ElfW(Addr) linker_base, char* linker_path) 
 
 extern "C" int __system_properties_init(void);
 
-const char* get_executable_path() {
+static const char* get_executable_path() {
   static std::string executable_path;
   if (executable_path.empty()) {
     char path[PATH_MAX];
