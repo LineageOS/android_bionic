@@ -707,16 +707,17 @@ static soinfo* find_library(android_namespace_t* ns,
 
 // g_ld_all_shim_libs maintains the references to memory as it used
 // in the soinfo structures and in the g_active_shim_libs list.
-
-typedef std::pair<std::string, std::string> ShimDescriptor;
 static std::vector<ShimDescriptor> g_ld_all_shim_libs;
 
 // g_active_shim_libs are all shim libs that are still eligible
 // to be loaded.  We must remove a shim lib from the list before
 // we load the library to avoid recursive loops (load shim libA
 // for libB where libA also links against libB).
-
 static linked_list_t<const ShimDescriptor> g_active_shim_libs;
+
+// matched_pairs are shim libs that load over their corresponding
+// target libraries/executables, which are DT_NEEDED.
+std::vector<const ShimDescriptor *> matched_pairs;
 
 static void reset_g_active_shim_libs(void) {
   g_active_shim_libs.clear();
@@ -740,26 +741,18 @@ void parse_LD_SHIM_LIBS(const char* path) {
   reset_g_active_shim_libs();
 }
 
-template<typename F>
-static void for_each_matching_shim(const char *const path, F action) {
-  if (path == nullptr) return;
+void shim_matching_pairs(const char *const path) {
   INFO("Finding shim libs for \"%s\"\n", path);
-  std::vector<const ShimDescriptor *> matched;
 
   g_active_shim_libs.for_each([&](const ShimDescriptor *a_pair) {
     if (a_pair->first == path) {
-      matched.push_back(a_pair);
+      matched_pairs.push_back(a_pair);
     }
   });
 
   g_active_shim_libs.remove_if([&](const ShimDescriptor *a_pair) {
     return a_pair->first == path;
   });
-
-  for (const auto& one_pair : matched) {
-    INFO("Injecting shim lib \"%s\" as needed for %s", one_pair->second.c_str(), path);
-    action(one_pair->second.c_str());
-  }
 }
 #endif
 
