@@ -726,9 +726,9 @@ void parse_LD_SHIM_LIBS(const char* path) {
   if (path != nullptr) {
     // We have historically supported ':' as well as ' ' in LD_SHIM_LIBS.
     for (const auto& pair : android::base::Split(path, " :")) {
-      size_t pos = pair.find('|');
-      if (pos > 0 && pos < pair.length() - 1) {
-        auto desc = std::pair<std::string, std::string>(pair.substr(0, pos), pair.substr(pos + 1));
+      std::vector<std::string> pieces = android::base::Split(pair, "|");
+      if (pieces.size() == 2) {
+        auto desc = std::pair<std::string, std::string>(pieces[0], pieces[1]);
         g_ld_all_shim_libs.push_back(desc);
       }
     }
