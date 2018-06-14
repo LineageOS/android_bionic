@@ -346,14 +346,13 @@ uint32_t calculate_elf_hash(const char* name);
 
 #ifdef LD_SHIM_LIBS
 typedef std::pair<std::string, std::string> ShimDescriptor;
-extern std::vector<const ShimDescriptor *> matched_pairs;
-void shim_matching_pairs(const char *const path);
+std::vector<const ShimDescriptor*> shim_matching_pairs(const char* path);
 
 template<typename F>
-void for_each_matching_shim(const char *const path, F action) {
+void for_each_matching_shim(const char* path, F action) {
   if (path == nullptr) return;
-  shim_matching_pairs(path);
-  for (const auto& one_pair : matched_pairs) {
+  INFO("Finding shim libs for \"%s\"", path);
+  for (const auto& one_pair : shim_matching_pairs(path)) {
     INFO("Injecting shim lib \"%s\" as needed for %s", one_pair->second.c_str(), path);
     action(one_pair->second.c_str());
   }
