@@ -367,6 +367,12 @@ static ElfW(Addr) __linker_init_post_relocation(KernelArgumentBlock& args) {
     ++ld_preloads_count;
   }
 
+#ifdef LD_SHIM_LIBS
+  for_each_matching_shim(si->get_realpath(), [&](const char* name) {
+    needed_library_name_list.push_back(name);
+  });
+#endif
+
   for_each_dt_needed(si, [&](const char* name) {
     needed_library_name_list.push_back(name);
   });
