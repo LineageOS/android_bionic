@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "00a49757_4b85b75c",
+        "filename": "linker/linker.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 738,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2018-06-23T21:23:16Z",
+      "side": 1,
+      "message": "use a reference instead\n\nstd::vector\u003cconst ShimDescriptor *\u003e\u0026 matched_pairs",
+      "range": {
+        "startLine": 738,
+        "startChar": 25,
+        "endLine": 738,
+        "endChar": 61
+      },
+      "revId": "43d7e3e51c0af97a76b2a4b45ffb23d24a414a7f",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
