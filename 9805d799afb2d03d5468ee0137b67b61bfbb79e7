@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "936e4a98_6d631fb9",
+        "filename": "libc/arch-arm64/kryo/bionic/memcpy.S",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2018-08-17T11:49:10Z",
+      "side": 1,
+      "message": "In pie google removed the (__memcpy_chk) from all memcpy.S, and just use one common one. So this is causing build error: multiple definition of \u0027__memcpy_chk\u0027.\nhttps://github.com/LineageOS/android_bionic/commit/6cb06879323cb45440ca1c7b42a2cc754b3d50c6\nProposed fix: https://review.lineageos.org/224718",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 17
+      },
+      "revId": "9805d799afb2d03d5468ee0137b67b61bfbb79e7",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
