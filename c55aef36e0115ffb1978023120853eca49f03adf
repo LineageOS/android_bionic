@@ -34,6 +34,24 @@
       "revId": "c55aef36e0115ffb1978023120853eca49f03adf",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b1dd913e_b8f9c749",
+        "filename": "libc/bionic/pthread_internal.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 11883
+      },
+      "writtenOn": "2018-08-18T12:00:14Z",
+      "side": 1,
+      "message": "https://review.lineageos.org/#/c/LineageOS/android_system_core/+/223082/\nbut apparently it\u0027s already merged",
+      "parentUuid": "76f36a28_fe7d7526",
+      "revId": "c55aef36e0115ffb1978023120853eca49f03adf",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }
