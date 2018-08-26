@@ -1524,6 +1524,14 @@ cc_library_static {
         "bionic/fork.cpp",
     ],
 
+    product_variables: {
+        lineage: {
+            target_destroyed_mutex_usage_whitelist: {
+                cppflags: ["-DDESTROYED_MUTEX_USAGE_WHITELIST=\"%s\""],
+            }
+        },
+    },
+
     cppflags: ["-Wold-style-cast"],
     include_dirs: ["bionic/libstdc++/include"],
     name: "libc_pthread",
