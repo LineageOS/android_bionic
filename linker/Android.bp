@@ -92,6 +92,9 @@ cc_defaults {
             cppflags: ["-DUSE_LD_CONFIG_FILE"],
         },
         lineage: {
+            target_process_sdk_version_override: {
+                cppflags: ["-DSDK_VERSION_OVERRIDES=\"%s\""],
+            },
             target_shim_libs: {
                 cppflags: ["-DLD_SHIM_LIBS=\"%s\""],
             },
