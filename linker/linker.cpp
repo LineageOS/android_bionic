@@ -3927,7 +3927,38 @@ std::vector<android_namespace_t*> init_default_namespaces(const char* executable
     // somain and ld_preloads are added to these namespaces after LD_PRELOAD libs are linked
   }
 
-  set_application_target_sdk_version(config->target_sdk_version());
+  uint32_t target_sdk = config->target_sdk_version();
+#ifdef SDK_VERSION_OVERRIDES
+  std::string sdk_overrides(SDK_VERSION_OVERRIDES);
+
+  size_t start_pos = 0, delimiter_pos = sdk_overrides.find_first_of(' ');
+  while (true) {
+    std::string token = delimiter_pos == std::string::npos
+      ? sdk_overrides.substr(start_pos)
+      : sdk_overrides.substr(start_pos, delimiter_pos - start_pos);
+    if (token.empty()) {
+      break;
+    }
+
+    size_t separator_pos = token.find_first_of('=');
+    if (separator_pos != std::string::npos && token.substr(0, separator_pos) == executable_path) {
+      char *endptr = nullptr;
+      unsigned long version = strtoul(token.substr(separator_pos + 1).c_str(), &endptr, 0);
+      if (!*endptr) {
+        PRINT("Read version %ld for %s", version, executable_path);
+        target_sdk = static_cast<uint32_t>(version);
+        break;
+      }
+    }
+    if (delimiter_pos == std::string::npos) {
+      break;
+    }
+    start_pos = delimiter_pos + 1;
+    delimiter_pos = sdk_overrides.find_first_of(' ', start_pos);
+  }
+  PRINT("Target SDK for %s = %d", executable_path, target_sdk);
+#endif
+  set_application_target_sdk_version(target_sdk);
 
   std::vector<android_namespace_t*> created_namespaces;
   created_namespaces.reserve(namespaces.size());
