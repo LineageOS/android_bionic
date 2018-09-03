@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0ff52d00_024d020b",
+        "filename": "linker/linker.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 3934,
+      "author": {
+        "id": 11883
+      },
+      "writtenOn": "2018-09-03T08:00:24Z",
+      "side": 1,
+      "message": "SDK_VERSION_OVERRIDES",
+      "range": {
+        "startLine": 3934,
+        "startChar": 48,
+        "endLine": 3934,
+        "endChar": 61
+      },
+      "revId": "20f9557df16fcf25681029263324815ac0b5032b",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    }
+  ]
+}
