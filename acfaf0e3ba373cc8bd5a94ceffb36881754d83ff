@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0cbf62bd_0144a4bb",
+        "filename": "linker/linker.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 3937,
+      "author": {
+        "id": 11883
+      },
+      "writtenOn": "2018-09-03T07:21:47Z",
+      "side": 1,
+      "message": "Probably not needed?",
+      "range": {
+        "startLine": 3935,
+        "startChar": 0,
+        "endLine": 3937,
+        "endChar": 5
+      },
+      "revId": "acfaf0e3ba373cc8bd5a94ceffb36881754d83ff",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1a7b4573_67ba3547",
+        "filename": "linker/linker.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 3948,
+      "author": {
+        "id": 11883
+      },
+      "writtenOn": "2018-09-03T07:21:47Z",
+      "side": 1,
+      "message": "std::vector\u003cstd::string\u003e pieces \u003d android::base::Split(pair, \"\u003d\");\nif (pieces.size() !\u003d 2) continue;\nif (pieces[1] \u003d\u003d executable_path) {\n        DEBUG(\"Read version %ld for %s\", version, executable_path);\n        target_sdk \u003d static_cast\u003cuint32_t\u003e(strtoul(pieces[2].c_str(), NULL, 0));\n}",
+      "range": {
+        "startLine": 3939,
+        "startChar": 0,
+        "endLine": 3948,
+        "endChar": 5
+      },
+      "revId": "acfaf0e3ba373cc8bd5a94ceffb36881754d83ff",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    }
+  ]
+}
