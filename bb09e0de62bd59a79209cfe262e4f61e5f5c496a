@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "94f6754a_8d53e2b8",
+        "filename": "linker/Android.bp",
+        "patchSetId": 5
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2018-09-10T02:41:30Z",
+      "side": 1,
+      "message": "nit: target_shim_libs comes after target_process_sdk_version_override alphabetically",
+      "range": {
+        "startLine": 176,
+        "startChar": 12,
+        "endLine": 176,
+        "endChar": 47
+      },
+      "revId": "bb09e0de62bd59a79209cfe262e4f61e5f5c496a",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    }
+  ]
+}
