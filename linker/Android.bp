@@ -167,9 +167,6 @@ cc_binary {
             cppflags: ["-DUSE_LD_CONFIG_FILE"],
         },
         lineage: {
-            needs_text_relocations: {
-                cppflags: ["-DTARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS"],
-            },
             target_process_sdk_version_override: {
                 cppflags: ["-DSDK_VERSION_OVERRIDES=\"%s\""],
             },
