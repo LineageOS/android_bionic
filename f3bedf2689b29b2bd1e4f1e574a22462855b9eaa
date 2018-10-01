@@ -34,6 +34,24 @@
       "revId": "f3bedf2689b29b2bd1e4f1e574a22462855b9eaa",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a98b25ac_f790cebb",
+        "filename": "libc/bionic/pthread_mutex.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 797,
+      "author": {
+        "id": 3075
+      },
+      "writtenOn": "2018-10-01T19:30:58Z",
+      "side": 1,
+      "message": "I don\u0027t know either.  However, I think it more likely to be the sdk call than fortify_fatal.\n\nAs I said, I don\u0027t think it will matter hugely.",
+      "parentUuid": "91f18b7d_10318421",
+      "revId": "f3bedf2689b29b2bd1e4f1e574a22462855b9eaa",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }
