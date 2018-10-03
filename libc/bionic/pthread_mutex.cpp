@@ -526,7 +526,8 @@ int pthread_mutex_init(pthread_mutex_t* mutex_interface, const pthread_mutexattr
         return EINVAL;
     }
 
-    if (((*attr & MUTEXATTR_PROTOCOL_MASK) >> MUTEXATTR_PROTOCOL_SHIFT) == PTHREAD_PRIO_INHERIT) {
+    if (((*attr & MUTEXATTR_PROTOCOL_MASK) >> MUTEXATTR_PROTOCOL_SHIFT) == PTHREAD_PRIO_INHERIT
+            && bionic_get_application_target_sdk_version() >= __ANDROID_API_P__) {
 #if !defined(__LP64__)
         if (state & MUTEX_SHARED_MASK) {
             return EINVAL;
