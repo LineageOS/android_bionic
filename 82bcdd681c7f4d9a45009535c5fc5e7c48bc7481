@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d09d2814_adc4cb18",
+        "filename": "libc/bionic/pthread_mutex.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 787,
+      "author": {
+        "id": 15175
+      },
+      "writtenOn": "2018-11-29T18:19:53Z",
+      "side": 1,
+      "message": "`inline __attribute((noinline))` doesn\u0027t make much sense to me. Will this get inlined or not? If not, why is the inline modifier added? If it will be, what about the comment above about the stack penalty?",
+      "revId": "82bcdd681c7f4d9a45009535c5fc5e7c48bc7481",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    }
+  ]
+}
