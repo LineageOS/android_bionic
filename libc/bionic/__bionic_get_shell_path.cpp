@@ -31,11 +31,18 @@
 #include <errno.h>
 #include <string.h>
 #include <sys/cdefs.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #define VENDOR_PREFIX "/vendor/"
 
 static const char* init_sh_path() {
+  /* Prefer /sbin/sh */
+  struct stat st;
+  if (stat("/sbin/sh", &st) == 0) {
+    return "/sbin/sh";
+  }
+
   /* If the device is not treble enabled, return the path to the system shell.
    * Vendor code, on non-treble enabled devices could use system() / popen()
    * with relative paths for executables on /system. Since /system will not be
