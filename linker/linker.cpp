@@ -783,11 +783,21 @@ void parse_LD_SHIM_LIBS(const char* path) {
     for (const auto& pair : android::base::Split(path, ":")) {
       std::vector<std::string> pieces = android::base::Split(pair, "|");
       if (pieces.size() != 2) continue;
-      char resolved_path[PATH_MAX];
-      if (realpath(pieces[0].c_str(), resolved_path) != nullptr) {
-        auto desc = std::pair<std::string, std::string>(std::string(resolved_path), pieces[1]);
-        g_ld_all_shim_libs.push_back(desc);
+      // If the path can be resolved, resolve it
+      char buf[PATH_MAX];
+      std::string resolved_path = pieces[0];
+      if (access(pieces[0].c_str(), R_OK) != 0) {
+        if (errno == ENOENT) {
+          // no need to test for non-existing path. skip.
+          continue;
+        }
+        // If not accessible, don't call realpath as it will just cause
+        // SELinux denial spam. Use the path unresolved.
+      } else if (realpath(pieces[0].c_str(), buf) != nullptr) {
+        resolved_path = buf;
       }
+      auto desc = std::pair<std::string, std::string>(resolved_path, pieces[1]);
+      g_ld_all_shim_libs.push_back(desc);
     }
   }
   reset_g_active_shim_libs();
