@@ -3621,10 +3621,21 @@ bool soinfo::link_image(const soinfo_list_t& global_group, const soinfo_list_t& 
   if (has_text_relocations) {
     // Fail if app is targeting M or above.
     int app_target_api_level = get_application_target_sdk_version();
+    const char* realpath = get_realpath();
+#ifdef SDK_VERSION_OVERRIDES
+    for (const auto& entry : android::base::Split(SDK_VERSION_OVERRIDES, " ")) {
+      auto splitted = android::base::Split(entry, "=");
+      if (splitted.size() == 2 && splitted[0] == realpath) {
+        app_target_api_level = static_cast<uint32_t>(std::stoul(splitted[1]));
+        break;
+      }
+    }
+    DEBUG("Target SDK for %s = %d", realpath, app_target_api_level);
+#endif
     if (app_target_api_level >= __ANDROID_API_M__) {
       DL_ERR_AND_LOG("\"%s\" has text relocations (https://android.googlesource.com/platform/"
                      "bionic/+/master/android-changes-for-ndk-developers.md#Text-Relocations-"
-                     "Enforced-for-API-level-23)", get_realpath());
+                     "Enforced-for-API-level-23)", realpath);
       return false;
     }
     // Make segments writable to allow text relocations to work properly. We will later call
@@ -3632,10 +3643,10 @@ bool soinfo::link_image(const soinfo_list_t& global_group, const soinfo_list_t& 
     DL_WARN_documented_change(__ANDROID_API_M__,
                               "Text-Relocations-Enforced-for-API-level-23",
                               "\"%s\" has text relocations",
-                              get_realpath());
-    add_dlwarning(get_realpath(), "text relocations");
+                              realpath);
+    add_dlwarning(realpath, "text relocations");
     if (phdr_table_unprotect_segments(phdr, phnum, load_bias) < 0) {
-      DL_ERR("can't unprotect loadable segments for \"%s\": %s", get_realpath(), strerror(errno));
+      DL_ERR("can't unprotect loadable segments for \"%s\": %s", realpath, strerror(errno));
       return false;
     }
   }
