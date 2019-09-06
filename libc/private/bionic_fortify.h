@@ -62,8 +62,8 @@ static inline void __check_fd_set(const char* fn, int fd, size_t set_size) {
 static inline void __check_pollfd_array(const char* fn, size_t fds_size, nfds_t fd_count) {
   size_t pollfd_array_length = fds_size / sizeof(pollfd);
   if (__predict_false(pollfd_array_length < fd_count)) {
-    __fortify_fatal("%s: %zu-element pollfd array too small for %u fds",
-                    fn, pollfd_array_length, fd_count);
+    //__fortify_fatal("%s: %zu-element pollfd array too small for %u fds",
+    //                fn, pollfd_array_length, fd_count);
   }
 }
 
