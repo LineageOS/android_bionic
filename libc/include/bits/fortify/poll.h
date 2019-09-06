@@ -65,7 +65,7 @@ int ppoll(struct pollfd* const fds __pass_object_size, nfds_t fd_count, const st
   return __ppoll_chk(fds, fd_count, timeout, mask, bos_fds);
 }
 
-#if __ANDROID_API__ >= __ANDROID_API_P__
+#if 0
 __BIONIC_FORTIFY_INLINE
 int ppoll64(struct pollfd* const fds __pass_object_size, nfds_t fd_count, const struct timespec* timeout, const sigset64_t* mask)
     __overloadable
