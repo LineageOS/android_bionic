@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "87e33a43_0aad4573",
+        "filename": "libc/bionic/pthread_mutex.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 795,
+      "author": {
+        "id": 16208
+      },
+      "writtenOn": "2019-09-07T07:25:34Z",
+      "side": 0,
+      "message": "I assume the no-inline comment means __fortify_fatal here, so HandleUsingDestroyedMutex() should not be inlined?",
+      "revId": "32ff70cd891568ee5df03ddf0fd0c9da8056cb06",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    }
+  ]
+}
