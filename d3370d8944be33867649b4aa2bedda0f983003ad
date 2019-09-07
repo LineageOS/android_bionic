@@ -22,6 +22,30 @@
       "revId": "d3370d8944be33867649b4aa2bedda0f983003ad",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3d952983_1ef130bf",
+        "filename": "linker/linker.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 18836
+      },
+      "writtenOn": "2019-09-07T13:16:44Z",
+      "side": 1,
+      "message": "this is needed for the INFO macro below.",
+      "parentUuid": "6d08a7bb_4e2ca43b",
+      "range": {
+        "startLine": 45,
+        "startChar": 0,
+        "endLine": 47,
+        "endChar": 6
+      },
+      "revId": "d3370d8944be33867649b4aa2bedda0f983003ad",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
     }
   ]
 }
