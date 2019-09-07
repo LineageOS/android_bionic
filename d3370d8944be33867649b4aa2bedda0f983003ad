@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "0bc6479c_179434e0",
+        "filename": "linker/linker.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 784,
+      "author": {
+        "id": 18836
+      },
+      "writtenOn": "2019-09-07T13:20:47Z",
+      "side": 1,
+      "message": "We could purge this now that Ice1411ee22b78da1dbf22eac412b9e4978acebdf forces the use of colons.",
+      "range": {
+        "startLine": 784,
+        "startChar": 56,
+        "endLine": 784,
+        "endChar": 57
+      },
+      "revId": "d3370d8944be33867649b4aa2bedda0f983003ad",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "6d08a7bb_4e2ca43b",
         "filename": "linker/linker.h",
         "patchSetId": 2
