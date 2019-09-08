@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9df09d02_4db5e04b",
+        "filename": "libc/bionic/pthread_mutex.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 799,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2019-09-08T22:37:16Z",
+      "side": 1,
+      "message": "I think the reason the inline attribute got swapped was for the android_get_application_target_sdk_version logic. Inlining __fortify_fatal shouldn\u0027t be a problem since it\u0027ll be fatal anyway. At least I think that was the logic the last time I wrote this change. TBH you\u0027d probably need to objdump the pthread_mutex_lock function and have a look at what the compiler is doing with and without this change.",
+      "range": {
+        "startLine": 799,
+        "startChar": 11,
+        "endLine": 799,
+        "endChar": 36
+      },
+      "revId": "40004a4a2bff8a0dce488504f1c7513d1eb17117",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    }
+  ]
+}
