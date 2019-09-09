@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0ef8615d_8896ff40",
+        "filename": "linker/linker.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 790,
+      "author": {
+        "id": 18836
+      },
+      "writtenOn": "2019-09-09T15:20:43Z",
+      "side": 1,
+      "message": "\u0026\u0026",
+      "range": {
+        "startLine": 789,
+        "startChar": 46,
+        "endLine": 790,
+        "endChar": 12
+      },
+      "revId": "dd72a8bb19c7a146b25d2b06479be189f2a0d5b1",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    }
+  ]
+}
