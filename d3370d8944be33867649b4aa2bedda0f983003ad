@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "acf376d1_8fb73a9b",
+        "filename": "linker/linker.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 784,
+      "author": {
+        "id": 18205
+      },
+      "writtenOn": "2019-09-09T13:57:17Z",
+      "side": 1,
+      "message": "except it got nuked in I3c5001f02975e5487ba66a02217f1d24d2021272",
+      "parentUuid": "15abce8b_29f84ba8",
+      "range": {
+        "startLine": 784,
+        "startChar": 56,
+        "endLine": 784,
+        "endChar": 57
+      },
+      "revId": "d3370d8944be33867649b4aa2bedda0f983003ad",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "6d08a7bb_4e2ca43b",
         "filename": "linker/linker.h",
         "patchSetId": 2
