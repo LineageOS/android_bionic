@@ -123,7 +123,8 @@ struct android_namespace_t* android_get_exported_namespace(const char* name) {
 // would create a dependency cycle with libc.so.
 __attribute__((visibility("hidden")))
 void __aeabi_unwind_cpp_pr0() {
-  __builtin_trap();
+//  __builtin_trap();
+  void();
 }
 #endif
 
