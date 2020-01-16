@@ -121,7 +121,7 @@ static int cmp_hcent_name(const void *a, const void *b)
 	return hstrcmp(na, nb);
 }
 
-static struct hcent *_hcfindname(const char *name)
+static struct hcent *_hcfindname_exact(const char *name)
 {
 	size_t first, last, mid;
 	struct hcent *cur = NULL;
@@ -160,6 +160,33 @@ found:
 	}
 
 	return cur;
+}
+
+static struct hcent *_hcfindname(const char *name)
+{
+	struct hcent *ent;
+	char namebuf[MAX_HOSTLEN];
+	char *p;
+	char *dot;
+
+	ent = _hcfindname_exact(name);
+	if (!ent && strlen(name) < sizeof(namebuf)) {
+		strcpy(namebuf, name);
+		p = namebuf;
+		do {
+			dot = strchr(p, '.');
+			if (!dot)
+				break;
+			if (dot > p) {
+				*(dot - 1) = '*';
+				ent = _hcfindname_exact(dot - 1);
+			}
+			p = dot + 1;
+		}
+		while (!ent);
+	}
+
+	return ent;
 }
 
 /*
