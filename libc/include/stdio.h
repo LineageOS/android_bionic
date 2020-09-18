@@ -184,24 +184,6 @@ int renameat(int __old_dir_fd, const char* __old_path, int __new_dir_fd, const c
 #if defined(__USE_GNU)
 
 /**
- * Flag for [renameat2(2)](http://man7.org/linux/man-pages/man2/renameat2.2.html)
- * to fail if the new path already exists.
- */
-#define RENAME_NOREPLACE (1<<0)
-
-/**
- * Flag for [renameat2(2)](http://man7.org/linux/man-pages/man2/renameat2.2.html)
- * to atomically exchange the two paths.
- */
-#define RENAME_EXCHANGE (1<<1)
-
-/**
- * Flag for [renameat2(2)](http://man7.org/linux/man-pages/man2/renameat2.2.html)
- * to create a union/overlay filesystem object.
- */
-#define RENAME_WHITEOUT (1<<2)
-
-/**
  * [renameat2(2)](http://man7.org/linux/man-pages/man2/renameat2.2.html) changes
  * the name or location of a file, interpreting relative paths using an fd,
  * with optional `RENAME_` flags.
