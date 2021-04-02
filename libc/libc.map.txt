@@ -1530,11 +1530,9 @@ LIBC_PRIVATE {
     __aeabi_idiv; # arm
     __aeabi_idiv0; # arm
     __aeabi_idivmod; # arm
-    __aeabi_l2d; # arm
     __aeabi_l2f; # arm
     __aeabi_lasr; # arm
     __aeabi_ldiv0; # arm
-    __aeabi_ldivmod; # arm
     __aeabi_llsl; # arm
     __aeabi_llsr; # arm
     __aeabi_lmul; # arm
@@ -1554,12 +1552,7 @@ LIBC_PRIVATE {
     __aeabi_ui2f; # arm
     __aeabi_uidiv; # arm
     __aeabi_uidivmod; # arm
-    __aeabi_ul2d; # arm
     __aeabi_ul2f; # arm
-    __aeabi_uldivmod; # arm
-    __aeabi_unwind_cpp_pr0; # arm
-    __aeabi_unwind_cpp_pr1; # arm
-    __aeabi_unwind_cpp_pr2; # arm
     __arm_fadvise64_64; # arm
     __ashldi3; # arm
     __ashrdi3; # arm
@@ -1715,6 +1708,13 @@ LIBC_DEPRECATED {
     __system_property_wait_any;
     free_malloc_leak_info; # arm
     get_malloc_leak_info; # arm
+    __aeabi_l2d; # arm
+    __aeabi_ldivmod; # arm
+    __aeabi_ul2d; # arm
+    __aeabi_uldivmod; # arm
+    __aeabi_unwind_cpp_pr0; # arm
+    __aeabi_unwind_cpp_pr1; # arm
+    __aeabi_unwind_cpp_pr2; # arm
 };
 
 LIBC_PLATFORM {
