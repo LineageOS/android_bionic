@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 The Android Open Source Project
+ * Copyright (C) 2008 The Android Open Source Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,23 +26,12 @@
  * SUCH DAMAGE.
  */
 
+// Prototype: void *memcpy (void *dst, const void *src, size_t count).
+
 #include <private/bionic_asm.h>
 
-#define FUNCTION_DELEGATE(name, impl) \
-ENTRY(name); \
-    b impl; \
-END(name)
-
-FUNCTION_DELEGATE(memchr, __memchr_aarch64_mte)
-FUNCTION_DELEGATE(stpcpy, __stpcpy_aarch64_mte)
-FUNCTION_DELEGATE(strchr, __strchr_aarch64_mte)
-FUNCTION_DELEGATE(strchrnul, __strchrnul_aarch64_mte)
-FUNCTION_DELEGATE(strcmp, __strcmp_aarch64_mte)
-FUNCTION_DELEGATE(strcpy, __strcpy_aarch64_mte)
-FUNCTION_DELEGATE(strlen, __strlen_aarch64_mte)
-FUNCTION_DELEGATE(strrchr, __strrchr_aarch64_mte)
-FUNCTION_DELEGATE(strncmp, __strncmp_aarch64_mte)
-FUNCTION_DELEGATE(memcpy, memcpy_generic)
-FUNCTION_DELEGATE(memmove, memmove_generic)
+ENTRY(__memcpy)
+  #include "memcpy_base.S"
+END(__memcpy)
 
 NOTE_GNU_PROPERTY()

@@ -915,6 +915,9 @@ cc_library_static {
                 "arch-arm64/generic/bionic/memmove.S",
                 "arch-arm64/generic/bionic/memset.S",
                 "arch-arm64/generic/bionic/wmemmove.S",
+                "arch-arm64/kryo785/bionic/__memcpy.S",
+                "arch-arm64/kryo785/bionic/memcpy.S",
+                "arch-arm64/kryo785/bionic/memmove.S",
 
                 "arch-arm64/bionic/__bionic_clone.S",
                 "arch-arm64/bionic/_exit_with_stack_teardown.S",
