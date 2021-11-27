@@ -1982,6 +1982,7 @@ cc_library {
         "bionic/new.cpp",
     ],
     name: "libstdc++",
+    vendor_available: true,
     static_ndk_lib: true,
     static_libs: ["libasync_safe"],
 
