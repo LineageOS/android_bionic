@@ -16,6 +16,24 @@
       "message": "https://review.lineageos.org/c/LineageOS/android_bionic/+/286301\nPlease give it the correct authorship.",
       "revId": "d83c5947dd6f0e6c3719e1322913463b846d8763",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9993cdae_6f2190a0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19867
+      },
+      "writtenOn": "2021-11-27T07:09:50Z",
+      "side": 1,
+      "message": "oh sorry I didn\u0027t saw that commit I found the issue while compiling so done the changes and pushed it.",
+      "parentUuid": "1cbe716f_9e55489a",
+      "revId": "d83c5947dd6f0e6c3719e1322913463b846d8763",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
     }
   ]
 }
