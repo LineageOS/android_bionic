@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b82a2f85_c0334407",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 13648
+      },
+      "writtenOn": "2021-11-27T08:09:20Z",
+      "side": 1,
+      "message": "That\u0027s not how it should be done. Pick the original change and abandon this one.",
+      "revId": "eefa017663d16f00bb0e3a3436505faae6df6357",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    }
+  ]
+}
