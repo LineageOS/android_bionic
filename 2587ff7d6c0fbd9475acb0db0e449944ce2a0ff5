@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9dac76d_2400f50f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 20370
+      },
+      "writtenOn": "2022-01-01T18:04:30Z",
+      "side": 1,
+      "message": "Needed for payton to fix:\nvndksupport: Could not load /vendor/lib/hw/camera.sdm660.so from default namespace: dlopen failed: library \"libstdc++.so\" not found: needed by /vendor/lib/libdualcameraddm.so in namespace (default).\n\n",
+      "revId": "2587ff7d6c0fbd9475acb0db0e449944ce2a0ff5",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    }
+  ]
+}
