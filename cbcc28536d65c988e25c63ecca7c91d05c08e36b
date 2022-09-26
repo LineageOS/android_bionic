@@ -34,6 +34,23 @@
       "parentUuid": "725abed4_9d80afc5",
       "revId": "cbcc28536d65c988e25c63ecca7c91d05c08e36b",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f647e97a_a32627e8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 14048
+      },
+      "writtenOn": "2022-09-26T22:27:42Z",
+      "side": 1,
+      "message": "Verified on tegra, works for keymaster shim.",
+      "revId": "cbcc28536d65c988e25c63ecca7c91d05c08e36b",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
     }
   ]
 }
