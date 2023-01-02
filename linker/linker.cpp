@@ -2373,7 +2373,7 @@ bool do_dlsym(void* handle,
     return false;
   }
 
-  DL_SYM_ERR("undefined symbol: %s", symbol_display_name(sym_name, sym_ver).c_str());
+  DL_ERR_AND_LOG("undefined symbol: %s", symbol_display_name(sym_name, sym_ver).c_str());
   return false;
 }
 
