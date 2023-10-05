@@ -2059,7 +2059,7 @@ cc_library_headers {
 // libstdc++.so and libstdc++.a.
 // ========================================================
 
-cc_library {
+cc_defaults {
     defaults: ["libc_defaults"],
     include_dirs: ["bionic/libstdc++/include"],
     srcs: [
@@ -2067,10 +2067,9 @@ cc_library {
         "bionic/__cxa_pure_virtual.cpp",
         "bionic/new.cpp",
     ],
-    name: "libstdc++",
+    name: "libstdc++_defaults",
     static_ndk_lib: true,
     static_libs: ["libasync_safe"],
-    vendor_available: true,
 
     static: {
         system_shared_libs: [],
@@ -2106,6 +2105,17 @@ cc_library {
             version_script: ":libstdc++.x86_64.map",
         },
     },
+}
+
+cc_library {
+    name: "libstdc++",
+    defaults: ["libstdc++_defaults"],
+}
+
+cc_library_shared {
+    name: "libstdc++_vendor",
+    defaults: ["libstdc++_defaults"],
+    vendor: true,
 }
 
 genrule {
