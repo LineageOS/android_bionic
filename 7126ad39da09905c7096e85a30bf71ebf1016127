@@ -16,6 +16,23 @@
       "message": "moto 8998 relies on this and stuff works fine.",
       "revId": "7126ad39da09905c7096e85a30bf71ebf1016127",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6553f4ba_99b142d9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 16185
+      },
+      "writtenOn": "2023-11-14T19:43:11Z",
+      "side": 1,
+      "message": "eh, dep is tangled in the build/ chain\n\nGot the \"it works\" when we\u0027re ready to push that.",
+      "revId": "7126ad39da09905c7096e85a30bf71ebf1016127",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
     }
   ]
 }
