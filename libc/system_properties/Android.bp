@@ -17,6 +17,7 @@ cc_library_static {
         "contexts_split.cpp",
         "contexts_serialized.cpp",
         "prop_area.cpp",
+        "prop_imitation_hooks.cpp",
         "prop_info.cpp",
         "system_properties.cpp",
     ],

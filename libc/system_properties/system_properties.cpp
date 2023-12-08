@@ -46,6 +46,7 @@
 #include "system_properties/context_node.h"
 #include "system_properties/prop_area.h"
 #include "system_properties/prop_info.h"
+#include "system_properties/prop_imitation_hooks.h"
 
 #define SERIAL_DIRTY(serial) ((serial)&1)
 #define SERIAL_VALUE_LEN(serial) ((serial) >> 24)
@@ -57,6 +58,8 @@ static bool is_dir(const char* pathname) {
   }
   return S_ISDIR(info.st_mode);
 }
+
+static PropImitationHooks pi_hooks;
 
 bool SystemProperties::Init(const char* filename) {
   // This is called from __libc_init_common, and should leave errno at 0 (http://b/37248982).
@@ -126,6 +129,8 @@ const prop_info* SystemProperties::Find(const char* name) {
   if (!initialized_) {
     return nullptr;
   }
+
+  pi_hooks.OnFind(&name);
 
   prop_area* pa = contexts_->GetPropAreaForName(name);
   if (!pa) {
