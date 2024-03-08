@@ -1,42 +1,15 @@
-/****************************************************************************
- ****************************************************************************
- ***
- ***   This header was automatically generated from a Linux kernel header
- ***   of the same name, to make information necessary for userspace to
- ***   call into the kernel available to libc.  It contains only constants,
- ***   structures, and macros generated from the original header, and thus,
- ***   contains no copyrightable information.
- ***
- ***   To edit the content of this header, modify the corresponding
- ***   source file (e.g. under external/kernel-headers/original/) then
- ***   run bionic/libc/kernel/tools/update_all.py
- ***
- ***   Any manual change here will be lost the next time this script will
- ***   be run. You've been warned!
- ***
- ****************************************************************************
- ****************************************************************************/
+/*
+ * This file is auto-generated. Modifications will be lost.
+ *
+ * See https://android.googlesource.com/platform/bionic/+/master/libc/kernel/
+ * for more information.
+ */
 #ifndef _UAPI_LINUX_TCP_H
 #define _UAPI_LINUX_TCP_H
+#include <bits/tcphdr.h>
 #include <linux/types.h>
 #include <asm/byteorder.h>
 #include <linux/socket.h>
-struct tcphdr {
-  __be16 source;
-  __be16 dest;
-  __be32 seq;
-  __be32 ack_seq;
-#ifdef __LITTLE_ENDIAN_BITFIELD
-  __u16 res1 : 4, doff : 4, fin : 1, syn : 1, rst : 1, psh : 1, ack : 1, urg : 1, ece : 1, cwr : 1;
-#elif defined(__BIG_ENDIAN_BITFIELD)
-  __u16 doff : 4, res1 : 4, cwr : 1, ece : 1, urg : 1, ack : 1, psh : 1, rst : 1, syn : 1, fin : 1;
-#else
-#error "Adjust your <asm/byteorder.h> defines"
-#endif
-  __be16 window;
-  __sum16 check;
-  __be16 urg_ptr;
-};
 union tcp_word_hdr {
   struct tcphdr hdr;
   __be32 words[5];
@@ -229,7 +202,7 @@ enum {
 #define TCP_MD5SIG_FLAG_PREFIX 0x1
 #define TCP_MD5SIG_FLAG_IFINDEX 0x2
 struct tcp_md5sig {
-  struct __kernel_sockaddr_storage tcpm_addr;
+  struct sockaddr_storage tcpm_addr;
   __u8 tcpm_flags;
   __u8 tcpm_prefixlen;
   __u16 tcpm_keylen;

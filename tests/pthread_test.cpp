@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <sys/cdefs.h>
 #include <sys/mman.h>
+#include <sys/param.h>
 #include <sys/prctl.h>
 #include <sys/resource.h>
 #include <sys/syscall.h>
@@ -585,7 +586,7 @@ TEST(pthread, pthread_kill__exited_thread) {
   while (TEMP_FAILURE_RETRY(syscall(__NR_tgkill, getpid(), tid, 0)) != -1) {
     continue;
   }
-  ASSERT_EQ(ESRCH, errno);
+  ASSERT_ERRNO(ESRCH);
 
   ASSERT_EQ(ESRCH, pthread_kill(thread, 0));
 }
@@ -784,7 +785,7 @@ TEST(pthread, pthread_attr_setguardsize_tiny) {
   size_t guard_size;
   ASSERT_EQ(0, pthread_attr_getguardsize(&attributes, &guard_size));
   ASSERT_EQ(128U, guard_size);
-  ASSERT_EQ(4096U, GetActualGuardSize(attributes));
+  ASSERT_EQ(static_cast<unsigned long>(getpagesize()), GetActualGuardSize(attributes));
 }
 
 TEST(pthread, pthread_attr_setguardsize_reasonable) {
@@ -808,7 +809,7 @@ TEST(pthread, pthread_attr_setguardsize_needs_rounding) {
   size_t guard_size;
   ASSERT_EQ(0, pthread_attr_getguardsize(&attributes, &guard_size));
   ASSERT_EQ(32*1024U + 1, guard_size);
-  ASSERT_EQ(36*1024U, GetActualGuardSize(attributes));
+  ASSERT_EQ(roundup(32 * 1024U + 1, getpagesize()), GetActualGuardSize(attributes));
 }
 
 TEST(pthread, pthread_attr_setguardsize_enormous) {

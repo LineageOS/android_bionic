@@ -36,8 +36,9 @@
 
 #include <async_safe/log.h>
 
-#include "private/bionic_defs.h"
+#include "platform/bionic/page.h"
 #include "private/ErrnoRestorer.h"
+#include "private/bionic_defs.h"
 #include "pthread_internal.h"
 
 __BIONIC_WEAK_FOR_NATIVE_BRIDGE
@@ -143,10 +144,10 @@ int pthread_attr_getstacksize(const pthread_attr_t* attr, size_t* stack_size) {
 
 __BIONIC_WEAK_FOR_NATIVE_BRIDGE
 int pthread_attr_setstack(pthread_attr_t* attr, void* stack_base, size_t stack_size) {
-  if ((stack_size & (PAGE_SIZE - 1) || stack_size < PTHREAD_STACK_MIN)) {
+  if ((stack_size & (page_size() - 1) || stack_size < PTHREAD_STACK_MIN)) {
     return EINVAL;
   }
-  if (reinterpret_cast<uintptr_t>(stack_base) & (PAGE_SIZE - 1)) {
+  if (reinterpret_cast<uintptr_t>(stack_base) & (page_size() - 1)) {
     return EINVAL;
   }
   attr->stack_base = stack_base;
@@ -157,12 +158,12 @@ int pthread_attr_setstack(pthread_attr_t* attr, void* stack_base, size_t stack_s
 static uintptr_t __get_main_stack_startstack() {
   FILE* fp = fopen("/proc/self/stat", "re");
   if (fp == nullptr) {
-    async_safe_fatal("couldn't open /proc/self/stat: %s", strerror(errno));
+    async_safe_fatal("couldn't open /proc/self/stat: %m");
   }
 
   char line[BUFSIZ];
   if (fgets(line, sizeof(line), fp) == nullptr) {
-    async_safe_fatal("couldn't read /proc/self/stat: %s", strerror(errno));
+    async_safe_fatal("couldn't read /proc/self/stat: %m");
   }
 
   fclose(fp);
@@ -204,7 +205,7 @@ static int __pthread_attr_getstack_main_thread(void** stack_base, size_t* stack_
   // Hunt for the region that contains that address.
   FILE* fp = fopen("/proc/self/maps", "re");
   if (fp == nullptr) {
-    async_safe_fatal("couldn't open /proc/self/maps: %s", strerror(errno));
+    async_safe_fatal("couldn't open /proc/self/maps: %m");
   }
   char line[BUFSIZ];
   while (fgets(line, sizeof(line), fp) != nullptr) {
@@ -218,7 +219,7 @@ static int __pthread_attr_getstack_main_thread(void** stack_base, size_t* stack_
       }
     }
   }
-  async_safe_fatal("Stack not found in /proc/self/maps");
+  async_safe_fatal("stack not found in /proc/self/maps");
 }
 
 __BIONIC_WEAK_FOR_NATIVE_BRIDGE

@@ -1,21 +1,9 @@
-/****************************************************************************
- ****************************************************************************
- ***
- ***   This header was automatically generated from a Linux kernel header
- ***   of the same name, to make information necessary for userspace to
- ***   call into the kernel available to libc.  It contains only constants,
- ***   structures, and macros generated from the original header, and thus,
- ***   contains no copyrightable information.
- ***
- ***   To edit the content of this header, modify the corresponding
- ***   source file (e.g. under external/kernel-headers/original/) then
- ***   run bionic/libc/kernel/tools/update_all.py
- ***
- ***   Any manual change here will be lost the next time this script will
- ***   be run. You've been warned!
- ***
- ****************************************************************************
- ****************************************************************************/
+/*
+ * This file is auto-generated. Modifications will be lost.
+ *
+ * See https://android.googlesource.com/platform/bionic/+/master/libc/kernel/
+ * for more information.
+ */
 #ifndef _UAPI_MPTCP_H
 #define _UAPI_MPTCP_H
 #include <netinet/in.h>
@@ -114,6 +102,11 @@ struct mptcp_info {
   __u8 mptcpi_local_addr_used;
   __u8 mptcpi_local_addr_max;
   __u8 mptcpi_csum_enabled;
+  __u32 mptcpi_retransmits;
+  __u64 mptcpi_bytes_retrans;
+  __u64 mptcpi_bytes_sent;
+  __u64 mptcpi_bytes_received;
+  __u64 mptcpi_bytes_acked;
 };
 enum mptcp_event_type {
   MPTCP_EVENT_UNSPEC = 0,
@@ -170,16 +163,32 @@ struct mptcp_subflow_addrs {
     struct sockaddr sa_local;
     struct sockaddr_in sin_local;
     struct sockaddr_in6 sin6_local;
-    struct __kernel_sockaddr_storage ss_local;
+    struct sockaddr_storage ss_local;
   };
   union {
     struct sockaddr sa_remote;
     struct sockaddr_in sin_remote;
     struct sockaddr_in6 sin6_remote;
-    struct __kernel_sockaddr_storage ss_remote;
+    struct sockaddr_storage ss_remote;
   };
+};
+struct mptcp_subflow_info {
+  __u32 id;
+  struct mptcp_subflow_addrs addrs;
+};
+struct mptcp_full_info {
+  __u32 size_tcpinfo_kernel;
+  __u32 size_tcpinfo_user;
+  __u32 size_sfinfo_kernel;
+  __u32 size_sfinfo_user;
+  __u32 num_subflows;
+  __u32 size_arrays_user;
+  __aligned_u64 subflow_info;
+  __aligned_u64 tcp_info;
+  struct mptcp_info mptcp_info;
 };
 #define MPTCP_INFO 1
 #define MPTCP_TCPINFO 2
 #define MPTCP_SUBFLOW_ADDRS 3
+#define MPTCP_FULL_INFO 4
 #endif

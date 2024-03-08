@@ -1,21 +1,9 @@
-/****************************************************************************
- ****************************************************************************
- ***
- ***   This header was automatically generated from a Linux kernel header
- ***   of the same name, to make information necessary for userspace to
- ***   call into the kernel available to libc.  It contains only constants,
- ***   structures, and macros generated from the original header, and thus,
- ***   contains no copyrightable information.
- ***
- ***   To edit the content of this header, modify the corresponding
- ***   source file (e.g. under external/kernel-headers/original/) then
- ***   run bionic/libc/kernel/tools/update_all.py
- ***
- ***   Any manual change here will be lost the next time this script will
- ***   be run. You've been warned!
- ***
- ****************************************************************************
- ****************************************************************************/
+/*
+ * This file is auto-generated. Modifications will be lost.
+ *
+ * See https://android.googlesource.com/platform/bionic/+/master/libc/kernel/
+ * for more information.
+ */
 #ifndef HNS_ABI_USER_H
 #define HNS_ABI_USER_H
 #include <linux/types.h>
@@ -62,9 +50,13 @@ struct hns_roce_ib_create_qp_resp {
 };
 enum {
   HNS_ROCE_EXSGE_FLAGS = 1 << 0,
+  HNS_ROCE_RQ_INLINE_FLAGS = 1 << 1,
+  HNS_ROCE_CQE_INLINE_FLAGS = 1 << 2,
 };
 enum {
   HNS_ROCE_RSP_EXSGE_FLAGS = 1 << 0,
+  HNS_ROCE_RSP_RQ_INLINE_FLAGS = 1 << 1,
+  HNS_ROCE_RSP_CQE_INLINE_FLAGS = 1 << 2,
 };
 struct hns_roce_ib_alloc_ucontext_resp {
   __u32 qp_tab_size;

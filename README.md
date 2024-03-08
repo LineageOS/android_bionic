@@ -48,7 +48,9 @@ jump to `fopen(3)`, say, it lands in the right place).
 #### tests/ --- unit tests
 
 The `tests/` directory contains unit tests. Roughly arranged as one file per
-publicly-exported header file.
+publicly-exported header file. `tests/headers/` contains compile-only tests
+that just check that things are _in_ the headers, whereas the "real" tests
+check actual _behavior_.
 
 #### benchmarks/ --- benchmarks
 
@@ -132,9 +134,9 @@ libc/
   tzcode/
     # A modified superset of the IANA tzcode. Most of the modifications relate
     # to Android's use of a single file (with corresponding index) to contain
-    # time zone data.
+    # timezone data.
   zoneinfo/
-    # Android-format time zone data.
+    # Android-format timezone data.
     # See 'Updating tzdata' later.
 ```
 
@@ -286,14 +288,14 @@ As mentioned above, this is currently a two-step process:
 
 Note that if you're actually just trying to expose device-specific headers to
 build your device drivers, you shouldn't modify bionic. Instead use
-`TARGET_DEVICE_KERNEL_HEADERS` and friends described in [config.mk](https://android.googlesource.com/platform/build/+/master/core/config.mk#186).
+`TARGET_DEVICE_KERNEL_HEADERS` and friends described in [config.mk](https://android.googlesource.com/platform/build/+/main/core/config.mk#186).
 
 
 ## Updating tzdata
 
 This is handled by the libcore team, because they own icu, and that needs to be
 updated in sync with bionic). See
-[system/timezone/README.android](https://android.googlesource.com/platform/system/timezone/+/master/README.android).
+[system/timezone/README.android](https://android.googlesource.com/platform/system/timezone/+/main/README.android).
 
 
 ## Verifying changes
@@ -371,6 +373,19 @@ just the behavior we think is correct), it is possible to run the tests against
 the host's glibc.
 
     $ ./tests/run-on-host.sh glibc
+
+### Against musl
+
+Another way to verify test behavior is to run against musl on the host. glibc
+musl don't always match, so this can be a good way to find the more complicated
+corners of the spec. If they *do* match, bionic probably should too!
+
+    $ OUT_DIR=$(ANDROID_BUILD_TOP)/musl-out ./tests/run-on-host.sh musl
+
+Note: the alternate OUT_DIR is used to avoid causing excessive rebuilding when
+switching between glibc and musl. The first musl test run will be expensive
+because it will not reuse any already built artifacts, but subsequent runs will
+be cheaper than if you hadn't used it.
 
 ## Gathering test coverage
 

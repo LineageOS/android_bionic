@@ -172,6 +172,7 @@ filegroup {
     srcs: [
         "dlfcn.cpp",
         "linker.cpp",
+        "linker_auxv.cpp",
         "linker_block_allocator.cpp",
         "linker_dlwarning.cpp",
         "linker_cfi.cpp",
@@ -500,10 +501,6 @@ cc_library {
         "//apex_available:platform",
         "com.android.runtime",
     ],
-
-    lto: {
-        never: true,
-    },
 }
 
 cc_test {

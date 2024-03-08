@@ -60,6 +60,9 @@
 #if defined(__NR_brk)
   #define SYS_brk __NR_brk
 #endif
+#if defined(__NR_cachestat)
+  #define SYS_cachestat __NR_cachestat
+#endif
 #if defined(__NR_capget)
   #define SYS_capget __NR_capget
 #endif
@@ -218,6 +221,9 @@
 #endif
 #if defined(__NR_fchmodat)
   #define SYS_fchmodat __NR_fchmodat
+#endif
+#if defined(__NR_fchmodat2)
+  #define SYS_fchmodat2 __NR_fchmodat2
 #endif
 #if defined(__NR_fchown)
   #define SYS_fchown __NR_fchown
@@ -570,6 +576,9 @@
 #if defined(__NR_madvise)
   #define SYS_madvise __NR_madvise
 #endif
+#if defined(__NR_map_shadow_stack)
+  #define SYS_map_shadow_stack __NR_map_shadow_stack
+#endif
 #if defined(__NR_mbind)
   #define SYS_mbind __NR_mbind
 #endif
@@ -905,6 +914,12 @@
 #endif
 #if defined(__NR_restart_syscall)
   #define SYS_restart_syscall __NR_restart_syscall
+#endif
+#if defined(__NR_riscv_flush_icache)
+  #define SYS_riscv_flush_icache __NR_riscv_flush_icache
+#endif
+#if defined(__NR_riscv_hwprobe)
+  #define SYS_riscv_hwprobe __NR_riscv_hwprobe
 #endif
 #if defined(__NR_rmdir)
   #define SYS_rmdir __NR_rmdir
