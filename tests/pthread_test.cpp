@@ -1423,10 +1423,11 @@ static int g_atfork_child_calls = 0;
 static void AtForkChild1() { g_atfork_child_calls = (g_atfork_child_calls * 10) + 1; }
 static void AtForkChild2() { g_atfork_child_calls = (g_atfork_child_calls * 10) + 2; }
 
-TEST(pthread, pthread_atfork_smoke) {
+TEST(pthread, pthread_atfork_smoke_fork) {
   ASSERT_EQ(0, pthread_atfork(AtForkPrepare1, AtForkParent1, AtForkChild1));
   ASSERT_EQ(0, pthread_atfork(AtForkPrepare2, AtForkParent2, AtForkChild2));
 
+  g_atfork_prepare_calls = g_atfork_parent_calls = g_atfork_child_calls = 0;
   pid_t pid = fork();
   ASSERT_NE(-1, pid) << strerror(errno);
 
@@ -1440,6 +1441,44 @@ TEST(pthread, pthread_atfork_smoke) {
   // Prepare calls are made in the reverse order.
   ASSERT_EQ(21, g_atfork_prepare_calls);
   AssertChildExited(pid, 0);
+}
+
+TEST(pthread, pthread_atfork_smoke_vfork) {
+  ASSERT_EQ(0, pthread_atfork(AtForkPrepare1, AtForkParent1, AtForkChild1));
+  ASSERT_EQ(0, pthread_atfork(AtForkPrepare2, AtForkParent2, AtForkChild2));
+
+  g_atfork_prepare_calls = g_atfork_parent_calls = g_atfork_child_calls = 0;
+  pid_t pid = vfork();
+  ASSERT_NE(-1, pid) << strerror(errno);
+
+  // atfork handlers are not called.
+  if (pid == 0) {
+    ASSERT_EQ(0, g_atfork_child_calls);
+    _exit(0);
+  }
+  ASSERT_EQ(0, g_atfork_parent_calls);
+  ASSERT_EQ(0, g_atfork_prepare_calls);
+  AssertChildExited(pid, 0);
+}
+
+TEST(pthread, pthread_atfork_smoke__Fork) {
+#if defined(__BIONIC__)
+  ASSERT_EQ(0, pthread_atfork(AtForkPrepare1, AtForkParent1, AtForkChild1));
+  ASSERT_EQ(0, pthread_atfork(AtForkPrepare2, AtForkParent2, AtForkChild2));
+
+  g_atfork_prepare_calls = g_atfork_parent_calls = g_atfork_child_calls = 0;
+  pid_t pid = _Fork();
+  ASSERT_NE(-1, pid) << strerror(errno);
+
+  // atfork handlers are not called.
+  if (pid == 0) {
+    ASSERT_EQ(0, g_atfork_child_calls);
+    _exit(0);
+  }
+  ASSERT_EQ(0, g_atfork_parent_calls);
+  ASSERT_EQ(0, g_atfork_prepare_calls);
+  AssertChildExited(pid, 0);
+#endif
 }
 
 TEST(pthread, pthread_attr_getscope) {
@@ -2398,6 +2437,20 @@ static void pthread_mutex_timedlock_helper(clockid_t clock,
   ts.tv_sec = -1;
   ASSERT_EQ(ETIMEDOUT, lock_function(&m, &ts));
 
+  // check we wait long enough for the lock.
+  ASSERT_EQ(0, clock_gettime(clock, &ts));
+  const int64_t start_ns = ts.tv_sec * NS_PER_S + ts.tv_nsec;
+
+  // add a second to get deadline.
+  ts.tv_sec += 1;
+
+  ASSERT_EQ(ETIMEDOUT, lock_function(&m, &ts));
+
+  // The timedlock must have waited at least 1 second before returning.
+  clock_gettime(clock, &ts);
+  const int64_t end_ns = ts.tv_sec * NS_PER_S + ts.tv_nsec;
+  ASSERT_GT(end_ns - start_ns, NS_PER_S);
+
   // If the mutex is unlocked, pthread_mutex_timedlock should succeed.
   ASSERT_EQ(0, pthread_mutex_unlock(&m));
 
@@ -2443,7 +2496,11 @@ static void pthread_mutex_timedlock_pi_helper(clockid_t clock,
 
   timespec ts;
   clock_gettime(clock, &ts);
+  const int64_t start_ns = ts.tv_sec * NS_PER_S + ts.tv_nsec;
+
+  // add a second to get deadline.
   ts.tv_sec += 1;
+
   ASSERT_EQ(0, lock_function(&m.lock, &ts));
 
   struct ThreadArgs {
@@ -2472,6 +2529,12 @@ static void pthread_mutex_timedlock_pi_helper(clockid_t clock,
   void* result;
   ASSERT_EQ(0, pthread_join(thread, &result));
   ASSERT_EQ(ETIMEDOUT, reinterpret_cast<intptr_t>(result));
+
+  // The timedlock must have waited at least 1 second before returning.
+  clock_gettime(clock, &ts);
+  const int64_t end_ns = ts.tv_sec * NS_PER_S + ts.tv_nsec;
+  ASSERT_GT(end_ns - start_ns, NS_PER_S);
+
   ASSERT_EQ(0, pthread_mutex_unlock(&m.lock));
 }
 
