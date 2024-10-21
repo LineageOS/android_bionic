@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f9bbff0_04fd0cbd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 14048
+      },
+      "writtenOn": "2024-10-21T02:31:02Z",
+      "side": 1,
+      "message": "Verified on foster. Necessary because patchelf breaks tegra prebuilts, presumably due to the dwarf debug symbols appended to them.",
+      "revId": "1781c2109dca66d93d469aadc4a4c7e267bb6031",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    }
+  ]
+}
