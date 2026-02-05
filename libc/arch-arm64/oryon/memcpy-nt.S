@@ -349,3 +349,4 @@ L(copy64_from_start_nt):
 
 END (__memcpy_aarch64_nt)
 
+NOTE_GNU_PROPERTY()

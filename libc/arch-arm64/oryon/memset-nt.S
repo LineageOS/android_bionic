@@ -224,3 +224,5 @@ ENTRY(__memset_aarch64_nt)
     b.ne   .Ltail_maybe_long
     ret
 END(__memset_aarch64_nt)
+
+NOTE_GNU_PROPERTY()
