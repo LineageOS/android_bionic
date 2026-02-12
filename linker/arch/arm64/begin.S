@@ -38,3 +38,5 @@ ENTRY(_start)
   // __linker_init returns the address of the entry point in the main image.
   br x0
 END(_start)
+
+NOTE_GNU_PROPERTY()

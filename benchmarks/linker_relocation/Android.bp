@@ -61,8 +61,23 @@ cc_benchmark {
 }
 
 cc_defaults {
+    name: "no_bti",
+    arch: {
+        arm64: {
+            // The generated .S files don't include the note,
+            // and the gen_bench.sh script doesn't work,
+            // so for now...
+            ldflags: ["-Wl,-z,bti-report=none"],
+        },
+    },
+}
+
+cc_defaults {
     name: "linker_reloc_bench_binary",
-    defaults: ["bionic_spawn_benchmark_targets"],
+    defaults: [
+        "bionic_spawn_benchmark_targets",
+        "no_bti",
+    ],
     header_libs: ["linker_reloc_bench_headers"],
     stl: "none",
     gtest: false,
@@ -80,7 +95,10 @@ cc_defaults {
 
 cc_defaults {
     name: "linker_reloc_bench_library",
-    defaults: ["bionic_spawn_benchmark_targets"],
+    defaults: [
+        "bionic_spawn_benchmark_targets",
+        "no_bti",
+    ],
     header_libs: ["linker_reloc_bench_headers"],
     stl: "none",
     gtest: false,

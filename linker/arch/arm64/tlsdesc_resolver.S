@@ -201,3 +201,5 @@ ENTRY_PRIVATE(tlsdesc_resolver_unresolved_weak)
   .cfi_restore x19
   ret
 END(tlsdesc_resolver_unresolved_weak)
+
+NOTE_GNU_PROPERTY()
