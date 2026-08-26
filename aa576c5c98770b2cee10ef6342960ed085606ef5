@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "43ce15ef_0541edba",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 16185
+      },
+      "writtenOn": "2026-08-26T20:53:52Z",
+      "side": 1,
+      "message": "still used by LGE 4.14/4.19 and mithorium 4.19 (this will likely be their last version, can assess dropping in 25.0)",
+      "revId": "aa576c5c98770b2cee10ef6342960ed085606ef5",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    }
+  ]
+}
